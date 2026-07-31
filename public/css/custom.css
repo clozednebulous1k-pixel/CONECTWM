@@ -290,3 +290,39 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
     display: block;
   }
 }
+
+/* Sequential Connect Cards Animation */
+@keyframes card-connect-pulse {
+  0%, 100% {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+  16.6% {
+    border-color: rgba(56, 189, 248, 0.6); /* baby blue neon */
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+  }
+  33.3% {
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  }
+}
+
+.connect-card {
+  animation: card-connect-pulse 9s infinite ease-in-out;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.connect-card:nth-child(1) { animation-delay: 0s; }
+.connect-card:nth-child(2) { animation-delay: 1.5s; }
+.connect-card:nth-child(3) { animation-delay: 3s; }
+.connect-card:nth-child(4) { animation-delay: 4.5s; }
+.connect-card:nth-child(5) { animation-delay: 6s; }
+.connect-card:nth-child(6) { animation-delay: 7.5s; }
+
+/* Override animation on hover so the card stays highlighted */
+.connect-card:hover {
+  animation-play-state: paused;
+  border-color: rgba(56, 189, 248, 0.8) !important;
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.5) !important;
+}
+
