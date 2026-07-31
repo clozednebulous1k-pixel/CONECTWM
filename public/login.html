@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar | conectWM 2.0</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            techblue: {
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            darkbg: '#0b0f17',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* Estilos extras específicos da tela de login para simular a PMG Academy */
+    .login-container {
+      min-height: 100vh;
+    }
+    .glow-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 75%);
+      filter: blur(40px);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .portrait-img {
+      mask-image: linear-gradient(to top, transparent 5%, black 40%);
+      -webkit-mask-image: linear-gradient(to top, transparent 5%, black 40%);
+      filter: grayscale(100%) contrast(1.3) brightness(0.6) sepia(100%) hue-rotate(170deg) saturate(350%);
+      transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .portrait-img:hover {
+      filter: grayscale(100%) contrast(1.4) brightness(0.7) sepia(100%) hue-rotate(170deg) saturate(380%);
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0f17] text-white font-sans antialiased overflow-x-hidden">
+
+  <div class="login-container flex flex-col lg:flex-row">
+    
+    <!-- 1. PAINEL ESQUERDO: Branding + Imagem do Instrutor/Membro (Oculto no Mobile) -->
+    <div class="hidden lg:flex lg:w-3/5 bg-[#070a0f] relative overflow-hidden flex-col justify-between p-12 border-r border-gray-900">
+      
+      <!-- Grid de fundo -->
+      <div class="grid-bg-overlay !mask-none !opacity-70"></div>
+      
+      <!-- Círculo de Brilho Neon (Azul Tech como a PMG Academy usa Verde) -->
+      <div class="glow-circle animate-pulse-soft"></div>
+
+      <!-- Top Header no Painel Esquerdo -->
+      <div class="z-10">
+        <a href="/" class="flex items-center gap-3 group">
+          <img src="/images/logo.png" alt="conectWM Logo" class="h-7 w-auto transition-transform duration-300 group-hover:scale-105">
+          <span class="text-xl font-bold tracking-wider font-outfit uppercase">
+            conect<span class="text-sky-400">WM</span>
+          </span>
+          <span class="h-1.5 w-1.5 rounded-full bg-sky-400"></span>
+        </a>
+      </div>
+
+      <!-- Centro: Logo conectWM 2.0 e Imagem Aleatória de Dev/AI -->
+      <div class="flex-1 flex items-center justify-center relative z-10 my-auto">
+        <!-- Logo Grande Traseiro -->
+        <div class="absolute left-10 text-left select-none pointer-events-none">
+          <h1 class="text-7xl font-black font-outfit tracking-tighter leading-none opacity-90">
+            conect<span class="text-sky-400 block drop-shadow-[0_0_20px_rgba(56,189,248,0.3)]">WM</span>
+            <span class="text-4xl text-gray-500 font-medium block mt-2">Academy 2.0</span>
+          </h1>
+        </div>
+
+        <!-- Imagem Aleatória com Máscara e Efeito Hover (Curated Professional Developer da Unsplash) -->
+        <div class="absolute bottom-0 right-10 w-[420px] h-[550px] flex items-end">
+          <!-- O link abaixo usa uma imagem profissional de desenvolvedora/empresária que simula perfeitamente o layout da PMG -->
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" 
+               alt="conectWM Leader" 
+               class="portrait-img w-full h-[95%] object-cover object-top">
+        </div>
+      </div>
+
+      <!-- Rodapé do Painel Esquerdo -->
+      <div class="z-10 flex justify-between items-center text-xs text-gray-600">
+        <span>Plataforma Oficial de Membros</span>
+        <span>conectwm.com.br</span>
+      </div>
+
+    </div>
+
+    <!-- 2. PAINEL DIREITO: Formulário de Login (Ocupa 100% no mobile e 2/5 no desktop) -->
+    <div class="flex-1 bg-[#0b0f17] flex flex-col justify-between p-8 sm:p-12 lg:p-16 relative z-10">
+      
+      <!-- Top header mobile -->
+      <div class="flex lg:hidden justify-between items-center mb-12">
+        <a href="/" class="text-xl font-bold tracking-wider font-outfit uppercase">
+          conect<span class="text-sky-400">WM</span>
+        </a>
+        <a href="/" class="text-xs text-gray-500 hover:text-white transition-colors">Voltar ao site</a>
+      </div>
+
+      <!-- Container do Formulário (Espaçador superior no desktop) -->
+      <div class="my-auto max-w-md w-full mx-auto space-y-8">
+        
+        <!-- Logo do Form (Pequeno) -->
+        <div class="text-center lg:text-left flex flex-col items-center lg:items-start space-y-2">
+          <div class="h-14 w-14 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
+            <i data-lucide="shield-check" class="h-8 w-8"></i>
+          </div>
+          <h2 class="text-2xl font-bold font-outfit mt-4 text-white">Acesse sua Conta</h2>
+          <p class="text-sm text-gray-400">Entre para gerenciar seus projetos e acessar a comunidade.</p>
+        </div>
+
+        <!-- Formulário -->
+        <form id="login-form" class="space-y-5">
+          
+          <!-- E-mail -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">E-mail</label>
+            <div class="relative">
+              <span class="absolute left-4 top-3.5 text-gray-500">
+                <i data-lucide="mail" class="h-5 w-5"></i>
+              </span>
+              <input type="email" id="login-email" required 
+                     class="input-focus-glow w-full bg-slate-950 border border-gray-800 rounded-xl pl-12 pr-4 py-3.5 text-sm text-white placeholder-gray-600 transition-all" 
+                     placeholder="Digite seu e-mail...">
+            </div>
+          </div>
+
+          <!-- Senha -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-semibold text-gray-400 uppercase">Senha</label>
+            </div>
+            <div class="relative">
+              <span class="absolute left-4 top-3.5 text-gray-500">
+                <i data-lucide="lock" class="h-5 w-5"></i>
+              </span>
+              <input type="password" id="login-password" required 
+                     class="input-focus-glow w-full bg-slate-950 border border-gray-800 rounded-xl pl-12 pr-12 py-3.5 text-sm text-white placeholder-gray-600 transition-all" 
+                     placeholder="Digite sua senha...">
+              
+              <!-- Toggle Senha -->
+              <button type="button" id="toggle-password-btn" class="absolute right-4 top-3.5 text-gray-500 hover:text-white transition-colors" aria-label="Mostrar senha">
+                <i data-lucide="eye" id="password-eye-icon" class="h-5 w-5"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lembrar-me e Esqueci Senha -->
+          <div class="flex items-center justify-between text-xs pt-1">
+            <label class="flex items-center gap-2 cursor-pointer select-none text-gray-400 hover:text-white transition-colors">
+              <input type="checkbox" id="remember-me" class="rounded border-gray-800 bg-slate-950 text-sky-400 focus:ring-sky-400 focus:ring-offset-slate-950">
+              <span>Lembrar-me</span>
+            </label>
+            <a href="#" class="text-sky-400 hover:underline">Esqueceu sua senha?</a>
+          </div>
+
+          <!-- Botões de Ação -->
+          <div class="space-y-3 pt-2">
+            <!-- Entrar -->
+            <button type="submit" class="w-full py-4 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all btn-glow-tech flex items-center justify-center gap-2 font-outfit">
+              <i data-lucide="log-in" class="h-4.5 w-4.5"></i>
+              <span>ENTRAR</span>
+            </button>
+
+            <!-- Criar Conta -->
+            <button type="button" class="w-full py-4 px-6 rounded-xl bg-transparent border border-gray-800 hover:border-gray-600 text-gray-300 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
+              <i data-lucide="user-plus" class="h-4.5 w-4.5"></i>
+              <span>CRIAR CONTA</span>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+      <!-- Rodapé Painel Direito -->
+      <div class="text-center text-xs text-gray-600 mt-8">
+        <span>© 2026 conectWM. Conexão e Inteligência Artificial.</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle Mostrar/Ocultar Senha
+      const passwordInput = document.getElementById('login-password');
+      const togglePasswordBtn = document.getElementById('toggle-password-btn');
+      const eyeIcon = document.getElementById('password-eye-icon');
+
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        
+        // Atualizar ícone
+        if (isPassword) {
+          eyeIcon.setAttribute('data-lucide', 'eye-off');
+        } else {
+          eyeIcon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+      });
+
+      // Submit do Login (simulação simples)
+      const form = document.getElementById('login-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        alert(`Login simulado com sucesso para: ${email}! Redirecionando para o painel de controle.`);
+        window.location.href = '/';
+      });
+
+      // Inicializa os ícones do Lucide
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { OpenAI } = require('openai');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Servir arquivos estáticos da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Inicializar cliente OpenAI se a chave estiver configurada
+let openai = null;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  console.log('🤖 OpenAI API configurada com sucesso.');
+} else {
+  console.log('⚠️ OpenAI API Key não configurada. O Chatbot usará o motor de fallback local.');
+}
+
+// ----------------------------------------------------
+// 1. ENDPOINT: DIAGNÓSTICO EMPRESARIAL (WEBHOOK CRM)
+// ----------------------------------------------------
+app.post('/api/diagnostico', async (req, res) => {
+  try {
+    const { name, email, whatsapp, companySize, challenge } = req.body;
+
+    // Validação simples
+    if (!name || !email || !whatsapp || !companySize || !challenge) {
+      return res.status(400).json({
+        success: false,
+        message: 'Todos os campos do formulário de diagnóstico são obrigatórios.',
+      });
+    }
+
+    console.log('\n--- Novo Diagnóstico de Automação Recebido ---');
+    console.log(`👤 Nome: ${name}`);
+    console.log(`📧 E-mail: ${email}`);
+    console.log(`📞 WhatsApp: ${whatsapp}`);
+    console.log(`🏢 Tamanho da Empresa: ${companySize}`);
+    console.log(`🎯 Desafio Principal: ${challenge}`);
+    console.log('--------------------------------------------\n');
+
+    // Simulação de envio para Webhook (ActiveCampaign, n8n, Make, etc.)
+    const webhookUrl = process.env.WEBHOOK_CRM_URL;
+    let webhookStatus = 'simulado_com_sucesso';
+
+    if (webhookUrl && webhookUrl.startsWith('http')) {
+      try {
+        console.log(`Enviando payload para webhook real: ${webhookUrl}`);
+        // Simulando a requisição real sem travar a resposta caso falhe
+        await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            origem: 'Landing Page conectWM',
+            data_envio: new Date().toISOString(),
+            lead: { name, email, whatsapp, companySize, challenge }
+          })
+        });
+        webhookStatus = 'enviado_real';
+      } catch (err) {
+        console.error('Erro ao enviar dados para webhook real:', err.message);
+        webhookStatus = 'erro_envio_real_fallback_local';
+      }
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Diagnóstico enviado com sucesso! Nossa equipe entrará em contato em até 24 horas no WhatsApp informado.',
+      webhookStatus
+    });
+
+  } catch (error) {
+    console.error('Erro no endpoint de diagnóstico:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Ocorreu um erro interno ao processar seu diagnóstico. Tente novamente mais tarde.',
+    });
+  }
+});
+
+// ----------------------------------------------------
+// 2. ENDPOINT: SIMULADOR DE CHECKOUT (COMUNIDADE)
+// ----------------------------------------------------
+app.post('/api/checkout', (req, res) => {
+  try {
+    const { email, type } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'E-mail é necessário para iniciar a simulação de checkout.',
+      });
+    }
+
+    console.log(`\n💳 Iniciando Simulação de Checkout para: ${email} (${type || 'Comunidade conectWM'})`);
+
+    // Criando um ID de transação simulada e link de checkout
+    const transactionId = 'tr_' + Math.random().toString(36).substring(2, 11).toUpperCase();
+    const mockCheckoutUrl = `/checkout-simulado.html?email=${encodeURIComponent(email)}&tr=${transactionId}&type=${encodeURIComponent(type || 'comunidade')}`;
+
+    return res.status(200).json({
+      success: true,
+      checkoutUrl: mockCheckoutUrl,
+      transactionId
+    });
+
+  } catch (error) {
+    console.error('Erro no endpoint de checkout:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao gerar sessão de checkout.',
+    });
+  }
+});
+
+// ----------------------------------------------------
+// 3. ENDPOINT: CHATBOT DE IA (CONECTWM ASSISTANT)
+// ----------------------------------------------------
+// Contexto institucional da conectWM que orienta a IA
+const SYSTEM_PROMPT = `
+Você é o assistente inteligente da conectWM. Seu objetivo é ajudar os visitantes a entenderem os serviços da empresa e as vantagens da comunidade.
+Seja sempre amigável, tecnológico, profissional e focado em conversão. Escreva respostas concisas, de no máximo 3 parágrafos curtos.
+
+Informações sobre a conectWM:
+1. O que é a conectWM?
+   É um ecossistema que atua em duas frentes: capacitação de pessoas para criarem softwares/SaaS usando IA (Comunidade conectWM) e automação inteligente de processos para empresas (Diagnóstico e Consultoria).
+2. Comunidade conectWM (Alunos/Criadores):
+   - O que ensina: Desenvolvimento Full-Stack auxiliado por IA (Prompt Engineering, Cursor, Copilot, No-Code/Low-Code), criação de Sites, Web Apps, MicroSaaS, estratégias de monetização, validação de ideias, tráfego pago/orgânico, kits e templates prontos.
+   - Suporte: Acesso a grupo exclusivo de networking no WhatsApp e canal de suporte contínuo para dúvidas de código e arquitetura.
+   - Preço simulado: R$ 47/mês ou R$ 497 anual (o usuário pode clicar em "Entrar na Comunidade" para ver o simulador de checkout).
+3. Diagnóstico de Automação (Empresas/Empresários):
+   - O que fazemos: Analisamos processos manuais repetitivos das empresas e implementamos automações completas, como agentes inteligentes de atendimento 24/7 (WhatsApp, site), integração de sistemas (CRMs, planilhas, ERPs) e automação de funis de vendas.
+   - Diagnóstico Gratuito: O empresário preenche o formulário na página de diagnóstico e nossa equipe analisa os gargalos de graça, desenhando uma solução sob medida.
+4. Programação:
+   - Não é necessário saber programar para começar na comunidade! Ensinamos como domar as IAs para gerarem o código de forma simples e rápida, mesmo do zero absolute.
+
+Instruções importantes:
+- Sempre incentive o usuário a:
+  * Escolher o caminho de Aluno/Criador clicando em "Quero Entrar na Comunidade" ou interagindo no card 1.
+  * Escolher o caminho de Empresa preenchendo o formulário de "Diagnóstico Gratuito" no site.
+- Se o usuário perguntar algo fora do contexto da conectWM ou de tecnologia/IA/automação, responda educadamente puxando o assunto de volta para como a conectWM pode ajudá-lo na criação de software ou automação de processos.
+`;
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { messages } = req.body;
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'A lista de mensagens está vazia ou é inválida.',
+      });
+    }
+
+    const lastUserMessage = messages[messages.length - 1].content;
+    console.log(`\n💬 Mensagem recebida no chat: "${lastUserMessage}"`);
+
+    // --- Caso 1: OpenAI Configurada ---
+    if (openai) {
+      try {
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...messages
+          ],
+          temperature: 0.7,
+          max_tokens: 400
+        });
+
+        const reply = response.choices[0].message.content;
+        console.log(`🤖 Resposta OpenAI: "${reply.substring(0, 60)}..."`);
+        return res.status(200).json({
+          success: true,
+          reply: reply
+        });
+      } catch (err) {
+        console.error('Falha ao chamar OpenAI API, utilizando fallback local:', err.message);
+      }
+    }
+
+    // --- Caso 2: Fallback Local Inteligente (Sem chave OpenAI ou se houver falha) ---
+    const reply = getFallbackResponse(lastUserMessage);
+    console.log(`🤖 Resposta Fallback: "${reply.substring(0, 60)}..."`);
+    return res.status(200).json({
+      success: true,
+      reply: reply
+    });
+
+  } catch (error) {
+    console.error('Erro no endpoint de chat:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro interno ao processar a mensagem no chatbot.',
+    });
+  }
+});
+
+// Mecanismo simples de correspondência de intenções para o bot de fallback
+function getFallbackResponse(message) {
+  const text = message.toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, ''); // Remover acentos
+
+  if (text.includes('comunidade') || text.includes('aluno') || text.includes('aprender') || text.includes('curso') || text.includes('escola') || text.includes('ensina') || text.includes('conteudo')) {
+    return `Na **Comunidade conectWM**, você aprende a criar sites, aplicativos e SaaS (softwares como serviço) usando Inteligência Artificial como sua copiloto. 
+
+O conteúdo inclui:
+• Desenvolvimento Full-Stack auxiliado por IA (Copilot, Cursor, prompts).
+• Criação de sites, Web Apps e Microsaas de alta qualidade.
+• Monetização, marketing digital, tráfego pago e validação de ideias.
+• Kits e templates prontos para você acelerar seus projetos.
+• Grupo exclusivo de WhatsApp para suporte e networking.
+
+Deseja começar a criar seus próprios projetos? Clique no botão **"Quero Entrar na Comunidade"** na barra de navegação ou no Card 1 para simular sua entrada!`;
+  }
+
+  if (text.includes('empresa') || text.includes('negocio') || text.includes('automacao') || text.includes('diagnostico') || text.includes('processo') || text.includes('atendimento') || text.includes('crm')) {
+    return `Para empresas, a **conectWM** desenvolve projetos de automação de processos inteligentes e agentes de IA personalizados. 
+
+Nós ajudamos a estruturar:
+• Agentes inteligentes de atendimento 24 horas via WhatsApp e web.
+• Integrações complexas entre CRMs (Pipedrive, Hubspot), planilhas, ERPs e e-mails.
+• Automação de qualificação de leads e tarefas administrativas.
+
+Para descobrirmos os maiores gargalos do seu negócio, recomendo preencher o formulário na seção **"Diagnóstico para Empresas"** aqui mesmo na página. O diagnóstico inicial é **100% gratuito**!`;
+  }
+
+  if (text.includes('programar') || text.includes('codigo') || text.includes('programacao') || text.includes('dificil') || text.includes('saber programar') || text.includes('iniciante') || text.includes('zero')) {
+    return `Absolutamente **não precisa saber programar** para começar! 
+
+Hoje em dia, com o auxílio de Inteligências Artificiais modernas (como ChatGPT, Claude, Cursor e Copilot) e ferramentas Low-Code/No-Code, qualquer pessoa consegue traduzir suas ideias em código funcional. 
+
+Na comunidade, nós ensinamos o passo a passo de como "conversar" com a IA (Engenharia de Prompt) para que ela escreva a lógica do código, crie o banco de dados e resolva bugs para você. Você atua como o arquiteto/diretor do projeto!`;
+  }
+
+  if (text.includes('preco') || text.includes('valor') || text.includes('custo') || text.includes('pagamento') || text.includes('gratuito') || text.includes('gratis')) {
+    return `Temos dois caminhos principais:
+1. **Comunidade conectWM:** É uma assinatura de apenas R$ 47 por mês no plano mensal (ou R$ 497 anual). Oferece acesso completo a todos os módulos, kits de ferramentas, comunidade de WhatsApp e suporte técnico.
+2. **Diagnóstico para Empresas:** Este serviço inicial de análise de gargalos e desenho de solução de automação é **100% gratuito**. 
+
+Para se inscrever na comunidade ou solicitar o diagnóstico empresarial, utilize os botões e formulários disponíveis no corpo da nossa landing page!`;
+  }
+
+  if (text.includes('suporte') || text.includes('duvida') || text.includes('ajuda') || text.includes('whatsapp') || text.includes('grupo')) {
+    return `O suporte na **conectWM** é diferenciado! Nós oferecemos:
+• Canal de suporte direto para dúvidas técnicas sobre seus códigos e integrações na plataforma.
+• Grupo exclusivo de networking no **WhatsApp**, onde você pode interagir com outros desenvolvedores, empresários e especialistas da conectWM.
+• Respostas rápidas e acompanhamento personalizado para que você nunca fique travado no seu projeto.`;
+  }
+
+  if (text.includes('ola') || text.includes('oi') || text.includes('bom dia') || text.includes('boa tarde') || text.includes('boa noite') || text.includes('saudacao')) {
+    return `Olá! Seja muito bem-vindo à **conectWM**. 🤖✨
+
+Sou o assistente inteligente da plataforma. Como posso te ajudar hoje?
+• Se você quer aprender a criar apps e SaaS com IA, me pergunte sobre a **Comunidade**.
+• Se você tem uma empresa e quer automatizar tarefas repetitivas, pergunte sobre as nossas **Automações e Diagnóstico**.`;
+  }
+
+  // Resposta padrão caso não case com nenhuma intenção específica
+  return `Fico feliz em te ajudar! Como assistente da **conectWM**, estou pronto para te dar detalhes sobre duas frentes:
+1. **Comunidade conectWM:** Como pessoas comuns criam sites, apps e SaaS usando Inteligência Artificial do absoluto zero.
+2. **Automações de Processos:** Como empresas economizam tempo e dinheiro automatizando tarefas manuais e integrando sistemas.
+
+Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perguntar o que quiser, ou use os formulários e botões na página para interagir direto!`;
+}
+
+// Rota de fallback para servir o index.html em qualquer rota desconhecida
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Inicializar Servidor
+app.listen(PORT, () => {
+  console.log(`\n🚀 Servidor conectWM rodando na porta ${PORT}`);
+  console.log(`🔗 Acesse localmente em: http://localhost:${PORT}`);
+});

@@ -1,0 +1,283 @@
+/* 
+  conectWM - Custom Premium CSS Stylesheet
+  Estilos complementares ao Tailwind CSS para efeitos visuais avançados, neon e glassmorphism.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-tech-blue: #38bdf8;
+  --color-tech-blue-glow: rgba(56, 189, 248, 0.4);
+  --color-tech-blue-dark: #0284c7;
+  --color-bg-dark: #0b0f17;
+  --color-bg-card: rgba(17, 24, 39, 0.7);
+  --font-title: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-dark);
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .font-outfit {
+  font-family: var(--font-title);
+}
+
+/* 1. FUTURISTIC BACKGROUND GRID */
+.grid-bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: center center;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial Glows */
+.radial-glow-top {
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(50px);
+}
+
+.radial-glow-section {
+  background: radial-gradient(circle at 80% 50%, rgba(56, 189, 248, 0.08) 0%, transparent 50%);
+}
+
+/* 2. GLASSMORPHISM CARD */
+.glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 10px 40px -10px rgba(56, 189, 248, 0.2);
+  transform: translateY(-4px);
+}
+
+/* 3. GLOWING BUTTONS & INPUTS */
+.btn-glow-tech {
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-glow-tech:hover {
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
+  transform: scale(1.02);
+}
+
+.input-focus-glow:focus {
+  outline: none;
+  border-color: var(--color-tech-blue);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+/* 4. CHATBOT FLOATING PANEL GLOW */
+.chat-window-glow {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+
+/* 5. MICRO-ANIMATIONS */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.98); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* 6. GRADIENT TEXT AND BADGES */
+.gradient-text-tech {
+  background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-text-full {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 50%, #ffffff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-tech-blue-dark);
+}
+
+/* FAQ Accordion Transitions */
+.faq-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+}
+
+.faq-item.active .faq-content {
+  max-height: 250px; /* Altere se as respostas forem muito longas */
+  padding-top: 1rem;
+}
+
+.faq-chevron {
+  transition: transform 0.3s ease;
+}
+
+.faq-item.active .faq-chevron {
+  transform: rotate(180deg);
+  color: var(--color-tech-blue);
+}
+
+/* Custom Loader Animation */
+.loader-spinner {
+  border: 3px solid rgba(56, 189, 248, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid var(--color-tech-blue);
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Chat bubble styling */
+.chat-bubble-user {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  border-bottom-right-radius: 2px;
+}
+
+.chat-bubble-bot {
+  background: rgba(30, 41, 59, 0.7);
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom-left-radius: 2px;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Tall Module Cards Styling */
+.module-card {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.module-card:hover {
+  border-color: #38bdf8 !important; /* Borda neon azul bebê */
+  box-shadow: 0 0 25px rgba(56, 189, 248, 0.45) !important; /* Brilho de contorno */
+}
+
+.module-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, #0b0f17 10%, rgba(11, 15, 23, 0.6) 40%, transparent 100%);
+  z-index: 2;
+  transition: opacity 0.5s ease;
+}
+
+.module-card:hover::after {
+  background: linear-gradient(to top, #0b0f17 12%, rgba(11, 15, 23, 0.5) 42%, transparent 100%);
+}
+
+/* Monochrome Blue Tech Image Effect */
+.bg-tech-glow-blue {
+  background-color: #03243f; /* Deep baby blue-navy background */
+}
+
+.monochrome-blue {
+  filter: grayscale(100%) contrast(1.35) brightness(0.5) saturate(0);
+  mix-blend-mode: luminosity;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.module-card:hover .monochrome-blue {
+  filter: grayscale(100%) contrast(1.5) brightness(0.7) saturate(0);
+}
+
+/* Carousel Edges Blur Overlay */
+.carousel-blur-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  background: linear-gradient(to right, #0b0f17 15%, rgba(11, 15, 23, 0.45) 55%, transparent 100%);
+  pointer-events: none;
+  z-index: 20;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.carousel-blur-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  background: linear-gradient(to left, #0b0f17 15%, rgba(11, 15, 23, 0.45) 55%, transparent 100%);
+  pointer-events: none;
+  z-index: 20;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}

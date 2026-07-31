@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulação de Checkout | conectWM</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            techblue: {
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+            },
+            darkbg: '#0b0f17',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0b0f17] text-white font-sans antialiased relative min-h-screen flex items-center justify-center py-12 px-4">
+  <div class="grid-bg-overlay"></div>
+
+  <div class="max-w-4xl w-full z-10">
+    <!-- Header/Logo Checkout -->
+    <div class="text-center mb-8 flex items-center justify-center gap-3">
+      <img src="/images/logo.png" alt="conectWM Logo" class="h-8 w-auto">
+      <span class="text-2xl font-black tracking-wider uppercase font-outfit">
+        conect<span class="text-sky-400">WM</span> <span class="text-gray-600 text-lg font-normal">| Checkout Seguro</span>
+      </span>
+    </div>
+
+    <!-- Main Container -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 bg-slate-950/80 backdrop-blur-md border border-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl relative">
+      
+      <!-- Lado Esquerdo: Detalhes do Pedido -->
+      <div class="md:col-span-5 border-b md:border-b-0 md:border-r border-gray-800 pb-6 md:pb-0 md:pr-8 flex flex-col justify-between">
+        <div>
+          <span class="text-xs text-sky-400 font-bold uppercase tracking-wider">Você está adquirindo:</span>
+          <h2 id="plan-title" class="text-2xl font-bold font-outfit mt-1 mb-4">Comunidade conectWM</h2>
+          
+          <div class="space-y-4 text-sm text-gray-400 mb-8">
+            <p>Acesso completo ao ecossistema de aprendizado de IA e Desenvolvimento Low-Code/No-Code.</p>
+            <div class="flex items-center gap-2">
+              <i data-lucide="check-circle" class="h-4.5 w-4.5 text-sky-400"></i>
+              <span>Cursos e Engenharia de Prompt</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="check-circle" class="h-4.5 w-4.5 text-sky-400"></i>
+              <span>Grupo VIP de Networking</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i data-lucide="check-circle" class="h-4.5 w-4.5 text-sky-400"></i>
+              <span>Templates e Suporte de código</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preço Total -->
+        <div class="pt-6 border-t border-gray-800">
+          <div class="flex justify-between items-end">
+            <div>
+              <span class="text-xs text-gray-500 block">Formato de Assinatura</span>
+              <span id="plan-billing" class="text-sm font-semibold text-gray-300">Mensal</span>
+            </div>
+            <div class="text-right">
+              <span id="plan-price" class="text-3xl font-black font-outfit text-sky-400">R$ 47,00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lado Direito: Método de Pagamento -->
+      <div class="md:col-span-7 md:pl-4 space-y-6">
+        
+        <!-- Tabs de Pagamento -->
+        <div class="flex border-b border-gray-800">
+          <button id="tab-pix" class="flex-1 pb-3 text-center border-b-2 border-sky-400 text-sky-400 font-bold text-sm flex items-center justify-center gap-2">
+            <i data-lucide="qr-code" class="h-4 w-4"></i>
+            <span>Pagar via PIX</span>
+          </button>
+          <button id="tab-card" class="flex-1 pb-3 text-center border-b-2 border-transparent text-gray-500 hover:text-white transition-all font-bold text-sm flex items-center justify-center gap-2">
+            <i data-lucide="credit-card" class="h-4 w-4"></i>
+            <span>Cartão de Crédito</span>
+          </button>
+        </div>
+
+        <!-- Formulários de Pagamento -->
+        <div class="space-y-4">
+          <!-- Info comprador -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">E-mail do Comprador</label>
+            <input type="email" id="buyer-email" readonly class="w-full bg-slate-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-gray-400 cursor-not-allowed" value="email@teste.com">
+          </div>
+
+          <!-- SEÇÃO PIX -->
+          <div id="payment-pix" class="space-y-4">
+            <div class="bg-sky-500/5 border border-sky-500/20 rounded-2xl p-4 text-center">
+              <p class="text-xs text-sky-400 mb-3 font-semibold">Gere seu PIX no botão abaixo. O acesso é liberado instantaneamente.</p>
+              
+              <!-- Simulação do QR Code (só aparece após gerar) -->
+              <div id="pix-qr-container" class="hidden flex-col items-center justify-center py-4 space-y-4 animate-float">
+                <div class="bg-white p-3 rounded-2xl inline-block">
+                  <!-- QR Code Fictício usando SVG para alta fidelidade -->
+                  <svg width="150" height="150" viewBox="0 0 100 100" class="text-black">
+                    <rect width="100" height="100" fill="white"/>
+                    <rect x="10" y="10" width="20" height="20" fill="black"/>
+                    <rect x="15" y="15" width="10" height="10" fill="white"/>
+                    <rect x="70" y="10" width="20" height="20" fill="black"/>
+                    <rect x="75" y="15" width="10" height="10" fill="white"/>
+                    <rect x="10" y="70" width="20" height="20" fill="black"/>
+                    <rect x="15" y="75" width="10" height="10" fill="white"/>
+                    <!-- Pontos aleatórios do QR -->
+                    <rect x="40" y="20" width="10" height="10" fill="black"/>
+                    <rect x="50" y="40" width="10" height="10" fill="black"/>
+                    <rect x="30" y="50" width="15" height="15" fill="black"/>
+                    <rect x="55" y="60" width="20" height="10" fill="black"/>
+                    <rect x="80" y="80" width="10" height="10" fill="black"/>
+                  </svg>
+                </div>
+                <div class="w-full">
+                  <span class="text-xs text-gray-500 block mb-1">Copia e Cola PIX</span>
+                  <input type="text" readonly value="00020126580014BR.GOV.BCB.PIX0136conectwm-pix-ficticio-12345" class="w-full text-center bg-slate-900 border border-gray-800 rounded-lg py-2 px-3 text-xs text-gray-300">
+                </div>
+              </div>
+
+              <button id="generate-pix-btn" class="py-3 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all w-full flex items-center justify-center gap-2 font-outfit">
+                <span>Gerar QR Code PIX</span>
+                <i data-lucide="zap" class="h-4 w-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- SEÇÃO CARTÃO DE CRÉDITO -->
+          <div id="payment-card" class="hidden space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Nome no Cartão</label>
+              <input type="text" placeholder="JOÃO S SILVA" class="w-full bg-slate-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-700">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Número do Cartão</label>
+              <div class="relative">
+                <input type="text" placeholder="4444 4444 4444 4444" class="w-full bg-slate-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-700">
+                <div class="absolute right-4 top-3 text-gray-600">
+                  <i data-lucide="credit-card" class="h-5 w-5"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Validade</label>
+                <input type="text" placeholder="MM/AA" class="w-full bg-slate-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-700">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">CVV</label>
+                <input type="text" placeholder="123" class="w-full bg-slate-900 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-700">
+              </div>
+            </div>
+
+            <button id="pay-card-btn" class="py-4 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all w-full flex items-center justify-center gap-2 font-outfit btn-glow-tech">
+              <span>Finalizar Pagamento de R$ 47,00</span>
+              <i data-lucide="lock" class="h-4 w-4"></i>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Link para voltar -->
+    <div class="text-center mt-6">
+      <a href="/" class="text-xs text-gray-500 hover:text-white transition-colors inline-flex items-center gap-1.5">
+        <i data-lucide="arrow-left" class="h-3.5 w-3.5"></i>
+        <span>Voltar para a Landing Page</span>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- Modal de Sucesso Completo -->
+  <div id="payment-success-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/85 backdrop-blur-md p-4">
+    <div class="glass-card max-w-xl w-full rounded-3xl p-8 border border-sky-500/20 text-center relative space-y-6">
+      <div class="mx-auto h-20 w-20 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 border border-green-500/20">
+        <i data-lucide="badge-check" class="h-12 w-12"></i>
+      </div>
+
+      <div class="space-y-2">
+        <span class="text-xs text-sky-400 font-extrabold uppercase tracking-widest">Inscrição Confirmada!</span>
+        <h3 class="text-3xl font-black font-outfit">Seja bem-vindo à conectWM!</h3>
+        <p class="text-gray-400 text-sm max-w-md mx-auto">
+          Seu pagamento simulado foi aprovado com sucesso! Aqui estão as instruções para acessar todo o conteúdo.
+        </p>
+      </div>
+
+      <div class="bg-slate-900 border border-gray-800 rounded-2xl p-6 text-left space-y-4">
+        <div class="flex gap-4">
+          <div class="h-10 w-10 rounded-lg bg-green-500/15 text-green-400 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="message-circle" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Entrar no Grupo de Networking</h4>
+            <p class="text-xs text-gray-400">Clique para se juntar aos outros alunos no canal restrito do WhatsApp.</p>
+            <a href="https://chat.whatsapp.com/mock-group-conectwm" target="_blank" class="inline-flex items-center gap-1 text-xs text-sky-400 font-bold mt-1.5 hover:underline">
+              <span>Acessar WhatsApp</span>
+              <i data-lucide="external-link" class="h-3 w-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="flex gap-4 border-t border-gray-800/60 pt-4">
+          <div class="h-10 w-10 rounded-lg bg-sky-500/15 text-sky-400 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="folder-git" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-white text-sm">Kit de Prompts & Templates</h4>
+            <p class="text-xs text-gray-400">Acesse e clone os repositórios base para iniciar seus projetos de IA e Web Apps.</p>
+            <a href="#" class="inline-flex items-center gap-1 text-xs text-sky-400 font-bold mt-1.5 hover:underline">
+              <span>Baixar Templates</span>
+              <i data-lucide="download" class="h-3 w-3"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <a href="/" class="inline-block w-full py-4 px-6 rounded-xl bg-white hover:bg-gray-100 text-slate-950 font-black transition-all">
+        Concluir e Voltar ao Início
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // Lógica simples do checkout
+    document.addEventListener('DOMContentLoaded', () => {
+      // Ler parâmetros da URL
+      const params = new URLSearchParams(window.location.search);
+      const email = params.get('email') || 'email@teste.com';
+      const plan = params.get('type') || 'comunidade_mensal';
+
+      document.getElementById('buyer-email').value = email;
+
+      const planTitle = document.getElementById('plan-title');
+      const planBilling = document.getElementById('plan-billing');
+      const planPrice = document.getElementById('plan-price');
+      const payCardBtn = document.getElementById('pay-card-btn');
+
+      if (plan === 'comunidade_anual') {
+        planTitle.innerText = 'Comunidade conectWM - Anual';
+        planBilling.innerText = 'Cobrado Anualmente';
+        planPrice.innerText = 'R$ 497,00';
+        if (payCardBtn) payCardBtn.innerText = 'Finalizar Pagamento de R$ 497,00';
+      } else {
+        planTitle.innerText = 'Comunidade conectWM - Mensal';
+        planBilling.innerText = 'Cobrado Mensalmente';
+        planPrice.innerText = 'R$ 47,00';
+        if (payCardBtn) payCardBtn.innerText = 'Finalizar Pagamento de R$ 47,00';
+      }
+
+      // Alternar Abas (PIX vs Cartão)
+      const tabPix = document.getElementById('tab-pix');
+      const tabCard = document.getElementById('tab-card');
+      const payPixSection = document.getElementById('payment-pix');
+      const payCardSection = document.getElementById('payment-card');
+
+      tabPix.addEventListener('click', () => {
+        tabPix.className = "flex-1 pb-3 text-center border-b-2 border-sky-400 text-sky-400 font-bold text-sm flex items-center justify-center gap-2";
+        tabCard.className = "flex-1 pb-3 text-center border-b-2 border-transparent text-gray-500 hover:text-white transition-all font-bold text-sm flex items-center justify-center gap-2";
+        payPixSection.classList.remove('hidden');
+        payCardSection.classList.add('hidden');
+      });
+
+      tabCard.addEventListener('click', () => {
+        tabCard.className = "flex-1 pb-3 text-center border-b-2 border-sky-400 text-sky-400 font-bold text-sm flex items-center justify-center gap-2";
+        tabPix.className = "flex-1 pb-3 text-center border-b-2 border-transparent text-gray-500 hover:text-white transition-all font-bold text-sm flex items-center justify-center gap-2";
+        payCardSection.classList.remove('hidden');
+        payPixSection.classList.add('hidden');
+      });
+
+      // Gerar QR Code PIX
+      const generatePixBtn = document.getElementById('generate-pix-btn');
+      const qrContainer = document.getElementById('pix-qr-container');
+
+      generatePixBtn.addEventListener('click', () => {
+        qrContainer.classList.remove('hidden');
+        qrContainer.classList.add('flex');
+        generatePixBtn.innerHTML = `
+          <div class="flex items-center justify-center gap-2">
+            <div class="loader-spinner !border-slate-950 !border-t-sky-400"></div>
+            <span>Aguardando Confirmação de Pagamento...</span>
+          </div>
+        `;
+        generatePixBtn.disabled = true;
+
+        // Simular aprovação do PIX após 4 segundos
+        setTimeout(() => {
+          showSuccessModal();
+        }, 4000);
+      });
+
+      // Botão Pagar Cartão
+      if (payCardBtn) {
+        payCardBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          payCardBtn.disabled = true;
+          payCardBtn.innerHTML = `
+            <div class="flex items-center justify-center gap-2">
+              <div class="loader-spinner !border-slate-950 !border-t-sky-400"></div>
+              <span>Processando Cartão...</span>
+            </div>
+          `;
+          
+          // Simular aprovação após 2 segundos
+          setTimeout(() => {
+            showSuccessModal();
+          }, 2000);
+        });
+      }
+
+      function showSuccessModal() {
+        const successModal = document.getElementById('payment-success-modal');
+        if (successModal) {
+          successModal.classList.remove('hidden');
+          successModal.classList.add('flex');
+        }
+      }
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
