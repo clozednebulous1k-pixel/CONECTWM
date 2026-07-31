@@ -81,6 +81,16 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
 .btn-glow-tech {
   box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
   transition: all 0.3s ease;
+  animation: btn-text-glow-loop 2s infinite ease-in-out;
+}
+
+@keyframes btn-text-glow-loop {
+  0%, 100% {
+    text-shadow: 0 0 0px transparent;
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(56, 189, 248, 0.6);
+  }
 }
 
 .btn-glow-tech:hover {
@@ -162,6 +172,7 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
 .faq-item.active .faq-content {
   max-height: 250px; /* Altere se as respostas forem muito longas */
   padding-top: 1rem;
+  padding-bottom: 1.5rem;
 }
 
 .faq-chevron {
