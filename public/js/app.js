@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initChatbot();
   initModulesCarousel();
   initWhatsAppContactForm();
+  initScrollNavbar();
 });
 
 // ----------------------------------------------------
@@ -469,6 +470,24 @@ function initWhatsAppContactForm() {
         }
       }
     });
+  }
+}
+
+// ----------------------------------------------------
+// 9. NAVBAR SCROLL EFFECT
+// ----------------------------------------------------
+function initScrollNavbar() {
+  const header = document.querySelector('header');
+  if (header) {
+    const handleScroll = () => {
+      if (window.scrollY >= 50) {
+        header.classList.add('nav-scrolled');
+      } else {
+        header.classList.remove('nav-scrolled');
+      }
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll);
   }
 }
 
