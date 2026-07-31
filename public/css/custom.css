@@ -255,42 +255,6 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
   filter: grayscale(100%) contrast(1.5) brightness(0.7) saturate(0);
 }
 
-/* Carousel Edges Blur Overlay */
-.carousel-blur-left {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 90px;
-  background: linear-gradient(to right, #0b0f17 15%, rgba(11, 15, 23, 0.45) 55%, transparent 100%);
-  pointer-events: none;
-  z-index: 20;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: none; /* Hide on mobile to prevent blocking text */
-}
-
-.carousel-blur-right {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 90px;
-  background: linear-gradient(to left, #0b0f17 15%, rgba(11, 15, 23, 0.45) 55%, transparent 100%);
-  pointer-events: none;
-  z-index: 20;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: none; /* Hide on mobile to prevent blocking text */
-}
-
-@media (min-width: 768px) {
-  .carousel-blur-left,
-  .carousel-blur-right {
-    display: block;
-  }
-}
-
 /* Sequential Connect Cards Animation */
 @keyframes card-connect-pulse {
   0%, 100% {
