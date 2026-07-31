@@ -275,6 +275,19 @@ Sou o assistente inteligente da plataforma. Como posso te ajudar hoje?
 Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perguntar o que quiser, ou use os formulários e botões na página para interagir direto!`;
 }
 
+// Rotas limpas para servir as páginas principais
+app.get('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/checkout-simulado', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'checkout-simulado.html'));
+});
+
 // Rota de fallback para servir o index.html em qualquer rota desconhecida
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

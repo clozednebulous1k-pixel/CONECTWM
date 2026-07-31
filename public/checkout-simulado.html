@@ -333,6 +333,16 @@
         if (successModal) {
           successModal.classList.remove('hidden');
           successModal.classList.add('flex');
+          // Salvar email no localStorage para simular status de pagante
+          try {
+            const purchasedEmails = JSON.parse(localStorage.getItem('conectwm_purchased_emails') || '[]');
+            if (!purchasedEmails.includes(email)) {
+              purchasedEmails.push(email);
+              localStorage.setItem('conectwm_purchased_emails', JSON.stringify(purchasedEmails));
+            }
+          } catch (err) {
+            console.error('Erro ao salvar no localStorage:', err);
+          }
         }
       }
 

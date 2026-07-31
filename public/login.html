@@ -228,9 +228,33 @@
       const form = document.getElementById('login-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        alert(`Login simulado com sucesso para: ${email}! Redirecionando para o painel de controle.`);
-        window.location.href = '/';
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        // 1. Verificar credencial padrão do aluno pagante
+        if (email === 'aluno@conectwm.com.br' && password === '123') {
+          localStorage.setItem('conectwm_logged_in_user', email);
+          localStorage.setItem('conectwm_user_is_paying', 'true');
+          alert('Login efetuado com sucesso! Redirecionando para a sua área de membros.');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+
+        // 2. Verificar se o e-mail concluiu a compra simulada no localStorage
+        try {
+          const purchasedEmails = JSON.parse(localStorage.getItem('conectwm_purchased_emails') || '[]');
+          if (purchasedEmails.includes(email)) {
+            localStorage.setItem('conectwm_logged_in_user', email);
+            localStorage.setItem('conectwm_user_is_paying', 'true');
+            alert('Login efetuado com sucesso! Redirecionando para a sua área de membros.');
+            window.location.href = '/dashboard.html';
+          } else {
+            alert('Esta conta não possui uma assinatura ativa da conectWM. Por favor, acesse a Landing Page e conclua a inscrição/simulação de pagamento.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ocorreu um erro ao processar o login local. Tente a conta padrão (aluno@conectwm.com.br / 123).');
+        }
       });
 
       // Inicializa os ícones do Lucide
