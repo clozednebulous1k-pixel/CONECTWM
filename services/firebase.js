@@ -1,5 +1,6 @@
 const crypto = require('crypto');
-const admin = require('firebase-admin');
+const { initializeApp, getApps, getApp, cert } = require('firebase-admin/app');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 let db = null;
 let enabled = false;
@@ -103,7 +104,6 @@ function buildServiceAccountFromEnv() {
 }
 
 function resetFirebaseApps() {
-  // Evita delete() assíncrono que pode quebrar cold starts na Vercel
   db = null;
   enabled = false;
 }
@@ -123,7 +123,7 @@ function initFirebase() {
   try {
     lastInitStep = 'initializeApp';
 
-    if (admin.apps.length === 0) {
+    if (getApps().length === 0) {
       let serviceAccount = null;
 
       if (json) {
@@ -142,15 +142,14 @@ function initFirebase() {
         throw new Error('Credenciais Firebase incompletas. Verifique PROJECT_ID, CLIENT_EMAIL e PRIVATE_KEY.');
       }
 
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
+      initializeApp({
+        credential: cert(serviceAccount),
         projectId: serviceAccount.project_id || projectId,
       });
     }
 
     lastInitStep = 'firestore';
-    const app = admin.apps[0] || admin.app();
-    db = admin.firestore(app);
+    db = getFirestore(getApp());
     enabled = true;
     lastInitError = null;
     console.log('🔥 Firebase Firestore conectado com sucesso.');
@@ -203,7 +202,7 @@ function getFirebaseStatus() {
 }
 
 function serverTimestamp() {
-  return admin.firestore.FieldValue.serverTimestamp();
+  return FieldValue.serverTimestamp();
 }
 
 module.exports = {
@@ -212,5 +211,4 @@ module.exports = {
   isFirebaseEnabled,
   getFirebaseStatus,
   serverTimestamp,
-  admin,
 };
