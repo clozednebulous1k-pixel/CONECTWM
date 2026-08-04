@@ -1,6 +1,7 @@
 // conectWM Academy - Dashboard Script
 
-// 1. DADOS DOS MÓDULOS E AULASconst modulesData = [
+// 1. DADOS DOS MÓDULOS E AULAS
+const modulesData = [
   {
     id: 1,
     title: "Criando um SaaS",
@@ -273,20 +274,18 @@
   }
 ];
 
-// 2. VERIFICAÇÃO DE AUTENTICAÇÃO
+// 2. ACESSO ABERTO AO DASHBOARD (demo / preview)
 function checkAuth() {
-  const loggedUser = localStorage.getItem('conectwm_logged_in_user');
-  const isPaying = localStorage.getItem('conectwm_user_is_paying');
+  let loggedUser = localStorage.getItem('conectwm_logged_in_user');
+  if (!loggedUser) {
+    loggedUser = 'visitante@conectwm.com.br';
+    localStorage.setItem('conectwm_logged_in_user', loggedUser);
+    localStorage.setItem('conectwm_user_is_paying', 'true');
+  }
 
-  if (!loggedUser || isPaying !== 'true') {
-    alert("Acesso restrito! Por favor, faça login com uma conta ativa.");
-    window.location.href = "/login.html";
-  } else {
-    // Exibir e-mail logado no perfil
-    const userEmailEl = document.getElementById('user-email');
-    if (userEmailEl) {
-      userEmailEl.innerText = loggedUser;
-    }
+  const userEmailEl = document.getElementById('user-email');
+  if (userEmailEl) {
+    userEmailEl.innerText = loggedUser;
   }
 }
 
@@ -294,7 +293,7 @@ function checkAuth() {
 function handleLogout() {
   localStorage.removeItem('conectwm_logged_in_user');
   localStorage.removeItem('conectwm_user_is_paying');
-  window.location.href = "/login.html";
+  window.location.href = "/";
 }
 
 // 4. CONTROLE DE NAVEGAÇÃO ENTRE ABAS
@@ -309,11 +308,11 @@ function initNavigation() {
 
       // Atualizar classes ativas no menu lateral
       navItems.forEach(nav => {
-        nav.classList.remove('bg-sky-500/10', 'text-sky-400', 'border-l-4', 'border-sky-400');
-        nav.classList.add('text-gray-400');
+        nav.classList.remove('text-sky-400', 'border-sky-400');
+        nav.classList.add('text-gray-400', 'border-transparent');
       });
-      item.classList.add('bg-sky-500/10', 'text-sky-400', 'border-l-4', 'border-sky-400');
-      item.classList.remove('text-gray-400');
+      item.classList.add('text-sky-400', 'border-sky-400');
+      item.classList.remove('text-gray-400', 'border-transparent');
 
       // Mostrar apenas a seção alvo
       sections.forEach(sec => {
@@ -600,7 +599,443 @@ function initLessonProgress() {
   }
 }
 
-// 11. INICIALIZAÇÃO GERAL DO PAINEL
+// 11. DADOS DAS DICAS DE SEGURANÇA E PROMPTS APPSEC
+const securityTipsData = [
+  {
+    id: 1,
+    title: "Vazamento de Credenciais (.env)",
+    icon: "eye-off",
+    desc: "Nunca submeta arquivos .env ou segredos hardcoded no Git. Use variáveis de ambiente injetadas de forma segura no runtime.",
+    prompt: "Analise o código a seguir e procure por chaves de API brutas (hardcoded) ou variáveis sensíveis expostas. Forneça o código corrigido usando process.env."
+  },
+  {
+    id: 2,
+    title: "SQL Injection (SQLi)",
+    icon: "database",
+    desc: "Evite concatenar variáveis de entrada diretamente em strings SQL. Sempre use prepared statements ou ORMs como Prisma/Sequelize.",
+    prompt: "Verifique se o seguinte código contém vulnerabilidade de injeção de SQL. Se sim, reescreva-o usando Prepared Statements ou parametrização segura."
+  },
+  {
+    id: 3,
+    title: "CORS Permissivo",
+    icon: "lock",
+    desc: "Não configure CORS com o curinga '*'. Restrinja as origens de API apenas ao seu domínio confiável em produção.",
+    prompt: "Examine as configurações de CORS deste código. Reescreva a política para restringir o acesso apenas a domínios autorizados e prevenir requisições não autorizadas."
+  },
+  {
+    id: 4,
+    title: "Falta de Rate Limiting",
+    icon: "zap",
+    desc: "Endpoints sem limite de taxa são suscetíveis a ataques DDoS e ataques de força bruta, além de estouro de faturamento de APIs.",
+    prompt: "Identifique se os endpoints deste código Express.js possuem Rate Limiting. Escreva um middleware limitador de requisições para proteger as rotas contra spam."
+  },
+  {
+    id: 5,
+    title: "Cross-Site Scripting (XSS)",
+    icon: "code",
+    desc: "Sanitize todas as entradas de usuário antes de renderizá-las no navegador para evitar injeção de scripts maliciosos.",
+    prompt: "Analise o código em busca de falhas de XSS na renderização de entradas do usuário. Mostre como sanitizar os inputs usando bibliotecas como DOMPurify ou escaping correto."
+  },
+  {
+    id: 6,
+    title: "Cross-Site Request Forgery (CSRF)",
+    icon: "shield",
+    desc: "Proteja rotas POST/PUT de alteração de estado contra requisições indesejadas vindas de outras abas utilizando cookies SameSite e tokens CSRF.",
+    prompt: "Verifique se o código protege contra ataques CSRF nas rotas de escrita (POST/PUT). Escreva uma implementação com tokens CSRF e cookies seguros."
+  },
+  {
+    id: 7,
+    title: "Armazenamento Inseguro de JWT",
+    icon: "key",
+    desc: "Não guarde tokens JWT no localStorage. Prefira Cookies seguros com as flags httpOnly, secure e SameSite=Strict.",
+    prompt: "Avalie como o token JWT está sendo enviado e armazenado nesta autenticação. Forneça a promoção do token para cookies protegidos com httpOnly."
+  },
+  {
+    id: 8,
+    title: "Validação Incompleta de Payload",
+    icon: "check-square",
+    desc: "Sempre valide os formatos, tipos e tamanhos de inputs no backend utilizando bibliotecas como Zod, Joi ou Yup.",
+    prompt: "Analise os objetos de entrada recebidos nas rotas e reescreva a validação utilizando um validador de schema estruturado como Zod ou Joi."
+  },
+  {
+    id: 9,
+    title: "Vazamento de Stack Traces",
+    icon: "alert-triangle",
+    desc: "Retornar o stack trace bruto do backend expõe detalhes internos do servidor. Trate erros e retorne mensagens amigáveis.",
+    prompt: "Examine os blocos catch e middlewares de tratamento de erro do código. Ajuste-os para não expor stack traces detalhados e retornar apenas mensagens amigáveis genéricas."
+  },
+  {
+    id: 10,
+    title: "Broken Object Level Authorization (IDOR)",
+    icon: "users",
+    desc: "Nunca confie que o usuário logado só enviará IDs pertencentes a ele nas requisições. Valide a titularidade no banco de dados.",
+    prompt: "Verifique se este código possui vulnerabilidade IDOR, onde IDs de recursos são alterados sem validação de propriedade. Ajuste o middleware para checar a titularidade do recurso."
+  },
+  {
+    id: 11,
+    title: "Dependências Vulneráveis",
+    icon: "package",
+    desc: "Mantenha pacotes npm sempre atualizados e audite as dependências de segurança periodicamente com npm audit.",
+    prompt: "Forneça as melhores práticas e comandos de auditoria para identificar e corrigir pacotes vulneráveis no package.json deste projeto."
+  },
+  {
+    id: 12,
+    title: "Senhas em Texto Claro",
+    icon: "key",
+    desc: "Nunca salve senhas limpas. Sempre criptografe antes de armazená-las no banco usando funções robustas com salt, como bcrypt.",
+    prompt: "Analise o processo de registro e login de usuários deste código. Substitua criptografias fracas pela biblioteca bcrypt ou argon2 com salt adequado."
+  },
+  {
+    id: 13,
+    title: "Injeção de Comando no OS (RCE)",
+    icon: "terminal",
+    desc: "Evite funções como child_process.exec ou eval passando entradas diretas de usuários, pois permitem invasão total do servidor.",
+    prompt: "Examine se há funções exec, eval, ou child_process executando strings baseadas em inputs de usuários. Reescreva o fluxo sem executar comandos do sistema."
+  },
+  {
+    id: 14,
+    title: "Uploads de Arquivos Inseguros",
+    icon: "upload-cloud",
+    desc: "Limite o tamanho do arquivo, valide a extensão por whitelist e o tipo MIME real. Salve arquivos fora da raiz pública de execução.",
+    prompt: "Audite esta lógica de upload de arquivos. Adicione validação de extensão por whitelist, validação de MIME type real e salve os arquivos fora da pasta pública executável."
+  },
+  {
+    id: 15,
+    title: "Ausência do Middleware Helmet",
+    icon: "shield-alert",
+    desc: "Use o middleware Helmet no Express para injetar automaticamente cabeçalhos fundamentais de segurança HTTP (como CSP, X-Frame-Options).",
+    prompt: "Ajuste esta aplicação Express adicionando middlewares como Helmet para configurar cabeçalhos de segurança (CSP, HSTS, X-Content-Type-Options)."
+  },
+  {
+    id: 16,
+    title: "Dados Sensíveis Não Cifrados",
+    icon: "lock",
+    desc: "Dados confidenciais como CPFs, documentos ou cartões devem ser encriptados no banco de dados com algoritmos simétricos como AES-256.",
+    prompt: "Proponha a implementação de criptografia simétrica AES-256 no banco de dados para campos de dados sensíveis antes de salvá-los no modelo."
+  },
+  {
+    id: 17,
+    title: "Sessões e Cookies Vulneráveis",
+    icon: "cookie",
+    desc: "Configure cookies de sessão com atributos de segurança rígidos e tempo de expiração curto para evitar ataques de Session Hijacking.",
+    prompt: "Avalie a configuração do express-session ou cookie-parser deste código e configure os cookies de sessão de forma restrita (Secure, HttpOnly, SameSite, Max-Age)."
+  },
+  {
+    id: 18,
+    title: "Exposição Excessiva na API",
+    icon: "file-warning",
+    desc: "Remova propriedades privadas do banco (como senhas hash e segredos de token) dos objetos JSON antes de retornar nas APIs.",
+    prompt: "Reescreva a rota de consulta a usuários para garantir que propriedades privadas (como password_hash) sejam deletadas do objeto antes do retorno JSON da API."
+  },
+  {
+    id: 19,
+    title: "Falta de Logs e Auditoria",
+    icon: "file-text",
+    desc: "Mantenha um log detalhado de ações administrativas críticas do sistema para permitir análise pós-incidente.",
+    prompt: "Crie uma estrutura simples de log de auditoria no Express que registra no arquivo de logs eventos críticos, contendo timestamp, IP, rota e ID do usuário autenticado."
+  },
+  {
+    id: 20,
+    title: "Privilégios de Sistema Excessivos",
+    icon: "activity",
+    desc: "Execute o processo NodeJS do backend sob um usuário do sistema sem privilégios administrativos (evite rodar como root/administrador).",
+    prompt: "Explique como auditar as permissões de arquivos e pastas no servidor Linux/Windows deste SaaS, garantindo que o processo web tenha privilégios mínimos."
+  },
+  {
+    id: 21,
+    title: "Redirecionamento Aberto (Open Redirect)",
+    icon: "link",
+    desc: "Evite redirecionar usuários para URLs externas dinâmicas vindas de parâmetros (como ?next=...) sem validá-las em uma whitelist.",
+    prompt: "Analise se este código possui redirecionamentos abertos (Open Redirect) baseados em entradas de query. Escreva uma checagem de domínio por whitelist para bloquear destinos externos maliciosos."
+  },
+  {
+    id: 22,
+    title: "Divulgação de Versão de Software",
+    icon: "info",
+    desc: "Omitir cabeçalhos padrão do servidor (como X-Powered-By ou Server) dificulta que atacantes identifiquem exploits específicos da versão.",
+    prompt: "Ajuste o servidor de forma a ocultar os cabeçalhos de assinatura do software (como X-Powered-By: Express ou Server: nginx) para mitigar fingerprinting."
+  },
+  {
+    id: 23,
+    title: "DNS com Política HSTS",
+    icon: "globe",
+    desc: "Habilite HSTS (HTTP Strict Transport Security) para forçar o navegador a usar conexões HTTPS em todas as comunicações com seu SaaS.",
+    prompt: "Proponha a configuração e cabeçalho do Strict-Transport-Security (HSTS) para o backend Node/Express, incluindo suporte a subdomínios e preload."
+  },
+  {
+    id: 24,
+    title: "Desativação de Contas Suspeitas",
+    icon: "user-x",
+    desc: "Implemente mecanismos automáticos de suspensão temporária para contas que apresentem múltiplos logins com falha ou atividades de spam.",
+    prompt: "Crie um algoritmo ou modelo de bloqueio temporário de usuário no banco de dados após 5 tentativas falhas de login (Account Lockout), com contador e timestamp de liberação."
+  },
+  {
+    id: 25,
+    title: "Redirecionamento HTTPS Forçado",
+    icon: "shield-check",
+    desc: "Force o redirecionamento automático de tráfego HTTP comum para HTTPS seguro na camada de servidor ou aplicação.",
+    prompt: "Escreva um middleware para Express.js que detecta se a requisição é HTTP comum e força o redirecionamento automático para HTTPS (enforce SSL)."
+  },
+  {
+    id: 26,
+    title: "Ataques de Deserialização Insegura",
+    icon: "refresh-cw",
+    desc: "Evite converter payloads brutos complexos (como arquivos binários serialized) de fontes não confiáveis em objetos em memória.",
+    prompt: "Analise se o código utiliza deserialização insegura de objetos (como funções JSON.parse abusadas, eval ou pacotes de serialização antigos). Corrija aplicando validação estrita."
+  },
+  {
+    id: 27,
+    title: "Broken Function Level Authorization (BFLA)",
+    icon: "user-check",
+    desc: "Valide se o usuário logado possui a role (permissão de cargo, como 'admin') antes de deixá-lo acessar endpoints de gerenciamento corporativo.",
+    prompt: "Escreva um middleware de controle de acesso baseado em papéis (RBAC) no Express que valida se o usuário possui a role necessária ('admin', 'editor') para a rota ativa."
+  },
+  {
+    id: 28,
+    title: "Ataques de Força Bruta (Senha e MFA)",
+    icon: "unlock",
+    desc: "Adicione delays lineares ou exponenciais após senhas incorretas sucessivas para travar a velocidade de ataques automatizados de dicionário.",
+    prompt: "Escreva uma lógica de atraso progressivo (linear delay) no endpoint de login após falhas sucessivas para inviabilizar ataques de força bruta rápidos."
+  },
+  {
+    id: 29,
+    title: "XML External Entity (XXE) Injection",
+    icon: "file-code",
+    desc: "Configure parseadores de XML no backend para desativar resoluções de entidades externas e evitar vazamento de arquivos locais do servidor.",
+    prompt: "Audite o parseador de XML deste código e reconfigure-o para desabilitar a resolução de DTD (Document Type Definition) e entidades externas (XXE)."
+  },
+  {
+    id: 30,
+    title: "Diretório Git Exposto (.git)",
+    icon: "git-branch",
+    desc: "Pastas .git expostas em servidores de produção permitem que invasores baixem todo o código-fonte da aplicação.",
+    prompt: "Explique como configurar o servidor web (Nginx/Apache) para bloquear o acesso público à pasta oculta .git e diretórios correlatos."
+  },
+  {
+    id: 31,
+    title: "Senhas Fracas no Cadastro",
+    icon: "shield-off",
+    desc: "Exija requisitos mínimos de senha (letras maiúsculas, minúsculas, números, caracteres especiais e tamanho) para barrar senhas óbvias.",
+    prompt: "Crie um script de validação de senha robusto usando Regex ou a biblioteca password-validator, garantindo que senhas fracas sejam barradas no registro de usuários."
+  },
+  {
+    id: 32,
+    title: "Server-Side Request Forgery (SSRF)",
+    icon: "send",
+    desc: "Nunca permita que a aplicação envie requisições HTTP para URLs dinâmicas informadas por usuários sem checar se pertencem a IPs internos privados.",
+    prompt: "Verifique se este código possui falha SSRF ao fazer requisições fetch baseadas em URLs fornecidas pelo cliente. Ajuste o código para barrar requisições para IPs de rede local (127.0.0.1, 10.0.0.0, etc.)."
+  },
+  {
+    id: 33,
+    title: "Metadados de Arquivos Enviados (Vazamento)",
+    icon: "image",
+    desc: "Remova metadados (como tags EXIF contendo geolocalização e modelo do celular) de imagens enviadas por usuários antes de salvá-las.",
+    prompt: "Escreva um script usando a biblioteca sharp ou similar para processar imagens enviadas via upload e remover metadados EXIF confidenciais antes do armazenamento definitivo."
+  },
+  {
+    id: 34,
+    title: "Configurações Padrão Inseguras",
+    icon: "settings",
+    desc: "Altere credenciais padrão de bancos de dados, portas padrão e caminhos administrativos conhecidos de ferramentas integradas.",
+    prompt: "Forneça um checklist de hardening de configuração e portas padrão (como mudar a porta default do Postgres ou Redis, desativar logs verbose, etc.)."
+  },
+  {
+    id: 35,
+    title: "Cache Inseguro de Páginas Privadas",
+    icon: "hard-drive",
+    desc: "Configure headers de controle de cache (Cache-Control: no-store) para impedir que dados sensíveis de usuários logados fiquem salvos em caches públicos.",
+    prompt: "Configure os cabeçalhos de controle de cache do Express para garantir que rotas privadas com dados financeiros ou pessoais não sejam cacheadas no navegador."
+  },
+  {
+    id: 36,
+    title: "Vulnerabilidade Prototype Pollution",
+    icon: "skull",
+    desc: "Evite mesclagens recursivas de objetos usando parâmetros do usuário não sanitizados que possam sobrescrever o protótipo base do JavaScript.",
+    prompt: "Verifique se o seguinte código Express/Javascript está vulnerável a Prototype Pollution através de clonagens profundas de objetos não validados. Reescreva de forma segura."
+  },
+  {
+    id: 37,
+    title: "Session Cookies Sem Flags Necessárias",
+    icon: "cookie",
+    desc: "Garanta que cookies de sessão trafeguem sempre com Secure (somente HTTPS) e HttpOnly (indetectável por JS).",
+    prompt: "Audite a criação de cookies neste backend Express e reescreva a lógica configurando as flags HttpOnly, Secure e SameSite corretas."
+  },
+  {
+    id: 38,
+    title: "Abuso de Reset de Senha (Tokens Previsíveis)",
+    icon: "rotate-ccw",
+    desc: "Tokens de redefinição de senha devem ser gerados usando geradores criptográficos aleatórios (não sequenciais) e possuir expiração curta.",
+    prompt: "Substitua a lógica de geração de tokens de reset de senha previsíveis (como Math.random) por criptografia robusta de números aleatórios usando o módulo crypto do Node.js."
+  },
+  {
+    id: 39,
+    title: "Ataques DDoS via Expressões Regulares (ReDoS)",
+    icon: "search",
+    desc: "Expressões regulares complexas (como com backtracking catastrófico) podem travar a thread principal do NodeJS se testadas contra payloads gigantes.",
+    prompt: "Examine as expressões regulares do código e identifique possíveis brechas para ReDoS (Regular Expression Denial of Service). Reescreva as regex de forma segura."
+  },
+  {
+    id: 40,
+    title: "Vazamento de Dados Pessoais em Logs",
+    icon: "alert-circle",
+    desc: "Evite registrar senhas de usuários, números de cartões ou dados pessoais sensíveis em arquivos de texto de log de erro do servidor.",
+    prompt: "Crie uma função sanitizadora de logs em Javascript que mascara informações sensíveis (como CPFs, emails e cartões de crédito) antes de escrevê-los nos logs."
+  },
+  {
+    id: 41,
+    title: "Referer Leakage (API Keys em Headers)",
+    icon: "link",
+    desc: "Proteja chaves de API trafegadas na URL para que não vazem no cabeçalho Referer quando o usuário clica em links externos.",
+    prompt: "Configure a diretiva de segurança Referrer-Policy apropriada no Express para bloquear o vazamento de caminhos e parâmetros de query sigilosos para sites terceiros."
+  },
+  {
+    id: 42,
+    title: "Ausência de Multi-Factor Authentication (MFA)",
+    icon: "smartphone",
+    desc: "Exija autenticação em duas etapas para acessos administrativos vitais do seu SaaS.",
+    prompt: "Forneça o fluxo e o código inicial para integrar autenticação em duas etapas baseada em TOTP (Google Authenticator) no NodeJS utilizando a biblioteca otplib."
+  },
+  {
+    id: 43,
+    title: "Vulnerabilidade de Clickjacking",
+    icon: "layers",
+    desc: "Impeça que seu site ou dashboard de pagamento seja renderizado dentro de tags iframe de portais maliciosos para roubar cliques.",
+    prompt: "Adicione as configurações necessárias de cabeçalho X-Frame-Options e Content-Security-Policy (frame-ancestors) para desativar iframes de terceiros."
+  },
+  {
+    id: 44,
+    title: "APIs REST Sem Escopo de Escrita",
+    icon: "key",
+    desc: "Valide se o token de acesso (OAuth/API Key) possui permissão específica de escrita (write) antes de efetuar alterações no banco de dados.",
+    prompt: "Escreva uma lógica de validação de escopos de API (Scope Validation) que checa se o token do portador possui escopos adequados ('read', 'write') para acessar a rota."
+  },
+  {
+    id: 45,
+    title: "Injeção de E-mail / SMTP Headers",
+    icon: "mail",
+    desc: "Entradas de usuários que alimentam o campo de destinatário (To), cópia (CC) ou assunto de e-mails devem ser sanitizadas para evitar spam.",
+    prompt: "Analise a lógica de envio de e-mails em busca de falhas de injeção de cabeçalhos SMTP/Email. Adicione sanitização para prevenir que caracteres de quebra de linha (CRLF) injetem destinatários ocultos."
+  },
+  {
+    id: 46,
+    title: "Divulgação de Portas e Serviços Internos",
+    icon: "server",
+    desc: "Proteja servidores internos (como bancos de dados ou instâncias de cache) bloqueando o acesso direto da internet e permitindo conexões apenas da VPC interna.",
+    prompt: "Descreva boas práticas para configurar firewalls (como UFW, Security Groups) para restringir o acesso público aos serviços de banco de dados e APIs internas do projeto."
+  },
+  {
+    id: 47,
+    title: "Backups Desprotegidos no Diretório Web",
+    icon: "archive",
+    desc: "Nunca compacte arquivos ou realize dumps de bancos de dados (.zip, .sql) salvando-os diretamente na pasta pública do servidor.",
+    prompt: "Escreva uma checagem automatizada para verificar se há arquivos de backup comuns, dumps de banco SQL ou arquivos compactados expostos no diretório público do Express."
+  },
+  {
+    id: 48,
+    title: "Ausência de Content Security Policy (CSP)",
+    icon: "shield",
+    desc: "Impeça a injeção e execução de arquivos JavaScript de domínios maliciosos não declarados nas tags de cabeçalho CSP.",
+    prompt: "Estruture uma Content-Security-Policy (CSP) robusta e configurável para o middleware Helmet no Express, restringindo fontes de scripts de origens desconhecidas."
+  },
+  {
+    id: 49,
+    title: "Cookies Sem SameSite",
+    icon: "cookie",
+    desc: "Defina explicitamente SameSite=Lax ou SameSite=Strict em todos os cookies de sessão para prevenir o roubo de requisições de origem cruzada.",
+    prompt: "Ajuste os cabeçalhos de resposta deste código para garantir que todo cookie setado possua a flag SameSite configurada corretamente."
+  },
+  {
+    id: 50,
+    title: "Excesso de Informações no Registro de Erros",
+    icon: "file-warning",
+    desc: "Não salve logs verbosos em ambientes de produção. Configure o nível do logger para logs críticos de aviso e erro.",
+    prompt: "Configure um logger profissional como Winston ou Pino no Node.js para alternar automaticamente o nível de log entre verbose (desenvolvimento) e error/critical (produção)."
+  }
+];
+
+// 12. RENDERIZAR DIRETRIZES DE SEGURANÇA E CONFIGURAR CLIQUES
+function initSecurityTips() {
+  const container = document.getElementById('security-tips-grid');
+  if (!container) return;
+
+  container.innerHTML = '';
+  securityTipsData.forEach(tip => {
+    const card = document.createElement('div');
+    card.className = "glass-card rounded-2xl p-6 border border-sky-500/10 hover:border-sky-500/20 space-y-4 flex flex-col justify-between";
+    card.innerHTML = `
+      <div class="space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center flex-shrink-0">
+            <i data-lucide="${tip.icon}" class="h-5 w-5"></i>
+          </div>
+          <h4 class="text-md font-bold font-outfit text-white leading-tight">${tip.title}</h4>
+        </div>
+        <p class="text-gray-400 text-xs leading-relaxed">${tip.desc}</p>
+        
+        <div class="space-y-2">
+          <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider block">Prompt de Validação</span>
+          <textarea id="prompt-text-${tip.id}" readonly class="w-full h-16 bg-slate-950 border border-gray-900 rounded-xl p-2.5 text-[11px] text-sky-200/80 font-mono focus:outline-none resize-none leading-relaxed">${tip.prompt}</textarea>
+        </div>
+      </div>
+      <button data-tip-id="${tip.id}" class="copy-tip-prompt-btn w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 text-xs font-bold transition-all mt-2">
+        Copiar Prompt
+      </button>
+    `;
+    container.appendChild(card);
+  });
+
+  // Re-inicializa ícones do Lucide após renderizar
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+
+  // Configura cliques nos botões de copiar individuais
+  const copyButtons = document.querySelectorAll('.copy-tip-prompt-btn');
+  copyButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tipId = btn.getAttribute('data-tip-id');
+      const textarea = document.getElementById(`prompt-text-${tipId}`);
+      if (textarea) {
+        textarea.select();
+        navigator.clipboard.writeText(textarea.value);
+
+        const originalText = btn.innerText;
+        btn.innerText = "Copiado!";
+        btn.classList.add('bg-green-500', 'text-slate-950', 'border-green-500');
+        btn.classList.remove('bg-slate-900', 'hover:bg-slate-800', 'border-gray-800');
+
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.classList.remove('bg-green-500', 'text-slate-950', 'border-green-500');
+          btn.classList.add('bg-slate-900', 'hover:bg-slate-800', 'border-gray-800');
+        }, 1500);
+      }
+    });
+  });
+
+  // Configura botão de copiar do Prompt Mestre
+  const copyMasterBtn = document.getElementById('copy-master-prompt-btn');
+  const masterTextarea = document.getElementById('master-prompt-text');
+  if (copyMasterBtn && masterTextarea) {
+    copyMasterBtn.addEventListener('click', () => {
+      masterTextarea.select();
+      navigator.clipboard.writeText(masterTextarea.value);
+
+      const originalText = copyMasterBtn.innerText;
+      copyMasterBtn.innerText = "Copiado!";
+      copyMasterBtn.classList.add('bg-green-500', 'text-slate-950');
+      copyMasterBtn.classList.remove('bg-sky-400', 'hover:bg-sky-300');
+
+      setTimeout(() => {
+        copyMasterBtn.innerText = originalText;
+        copyMasterBtn.classList.remove('bg-green-500', 'text-slate-950');
+        copyMasterBtn.classList.add('bg-sky-400', 'hover:bg-sky-300');
+      }, 1500);
+    });
+  }
+}
+
+// 13. INICIALIZAÇÃO GERAL DO PAINEL
 document.addEventListener('DOMContentLoaded', () => {
   // Garantir controle de login
   checkAuth();
@@ -630,4 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initVideoPlayer();
   initPromptCopy();
   initLessonProgress();
+  
+  // Renderizar e iniciar tela de segurança
+  initSecurityTips();
 });

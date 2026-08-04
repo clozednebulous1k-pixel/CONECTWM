@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initDiagnosticForm();
   initCheckoutModal();
-  initChatbot();
   initModulesCarousel();
   initWhatsAppContactForm();
   initScrollNavbar();
+  initMobilePathLock();
 });
 
 // ----------------------------------------------------
@@ -261,159 +261,7 @@ function initCheckoutModal() {
   }
 }
 
-// ----------------------------------------------------
-// 6. CHATBOT INTERATIVO DE IA
-// ----------------------------------------------------
-function initChatbot() {
-  const chatbotToggle = document.getElementById('chatbot-toggle');
-  const chatbotWindow = document.getElementById('chatbot-window');
-  const chatbotClose = document.getElementById('chatbot-close');
-  const chatMessages = document.getElementById('chat-messages');
-  const chatInput = document.getElementById('chat-input');
-  const chatSendBtn = document.getElementById('chat-send-btn');
-  const chatTypingIndicator = document.getElementById('chat-typing');
 
-  // Histórico de mensagens do chat (mantém contexto no servidor)
-  let chatHistory = [];
-  let isChatbotOpened = false;
-
-  // Abrir / Fechar Chat
-  if (chatbotToggle && chatbotWindow) {
-    chatbotToggle.addEventListener('click', () => {
-      chatbotWindow.classList.toggle('hidden');
-      isChatbotOpened = !chatbotWindow.classList.contains('hidden');
-      
-      // Mensagem de boas-vindas na primeira abertura
-      if (isChatbotOpened && chatMessages.children.length === 0) {
-        sendWelcomeMessage();
-      }
-      
-      // Rolar para o final
-      scrollToBottom();
-      chatInput.focus();
-    });
-  }
-
-  if (chatbotClose && chatbotWindow) {
-    chatbotClose.addEventListener('click', () => {
-      chatbotWindow.classList.add('hidden');
-    });
-  }
-
-  // Enviar Mensagem
-  if (chatSendBtn && chatInput) {
-    chatSendBtn.addEventListener('click', handleSendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        handleSendMessage();
-      }
-    });
-  }
-
-  async function handleSendMessage() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    // Limpar input
-    chatInput.value = '';
-
-    // Adicionar mensagem do usuário no HTML
-    addMessageBubble(text, 'user');
-    scrollToBottom();
-
-    // Adicionar ao histórico
-    chatHistory.push({ role: 'user', content: text });
-
-    // Mostrar indicador de digitando
-    if (chatTypingIndicator) {
-      chatTypingIndicator.classList.remove('hidden');
-      scrollToBottom();
-    }
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ messages: chatHistory })
-      });
-
-      const result = await response.json();
-
-      // Esconder indicador
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-
-      if (response.ok && result.success) {
-        const botReply = result.reply;
-        addMessageBubble(botReply, 'bot');
-        chatHistory.push({ role: 'assistant', content: botReply });
-      } else {
-        addMessageBubble('Desculpe, tive um problema para me conectar à minha mente inteligente. Você pode tentar novamente mais tarde?', 'bot');
-      }
-
-    } catch (error) {
-      console.error('Erro de chat:', error);
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-      addMessageBubble('Erro de rede. Verifique se o servidor backend está rodando no terminal.', 'bot');
-    }
-
-    scrollToBottom();
-  }
-
-  function sendWelcomeMessage() {
-    if (chatTypingIndicator) {
-      chatTypingIndicator.classList.remove('hidden');
-    }
-    
-    setTimeout(() => {
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-      const welcomeText = `Olá! Sou o assistente de IA da **conectWM** 🤖✨.
-
-Como posso te ajudar hoje? 
-- Se quiser saber mais sobre a **Comunidade conectWM** (ensino full-stack com IA para criar seus apps), digite "Comunidade".
-- Se quiser entender como ajudamos sua **Empresa** com automação inteligente e agentes de IA, digite "Automação".`;
-      addMessageBubble(welcomeText, 'bot');
-      chatHistory.push({ role: 'assistant', content: welcomeText });
-      scrollToBottom();
-    }, 1000);
-  }
-
-  function addMessageBubble(text, sender) {
-    const bubbleWrapper = document.createElement('div');
-    bubbleWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-3 fade-in`;
-
-    const bubble = document.createElement('div');
-    bubble.className = `max-w-[85%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-      sender === 'user' 
-        ? 'chat-bubble-user font-medium' 
-        : 'chat-bubble-bot'
-    }`;
-
-    // Permitir negritos em Markdown simples (**texto**) e quebras de linha
-    let formattedText = text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/•\s(.*?)\n/g, '<li class="ml-4 list-disc">$1</li>')
-      .replace(/\n/g, '<br>');
-
-    bubble.innerHTML = formattedText;
-    bubbleWrapper.appendChild(bubble);
-    chatMessages.appendChild(bubbleWrapper);
-  }
-
-  function scrollToBottom() {
-    if (chatMessages) {
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-  }
-}
 
 // ----------------------------------------------------
 // 7. CARROSSEL DE MÓDULOS (PMG ACADEMY MODEL)
@@ -488,6 +336,67 @@ function initScrollNavbar() {
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll);
+  }
+}
+
+// ----------------------------------------------------
+// 10. MOBILE PATH LOCK SYSTEM
+// ----------------------------------------------------
+function initMobilePathLock() {
+  const isMobile = window.innerWidth < 768;
+  
+  if (isMobile) {
+    document.body.classList.add('mobile-locked');
+    
+    // Encontrar os botões dos dois caminhos no Hero
+    const path1Btn = document.querySelector('#caminhos .trigger-checkout');
+    const path2Btn = document.querySelector('#caminhos a[href="#diagnostico"]');
+    
+    if (path1Btn) {
+      path1Btn.addEventListener('click', (e) => {
+        if (document.body.classList.contains('mobile-locked')) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Destravar a tela
+          document.body.classList.remove('mobile-locked');
+          
+          // Rolar para comunidade
+          setTimeout(() => {
+            const targetSection = document.getElementById('comunidade');
+            if (targetSection) {
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
+      }, true);
+    }
+    
+    if (path2Btn) {
+      path2Btn.addEventListener('click', (e) => {
+        if (document.body.classList.contains('mobile-locked')) {
+          e.preventDefault();
+          
+          // Destravar a tela
+          document.body.classList.remove('mobile-locked');
+          
+          setTimeout(() => {
+            const targetSection = document.getElementById('diagnostico');
+            if (targetSection) {
+              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 100);
+        }
+      });
+    }
+    
+    // Destravar em qualquer clique do menu/header
+    const navLinks = document.querySelectorAll('header a, #mobile-menu a, header button');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        document.body.classList.remove('mobile-locked');
+      });
+    });
   }
 }
 

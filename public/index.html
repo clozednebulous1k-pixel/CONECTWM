@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>conectWM | IA e Automação Inteligente de Processos</title>
-  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="icon" type="image/png" href="images/logo.png">
   <meta name="description" content="Crie Apps e SaaS com Inteligência Artificial ou Automatize o Seu Negócio com a conectWM. Capacitamos pessoas e transformamos empresas através da tecnologia.">
   
   <!-- Tailwind CSS CDN -->
@@ -64,8 +64,8 @@
 
       <!-- CTA Button Desktop -->
       <div class="hidden md:flex items-center gap-4">
-        <a href="/login.html" class="text-sm font-semibold text-gray-300 hover:text-white transition-colors font-outfit">
-          Entrar
+        <a href="/dashboard.html" class="text-sm font-semibold text-gray-300 hover:text-white transition-colors font-outfit">
+          Área de Membros
         </a>
         <button data-product="comunidade_mensal" class="trigger-checkout btn-glow-tech rounded-full bg-sky-400 px-6 py-2.5 text-sm font-semibold text-slate-950 hover:bg-sky-300 transition-all font-outfit">
           Entrar na Comunidade
@@ -85,7 +85,7 @@
       <a href="#comunidade" class="block text-gray-300 hover:text-sky-400 text-lg py-1">Comunidade conectWM</a>
       <a href="#diagnostico" class="block text-gray-300 hover:text-sky-400 text-lg py-1">Diagnóstico para Empresas</a>
       <a href="#faq" class="block text-gray-300 hover:text-sky-400 text-lg py-1">FAQ</a>
-      <a href="/login.html" class="block text-gray-300 hover:text-sky-400 text-lg py-1">Entrar (Login)</a>
+      <a href="/dashboard.html" class="block text-gray-300 hover:text-sky-400 text-lg py-1">Área de Membros</a>
       <button data-product="comunidade_mensal" class="trigger-checkout btn-glow-tech w-full text-center rounded-full bg-sky-400 py-3 text-slate-950 font-bold font-outfit">
         Entrar na Comunidade
       </button>
@@ -766,58 +766,8 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       WIDGET DO CHATBOT DE IA (CONECTWM ASSISTANTE)
-       ========================================== -->
-  <!-- Botão Flutuante -->
-  <button id="chatbot-toggle" class="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center shadow-lg transition-all hover:scale-110 btn-glow-tech" aria-label="Abrir Assistente de IA">
-    <i data-lucide="message-square" class="h-6 w-6"></i>
-  </button>
-
-  <!-- Janela de Chat -->
-  <div id="chatbot-window" class="hidden fixed bottom-24 right-6 z-50 w-[90%] sm:w-[380px] h-[500px] glass-card rounded-[2rem] flex flex-col overflow-hidden chat-window-glow border border-sky-500/20">
-    
-    <!-- Chat Header -->
-    <div class="bg-slate-950 p-4 border-b border-gray-800 flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <div class="relative">
-          <div class="h-10 w-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
-            <i data-lucide="bot" class="h-5 w-5"></i>
-          </div>
-          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-slate-950"></span>
-        </div>
-        <div>
-          <h4 class="font-bold text-sm text-white font-outfit leading-none">conectWM Assistente</h4>
-          <span class="text-xs text-gray-500 font-medium">Agente inteligente online</span>
-        </div>
-      </div>
-      <button id="chatbot-close" class="text-gray-400 hover:text-white p-1">
-        <i data-lucide="x" class="h-5 w-5"></i>
-      </button>
-    </div>
-
-    <!-- Chat Messages -->
-    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0a0d14]">
-      <!-- Mensagens inseridas via JS -->
-    </div>
-
-    <!-- Indicador de Digitou/Pensando -->
-    <div id="chat-typing" class="hidden px-4 py-2 text-xs text-gray-500 flex items-center gap-2 bg-[#0a0d14]">
-      <div class="loader-spinner !w-3.5 !h-3.5 !border-[2px]"></div>
-      <span>Assistente está pensando...</span>
-    </div>
-
-    <!-- Chat Input Form -->
-    <div class="p-3 bg-slate-950 border-t border-gray-800 flex gap-2">
-      <input type="text" id="chat-input" class="flex-1 bg-slate-900 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 input-focus-glow transition-all" placeholder="Escreva sua dúvida...">
-      <button id="chat-send-btn" class="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center transition-all">
-        <i data-lucide="send-horizontal" class="h-4.5 w-4.5"></i>
-      </button>
-    </div>
-
-  </div>
-
   <!-- Scripts -->
+  <script src="js/chatbot.js"></script>
   <script src="js/app.js"></script>
   <script>
     // Inicializar os ícones do Lucide

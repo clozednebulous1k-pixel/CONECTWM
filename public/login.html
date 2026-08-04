@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entrar | conectWM 2.0</title>
-  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="icon" type="image/png" href="images/logo.png">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -26,7 +26,7 @@
     }
   </script>
   
-  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="css/custom.css">
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <style>
@@ -74,7 +74,7 @@
       <!-- Top Header no Painel Esquerdo -->
       <div class="z-10">
         <a href="/" class="flex items-center gap-3 group">
-          <img src="/images/logo.png" alt="conectWM Logo" class="h-7 w-auto transition-transform duration-300 group-hover:scale-105">
+          <img src="images/logo.png" alt="conectWM Logo" class="h-7 w-auto transition-transform duration-300 group-hover:scale-105">
           <span class="text-xl font-bold tracking-wider font-outfit uppercase">
             conect<span class="text-sky-400">WM</span>
           </span>
@@ -185,6 +185,12 @@
               <span>ENTRAR</span>
             </button>
 
+            <!-- Acesso direto (demo) -->
+            <button type="button" id="direct-access-btn" class="w-full py-4 px-6 rounded-xl bg-transparent border border-sky-500/40 hover:border-sky-400 text-sky-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
+              <i data-lucide="layout-dashboard" class="h-4.5 w-4.5"></i>
+              <span>ACESSAR DASHBOARD SEM LOGIN</span>
+            </button>
+
             <!-- Criar Conta -->
             <button type="button" class="w-full py-4 px-6 rounded-xl bg-transparent border border-gray-800 hover:border-gray-600 text-gray-300 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
               <i data-lucide="user-plus" class="h-4.5 w-4.5"></i>
@@ -225,42 +231,31 @@
         lucide.createIcons();
       });
 
-      // Submit do Login (simulação simples)
+      function enterDashboard(email) {
+        const userEmail = email || 'visitante@conectwm.com.br';
+        localStorage.setItem('conectwm_logged_in_user', userEmail);
+        localStorage.setItem('conectwm_user_is_paying', 'true');
+        window.location.href = '/dashboard.html';
+      }
+
+      // Submit do Login (acesso aberto para demo)
       const form = document.getElementById('login-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value.trim();
-
-        // 1. Verificar credencial padrão do aluno pagante
-        if (email === 'aluno@conectwm.com.br' && password === '123') {
-          localStorage.setItem('conectwm_logged_in_user', email);
-          localStorage.setItem('conectwm_user_is_paying', 'true');
-          alert('Login efetuado com sucesso! Redirecionando para a sua área de membros.');
-          window.location.href = '/dashboard.html';
-          return;
-        }
-
-        // 2. Verificar se o e-mail concluiu a compra simulada no localStorage
-        try {
-          const purchasedEmails = JSON.parse(localStorage.getItem('conectwm_purchased_emails') || '[]');
-          if (purchasedEmails.includes(email)) {
-            localStorage.setItem('conectwm_logged_in_user', email);
-            localStorage.setItem('conectwm_user_is_paying', 'true');
-            alert('Login efetuado com sucesso! Redirecionando para a sua área de membros.');
-            window.location.href = '/dashboard.html';
-          } else {
-            alert('Esta conta não possui uma assinatura ativa da conectWM. Por favor, acesse a Landing Page e conclua a inscrição/simulação de pagamento.');
-          }
-        } catch (err) {
-          console.error(err);
-          alert('Ocorreu um erro ao processar o login local. Tente a conta padrão (aluno@conectwm.com.br / 123).');
-        }
+        enterDashboard(email);
       });
+
+      // Acesso direto sem credenciais
+      const directAccessBtn = document.getElementById('direct-access-btn');
+      if (directAccessBtn) {
+        directAccessBtn.addEventListener('click', () => enterDashboard());
+      }
 
       // Inicializa os ícones do Lucide
       lucide.createIcons();
     });
   </script>
+  <script src="js/chatbot.js"></script>
 </body>
 </html>

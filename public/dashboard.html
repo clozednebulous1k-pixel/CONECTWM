@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Área de Membros | conectWM Academy</title>
-  <link rel="icon" type="image/png" href="/images/logo.png">
+  <link rel="icon" type="image/png" href="images/logo.png">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,7 +27,7 @@
   </script>
   
   <!-- Google Fonts & Custom CSS -->
-  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="css/custom.css">
   
   <!-- Lucide Icons Library -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -46,7 +46,7 @@
       
       <!-- Logo Branding -->
       <div class="flex items-center gap-3 mb-8">
-        <img src="/images/logo.png" alt="conectWM Logo" class="h-8 w-auto">
+        <img src="images/logo.png" alt="conectWM Logo" class="h-8 w-auto">
         <span class="text-xl font-bold tracking-wider font-outfit uppercase">
           conect<span class="text-sky-400">WM</span>
         </span>
@@ -67,19 +67,19 @@
 
       <!-- Navigation Menu -->
       <nav class="space-y-1">
-        <a href="#" data-target="sec-modulos" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-sky-500/10 text-sky-400 border-l-4 border-sky-400">
+        <a href="#" data-target="sec-modulos" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-sky-400 border-b-2 border-sky-400">
           <i data-lucide="book-open" class="h-4.5 w-4.5"></i>
           <span>Módulos & Aulas</span>
         </a>
-        <a href="#" data-target="sec-seguranca" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-slate-900">
+        <a href="#" data-target="sec-seguranca" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
           <i data-lucide="shield-check" class="h-4.5 w-4.5"></i>
           <span>Dicas de Segurança</span>
         </a>
-        <a href="#" data-target="sec-recursos" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-slate-900">
+        <a href="#" data-target="sec-recursos" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
           <i data-lucide="terminal" class="h-4.5 w-4.5"></i>
           <span>Recursos & Prompts</span>
         </a>
-        <a href="#" data-target="sec-suporte" class="nav-link flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-gray-400 hover:text-white hover:bg-slate-900">
+        <a href="#" data-target="sec-suporte" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
           <i data-lucide="users" class="h-4.5 w-4.5"></i>
           <span>Comunidade</span>
         </a>
@@ -105,7 +105,7 @@
     <section id="sec-modulos" class="dashboard-section space-y-6">
       
       <!-- SUB-VIEW 1: Lista de Módulos (Original Grid) -->
-      <div id="modules-list-wrapper" class="space-y-6 animate-pulse-soft">
+      <div id="modules-list-wrapper" class="space-y-6">
         <div class="border-b border-gray-900 pb-4">
           <h2 class="text-3xl font-bold font-outfit text-white">Módulos da conectWM Academy</h2>
           <p class="text-gray-400 text-sm mt-1">Selecione um dos módulos originais para iniciar as aulas guiadas por IA.</p>
@@ -235,76 +235,29 @@
     <section id="sec-seguranca" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
         <h2 class="text-3xl font-bold font-outfit text-white">Diretrizes de Segurança para Desenvolvedores</h2>
-        <p class="text-gray-400 text-sm mt-1">Boas práticas cruciais para evitar vazamentos de dados, exploits e manter seu SaaS blindado.</p>
+        <p class="text-gray-400 text-sm mt-1">20 diretrizes cruciais com prompts de validação prontos para blindar seu SaaS contra vulnerabilidades.</p>
       </div>
 
-      <!-- Grid de Dicas -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-        
-        <!-- Dica 1: Env Variables -->
-        <div class="glass-card rounded-2xl p-6 border border-red-500/10 hover:border-red-500/20 space-y-3">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center">
-              <i data-lucide="eye-off" class="h-5 w-5"></i>
-            </div>
-            <h4 class="text-lg font-bold font-outfit text-white">Vazamento de Credenciais (.env)</h4>
+      <!-- Master Prompt Card -->
+      <div class="glass-card rounded-2xl p-6 border border-sky-500/20 bg-sky-500/5 space-y-4">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="space-y-1">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-sky-400/20 text-sky-300 text-[10px] px-2.5 py-1 font-bold uppercase tracking-wider">
+              🛡️ PROMPT MESTRE DE SEGURANÇA (AUDITORIA DE 50 RISCOS)
+            </span>
+            <h4 class="text-lg font-bold font-outfit text-white">Auditar Todas as 50 Vulnerabilidades de Uma Só Vez</h4>
+            <p class="text-gray-400 text-xs leading-relaxed max-w-2xl">Use este prompt único e extremamente resumido no ChatGPT, Claude ou Cursor para auditar todos os 50 riscos críticos do seu código simultaneamente.</p>
           </div>
-          <p class="text-gray-400 text-xs leading-relaxed">
-            Nunca commite seus arquivos <code class="text-red-300 bg-red-500/5 px-1 py-0.5 rounded font-mono font-medium">.env</code> no GitHub. Chaves de API expostas (como OpenAI, Stripe ou bancos de dados) podem ser detectadas em segundos por rastreadores maliciosos, gerando prejuízos financeiros imediatos.
-          </p>
-          <div class="text-[10px] text-gray-500 leading-normal">
-            <strong>Recomendação:</strong> Crie sempre um arquivo <code class="text-sky-300 font-mono">.env.example</code> para mostrar quais variáveis são necessárias, e adicione <code class="text-sky-300 font-mono">.env</code> no seu <code class="text-sky-300 font-mono">.gitignore</code>.
-          </div>
+          <button id="copy-master-prompt-btn" class="bg-sky-400 hover:bg-sky-300 text-slate-950 text-xs font-bold font-outfit px-4 py-2.5 rounded-xl transition-all btn-glow-tech shrink-0">
+            Copiar Prompt Mestre
+          </button>
         </div>
+        <textarea id="master-prompt-text" readonly class="w-full h-24 bg-slate-950 border border-gray-900 rounded-xl p-3 text-xs text-sky-200 font-mono focus:outline-none resize-none leading-relaxed">Aja como um auditor AppSec sênior especialista em Node.js/SaaS. Analise o código fornecido e verifique se há indícios de até 50 vulnerabilidades críticas de segurança (incluindo SQLi, XSS, CSRF, IDOR, RCE, chaves expostas no Git, CORS irrestrito, falta de rate limiting, uploads inseguros, headers faltantes, redirecionamentos abertos, injeção XXE, SSRF, vazamento de .git, backups expostos, etc.). Indique quais falhas foram encontradas de maneira concisa e forneça o código ajustado.</textarea>
+      </div>
 
-        <!-- Dica 2: SQL Injection -->
-        <div class="glass-card rounded-2xl p-6 border border-sky-500/10 hover:border-sky-500/20 space-y-3">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
-              <i data-lucide="database" class="h-5 w-5"></i>
-            </div>
-            <h4 class="text-lg font-bold font-outfit text-white">Prevenindo SQL Injection</h4>
-          </div>
-          <p class="text-gray-400 text-xs leading-relaxed">
-            Ocorre quando comandos SQL são inseridos diretamente em campos de input. Se você concatenar strings de entrada diretamente nas consultas de banco de dados, invasores poderão executar comandos arbitrários, ler ou apagar dados.
-          </p>
-          <div class="text-[10px] text-gray-500 leading-normal">
-            <strong>Recomendação:</strong> Utilize parametrização de consultas (Prepared Statements) ou ORMs seguros (como Prisma, Sequelize ou Mongoose) para isolar completamente as strings dos comandos SQL.
-          </div>
-        </div>
-
-        <!-- Dica 3: CORS -->
-        <div class="glass-card rounded-2xl p-6 border border-sky-500/10 hover:border-sky-500/20 space-y-3">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
-              <i data-lucide="lock" class="h-5 w-5"></i>
-            </div>
-            <h4 class="text-lg font-bold font-outfit text-white">Configuração de CORS Rígida</h4>
-          </div>
-          <p class="text-gray-400 text-xs leading-relaxed">
-            Habilitar Cross-Origin Resource Sharing (CORS) com o curinga <code class="text-gray-300 font-mono">*</code> permite que qualquer site na internet envie requisições para a sua API e leia as respostas dos usuários, facilitando ataques de falsificação de requisições.
-          </p>
-          <div class="text-[10px] text-gray-500 leading-normal">
-            <strong>Recomendação:</strong> Configure sua API para aceitar requisições de origens específicas (ex: <code class="text-sky-300 font-mono">https://conectwm.com.br</code>) e recuse conexões externas genéricas.
-          </div>
-        </div>
-
-        <!-- Dica 4: Rate Limiting -->
-        <div class="glass-card rounded-2xl p-6 border border-sky-500/10 hover:border-sky-500/20 space-y-3">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-lg bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
-              <i data-lucide="shield-alert" class="h-5 w-5"></i>
-            </div>
-            <h4 class="text-lg font-bold font-outfit text-white">Limitação de Requisições (Rate Limiting)</h4>
-          </div>
-          <p class="text-gray-400 text-xs leading-relaxed">
-            Seus endpoints de inteligência artificial (que gastam tokens caros da OpenAI) ou telas de login precisam de limites. Sem rate limiting, bots podem fazer milhares de requisições rápidas para derrubar o servidor ou consumir seus fundos de API.
-          </p>
-          <div class="text-[10px] text-gray-500 leading-normal">
-            <strong>Recomendação:</strong> Adicione pacotes de limitação (como <code class="text-sky-300 font-mono">express-rate-limit</code>) para bloquear temporariamente IPs que excedam requisições permitidas em um intervalo.
-          </div>
-        </div>
-
+      <!-- Grid de Dicas (Renderizado Dinamicamente pelo dashboard.js) -->
+      <div id="security-tips-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+        <!-- Renderizado dinamicamente via JS -->
       </div>
     </section>
 
@@ -401,7 +354,8 @@
   </main>
 
   <!-- Scripts -->
-  <script src="/js/dashboard.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/dashboard.js"></script>
   <script>
     // Inicializar ícones do Lucide
     lucide.createIcons();
