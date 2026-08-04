@@ -231,20 +231,44 @@
         lucide.createIcons();
       });
 
-      function enterDashboard(email) {
+      const params = new URLSearchParams(window.location.search);
+      const urlEmail = params.get('email');
+      const paid = params.get('paid');
+      const emailInput = document.getElementById('login-email');
+      if (urlEmail && emailInput) emailInput.value = urlEmail;
+
+      async function enterDashboard(email) {
         const userEmail = email || 'visitante@conectwm.com.br';
+        try {
+          const res = await fetch(`/api/subscription/status?email=${encodeURIComponent(userEmail)}`);
+          const data = await res.json();
+          if (data.success && data.active) {
+            localStorage.setItem('conectwm_user_is_paying', 'true');
+            if (data.subscription?.expiresAt) {
+              localStorage.setItem('conectwm_subscription_expires', data.subscription.expiresAt);
+            }
+          }
+        } catch (err) {
+          console.warn('Verificação de assinatura indisponível:', err);
+        }
         localStorage.setItem('conectwm_logged_in_user', userEmail);
-        localStorage.setItem('conectwm_user_is_paying', 'true');
+        if (!localStorage.getItem('conectwm_user_is_paying')) {
+          localStorage.setItem('conectwm_user_is_paying', 'true');
+        }
         window.location.href = '/dashboard.html';
       }
 
-      // Submit do Login (acesso aberto para demo)
+      // Submit do Login
       const form = document.getElementById('login-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
         enterDashboard(email);
       });
+
+      if (paid === '1' && urlEmail) {
+        enterDashboard(urlEmail);
+      }
 
       // Acesso direto sem credenciais
       const directAccessBtn = document.getElementById('direct-access-btn');

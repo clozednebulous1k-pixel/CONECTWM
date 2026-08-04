@@ -130,7 +130,7 @@
                 </div>
                 <div class="w-full">
                   <span class="text-xs text-gray-500 block mb-1">Copia e Cola PIX</span>
-                  <input type="text" readonly value="00020126580014BR.GOV.BCB.PIX0136conectwm-pix-ficticio-12345" class="w-full text-center bg-slate-900 border border-gray-800 rounded-lg py-2 px-3 text-xs text-gray-300">
+                  <input type="text" id="pix-copy-paste" readonly value="Aguardando geração..." class="w-full text-center bg-slate-900 border border-gray-800 rounded-lg py-2 px-3 text-xs text-gray-300">
                 </div>
               </div>
 
@@ -198,13 +198,14 @@
         <i data-lucide="badge-check" class="h-12 w-12"></i>
       </div>
 
-      <div class="space-y-2">
-        <span class="text-xs text-sky-400 font-extrabold uppercase tracking-widest">Inscrição Confirmada!</span>
-        <h3 class="text-3xl font-black font-outfit">Seja bem-vindo à conectWM!</h3>
-        <p class="text-gray-400 text-sm max-w-md mx-auto">
-          Seu pagamento simulado foi aprovado com sucesso! Aqui estão as instruções para acessar todo o conteúdo.
-        </p>
-      </div>
+          <div class="space-y-2">
+            <span class="text-xs text-sky-400 font-extrabold uppercase tracking-widest">Inscrição Confirmada!</span>
+            <h3 class="text-3xl font-black font-outfit">Seja bem-vindo à conectWM!</h3>
+            <p class="text-gray-400 text-sm max-w-md mx-auto">
+              Pagamento aprovado e assinatura salva no banco de dados. Seu acesso está liberado!
+            </p>
+            <p id="success-order-info" class="text-[11px] text-gray-500 font-mono"></p>
+          </div>
 
       <div class="bg-slate-900 border border-gray-800 rounded-2xl p-6 text-left space-y-4">
         <div class="flex gap-4">
@@ -236,19 +237,19 @@
         </div>
       </div>
 
-      <a href="/" class="inline-block w-full py-4 px-6 rounded-xl bg-white hover:bg-gray-100 text-slate-950 font-black transition-all">
-        Concluir e Voltar ao Início
+      <a id="success-dashboard-link" href="/login.html" class="inline-block w-full py-4 px-6 rounded-xl bg-white hover:bg-gray-100 text-slate-950 font-black transition-all">
+        Acessar Área de Membros
       </a>
     </div>
   </div>
 
   <script>
-    // Lógica simples do checkout
     document.addEventListener('DOMContentLoaded', () => {
-      // Ler parâmetros da URL
       const params = new URLSearchParams(window.location.search);
       const email = params.get('email') || 'email@teste.com';
       const plan = params.get('type') || 'comunidade_mensal';
+      const orderId = params.get('orderId');
+      const transactionId = params.get('tr');
 
       document.getElementById('buyer-email').value = email;
 
@@ -256,11 +257,15 @@
       const planBilling = document.getElementById('plan-billing');
       const planPrice = document.getElementById('plan-price');
       const payCardBtn = document.getElementById('pay-card-btn');
+      const pixCopyInput = document.getElementById('pix-copy-paste');
+
+      let currentAmount = 47;
 
       if (plan === 'comunidade_anual') {
         planTitle.innerText = 'Comunidade conectWM - Anual';
         planBilling.innerText = 'Cobrado Anualmente';
         planPrice.innerText = 'R$ 497,00';
+        currentAmount = 497;
         if (payCardBtn) payCardBtn.innerText = 'Finalizar Pagamento de R$ 497,00';
       } else {
         planTitle.innerText = 'Comunidade conectWM - Mensal';
@@ -269,7 +274,20 @@
         if (payCardBtn) payCardBtn.innerText = 'Finalizar Pagamento de R$ 47,00';
       }
 
-      // Alternar Abas (PIX vs Cartão)
+      async function loadOrderFromApi() {
+        if (!orderId) return;
+        try {
+          const res = await fetch(`/api/checkout/order/${orderId}`);
+          const data = await res.json();
+          if (data.success && data.order?.pixCopyPaste && pixCopyInput) {
+            pixCopyInput.value = data.order.pixCopyPaste;
+          }
+        } catch (err) {
+          console.warn('Não foi possível carregar pedido:', err);
+        }
+      }
+      loadOrderFromApi();
+
       const tabPix = document.getElementById('tab-pix');
       const tabCard = document.getElementById('tab-card');
       const payPixSection = document.getElementById('payment-pix');
@@ -289,11 +307,15 @@
         payPixSection.classList.add('hidden');
       });
 
-      // Gerar QR Code PIX
       const generatePixBtn = document.getElementById('generate-pix-btn');
       const qrContainer = document.getElementById('pix-qr-container');
 
-      generatePixBtn.addEventListener('click', () => {
+      generatePixBtn.addEventListener('click', async () => {
+        if (!orderId) {
+          alert('Pedido inválido. Volte e inicie o checkout novamente.');
+          return;
+        }
+
         qrContainer.classList.remove('hidden');
         qrContainer.classList.add('flex');
         generatePixBtn.innerHTML = `
@@ -304,16 +326,36 @@
         `;
         generatePixBtn.disabled = true;
 
-        // Simular aprovação do PIX após 4 segundos
-        setTimeout(() => {
-          showSuccessModal();
-        }, 4000);
+        await new Promise(r => setTimeout(r, 3500));
+
+        try {
+          const res = await fetch('/api/checkout/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, paymentMethod: 'pix' }),
+          });
+          const result = await res.json();
+          if (result.success) {
+            showSuccessModal(result);
+          } else {
+            alert(result.message || 'Erro ao confirmar PIX.');
+            generatePixBtn.disabled = false;
+            generatePixBtn.innerHTML = '<span>Gerar QR Code PIX</span>';
+          }
+        } catch (err) {
+          alert('Erro de conexão ao confirmar pagamento.');
+          generatePixBtn.disabled = false;
+        }
       });
 
-      // Botão Pagar Cartão
       if (payCardBtn) {
-        payCardBtn.addEventListener('click', (e) => {
+        payCardBtn.addEventListener('click', async (e) => {
           e.preventDefault();
+          if (!orderId) {
+            alert('Pedido inválido. Volte e inicie o checkout novamente.');
+            return;
+          }
+
           payCardBtn.disabled = true;
           payCardBtn.innerHTML = `
             <div class="flex items-center justify-center gap-2">
@@ -321,29 +363,55 @@
               <span>Processando Cartão...</span>
             </div>
           `;
-          
-          // Simular aprovação após 2 segundos
-          setTimeout(() => {
-            showSuccessModal();
-          }, 2000);
+
+          await new Promise(r => setTimeout(r, 2000));
+
+          try {
+            const cardInput = document.querySelector('#payment-card input[placeholder="4444 4444 4444 4444"]');
+            const last4 = cardInput?.value?.replace(/\s/g, '').slice(-4) || '4242';
+
+            const res = await fetch('/api/checkout/confirm', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId, paymentMethod: 'card', cardLast4: last4 }),
+            });
+            const result = await res.json();
+            if (result.success) {
+              showSuccessModal(result);
+            } else {
+              alert(result.message || 'Erro ao processar cartão.');
+              payCardBtn.disabled = false;
+              payCardBtn.innerHTML = `Finalizar Pagamento de R$ ${currentAmount},00`;
+            }
+          } catch (err) {
+            alert('Erro de conexão ao processar pagamento.');
+            payCardBtn.disabled = false;
+          }
         });
       }
 
-      function showSuccessModal() {
+      function showSuccessModal(result) {
         const successModal = document.getElementById('payment-success-modal');
+        const info = document.getElementById('success-order-info');
+        const dashLink = document.getElementById('success-dashboard-link');
+
+        if (info) {
+          info.textContent = `Pedido ${orderId} | ${transactionId || ''} | Firebase: ${result?.storage || 'ok'}`;
+        }
+
+        localStorage.setItem('conectwm_logged_in_user', email);
+        localStorage.setItem('conectwm_user_is_paying', 'true');
+        if (result?.subscription?.expiresAt) {
+          localStorage.setItem('conectwm_subscription_expires', result.subscription.expiresAt);
+        }
+
+        if (dashLink) {
+          dashLink.href = `/login.html?email=${encodeURIComponent(email)}&paid=1`;
+        }
+
         if (successModal) {
           successModal.classList.remove('hidden');
           successModal.classList.add('flex');
-          // Salvar email no localStorage para simular status de pagante
-          try {
-            const purchasedEmails = JSON.parse(localStorage.getItem('conectwm_purchased_emails') || '[]');
-            if (!purchasedEmails.includes(email)) {
-              purchasedEmails.push(email);
-              localStorage.setItem('conectwm_purchased_emails', JSON.stringify(purchasedEmails));
-            }
-          } catch (err) {
-            console.error('Erro ao salvar no localStorage:', err);
-          }
         }
       }
 

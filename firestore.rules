@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Clientes não escrevem direto — apenas o servidor (Firebase Admin) grava pedidos.
+    match /orders/{orderId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /subscriptions/{emailId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    match /payments/{paymentId} {
+      allow read: if false;
+      allow write: if false;
+    }
+  }
+}

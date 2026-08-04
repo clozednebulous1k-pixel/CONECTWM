@@ -3,9 +3,13 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { OpenAI } = require('openai');
+const { initFirebase } = require('./services/firebase');
+const checkoutService = require('./services/checkout');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+initFirebase();
 
 // Middleware
 app.use(cors());
@@ -89,37 +93,108 @@ app.post('/api/diagnostico', async (req, res) => {
 });
 
 // ----------------------------------------------------
-// 2. ENDPOINT: SIMULADOR DE CHECKOUT (COMUNIDADE)
+// 2. ENDPOINTS: CHECKOUT + FIREBASE (COMPRA SIMULADA)
 // ----------------------------------------------------
-app.post('/api/checkout', (req, res) => {
+app.post('/api/checkout', async (req, res) => {
   try {
-    const { email, type } = req.body;
+    const { email, type, affiliateRef } = req.body;
 
     if (!email) {
       return res.status(400).json({
         success: false,
-        message: 'E-mail é necessário para iniciar a simulação de checkout.',
+        message: 'E-mail é necessário para iniciar o checkout.',
       });
     }
 
-    console.log(`\n💳 Iniciando Simulação de Checkout para: ${email} (${type || 'Comunidade conectWM'})`);
+    const result = await checkoutService.createOrder({
+      email,
+      type: type || 'comunidade_mensal',
+      affiliateRef,
+    });
 
-    // Criando um ID de transação simulada e link de checkout
-    const transactionId = 'tr_' + Math.random().toString(36).substring(2, 11).toUpperCase();
-    const mockCheckoutUrl = `/checkout-simulado.html?email=${encodeURIComponent(email)}&tr=${transactionId}&type=${encodeURIComponent(type || 'comunidade')}`;
+    console.log(`\n💳 Pedido criado: ${result.orderId} | ${email} | R$ ${result.plan.amount} | storage: ${result.storage}`);
 
     return res.status(200).json({
       success: true,
-      checkoutUrl: mockCheckoutUrl,
-      transactionId
+      checkoutUrl: result.checkoutUrl,
+      orderId: result.orderId,
+      transactionId: result.transactionId,
+      amount: result.plan.amount,
+      pixCopyPaste: result.pixCopyPaste,
+      storage: result.storage,
     });
-
   } catch (error) {
     console.error('Erro no endpoint de checkout:', error);
     res.status(500).json({
       success: false,
-      message: 'Erro ao gerar sessão de checkout.',
+      message: error.message || 'Erro ao gerar sessão de checkout.',
     });
+  }
+});
+
+app.get('/api/checkout/order/:orderId', async (req, res) => {
+  try {
+    const order = await checkoutService.getOrder(req.params.orderId);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Pedido não encontrado.' });
+    }
+    return res.json({ success: true, order });
+  } catch (error) {
+    console.error('Erro ao buscar pedido:', error);
+    res.status(500).json({ success: false, message: 'Erro ao buscar pedido.' });
+  }
+});
+
+app.post('/api/checkout/confirm', async (req, res) => {
+  try {
+    const { orderId, paymentMethod, cardLast4 } = req.body;
+
+    if (!orderId) {
+      return res.status(400).json({ success: false, message: 'orderId é obrigatório.' });
+    }
+
+    const result = await checkoutService.confirmPayment({
+      orderId,
+      paymentMethod: paymentMethod || 'pix',
+      cardLast4: cardLast4 || null,
+    });
+
+    console.log(`\n✅ Pagamento confirmado: ${orderId} | ${result.order.email} | ${paymentMethod || 'pix'} | storage: ${result.storage}`);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Pagamento aprovado! Assinatura ativada.',
+      order: result.order,
+      subscription: result.subscription,
+      alreadyPaid: result.alreadyPaid,
+      storage: result.storage,
+    });
+  } catch (error) {
+    console.error('Erro ao confirmar pagamento:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Erro ao confirmar pagamento.',
+    });
+  }
+});
+
+app.get('/api/subscription/status', async (req, res) => {
+  try {
+    const email = req.query.email;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Informe o e-mail.' });
+    }
+
+    const subscription = await checkoutService.getSubscription(email);
+
+    return res.json({
+      success: true,
+      active: subscription?.active || false,
+      subscription: subscription || null,
+    });
+  } catch (error) {
+    console.error('Erro ao verificar assinatura:', error);
+    res.status(500).json({ success: false, message: 'Erro ao verificar assinatura.' });
   }
 });
 
