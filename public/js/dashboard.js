@@ -274,29 +274,39 @@ const modulesData = [
   }
 ];
 
-// 2. AUTENTICAÇÃO DO DASHBOARD
+// 2. AUTENTICAÇÃO DO DASHBOARD — exige login válido
 async function checkAuth() {
   const userEmailEl = document.getElementById('user-email');
   const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('conectwm_auth_token');
 
-  if (token && typeof fetchAuthMe === 'function') {
+  if (!token) {
+    window.location.replace('/login.html');
+    return false;
+  }
+
+  if (typeof fetchAuthMe === 'function') {
     const me = await fetchAuthMe();
-    if (me?.email) {
+    if (me?.email && me?.active) {
       if (userEmailEl) userEmailEl.innerText = me.email;
       localStorage.setItem('conectwm_logged_in_user', me.email);
-      localStorage.setItem('conectwm_user_is_paying', me.active ? 'true' : 'false');
-      return;
+      localStorage.setItem('conectwm_user_is_paying', 'true');
+      if (me.subscription?.expiresAt) {
+        localStorage.setItem('conectwm_subscription_expires', me.subscription.expiresAt);
+      }
+      return true;
     }
   }
 
-  let loggedUser = localStorage.getItem('conectwm_logged_in_user');
-  if (!loggedUser) {
-    loggedUser = 'visitante@conectwm.com.br';
-    localStorage.setItem('conectwm_logged_in_user', loggedUser);
-    localStorage.setItem('conectwm_user_is_paying', 'true');
+  if (typeof clearAuthSession === 'function') clearAuthSession();
+  else {
+    localStorage.removeItem('conectwm_auth_token');
+    localStorage.removeItem('conectwm_logged_in_user');
+    localStorage.removeItem('conectwm_user_is_paying');
+    localStorage.removeItem('conectwm_subscription_expires');
   }
 
-  if (userEmailEl) userEmailEl.innerText = loggedUser;
+  window.location.replace('/login.html?error=sessao');
+  return false;
 }
 
 // 3. LOGOUT
@@ -1303,7 +1313,8 @@ function renderSecurityTipsGrid(answers) {
 
 // 13. INICIALIZAÇÃO GERAL DO PAINEL
 document.addEventListener('DOMContentLoaded', async () => {
-  await checkAuth();
+  const authed = await checkAuth();
+  if (!authed) return;
 
   // Configurar Logout
   const logoutBtn = document.getElementById('btn-logout');

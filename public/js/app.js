@@ -349,7 +349,7 @@ function initMobilePathLock() {
     document.body.classList.add('mobile-locked');
     
     // Encontrar os botões dos dois caminhos no Hero
-    const path1Btn = document.querySelector('#caminhos a[href="/dashboard.html"]');
+    const path1Btn = document.querySelector('#caminhos a[href="/login.html"]');
     const path2Btn = document.querySelector('#caminhos a[href="#diagnostico"]');
     
     if (path1Btn) {

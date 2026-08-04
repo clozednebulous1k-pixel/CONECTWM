@@ -195,12 +195,6 @@
               <span>ENTRAR</span>
             </button>
 
-            <!-- Acesso direto (demo / preview) -->
-            <button type="button" id="direct-access-btn" class="w-full py-3 px-6 rounded-xl bg-transparent border border-gray-800 hover:border-gray-600 text-gray-500 hover:text-gray-300 text-sm font-semibold transition-all flex items-center justify-center gap-2 font-outfit">
-              <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
-              <span>Preview do dashboard (sem compra)</span>
-            </button>
-
             <!-- Comprar acesso -->
             <a href="/index.html#precos" class="w-full py-4 px-6 rounded-xl bg-transparent border border-sky-500/40 hover:border-sky-400 text-sky-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
               <i data-lucide="shopping-cart" class="h-4.5 w-4.5"></i>
@@ -238,14 +232,24 @@
         lucide.createIcons();
       });
 
+      function showError(msg) {
+        if (!loginError) return;
+        loginError.textContent = msg;
+        loginError.classList.remove('hidden');
+      }
+
       const params = new URLSearchParams(window.location.search);
       const urlEmail = params.get('email');
       const welcome = params.get('welcome');
       const urlPwd = params.get('pwd');
+      const authError = params.get('error');
       const emailInput = document.getElementById('login-email');
 
       if (urlEmail && emailInput) emailInput.value = urlEmail;
       if (welcome === '1' && welcomeBanner) welcomeBanner.classList.remove('hidden');
+      if (authError === 'sessao') {
+        showError('Sessão expirada ou inválida. Faça login novamente.');
+      }
 
       const tempPwd = sessionStorage.getItem('conectwm_temp_pwd') || urlPwd;
       if (tempPwd && passwordInput) {
@@ -253,17 +257,12 @@
         sessionStorage.removeItem('conectwm_temp_pwd');
       }
 
-      function showError(msg) {
-        if (!loginError) return;
-        loginError.textContent = msg;
-        loginError.classList.remove('hidden');
-      }
-
-      async function enterDashboardPreview() {
-        localStorage.setItem('conectwm_logged_in_user', 'preview@conectwm.com.br');
-        localStorage.setItem('conectwm_user_is_paying', 'true');
-        window.location.href = '/dashboard.html';
-      }
+      // Já logado → vai direto pro dashboard
+      (async () => {
+        if (typeof fetchAuthMe !== 'function' || !getAuthToken()) return;
+        const me = await fetchAuthMe();
+        if (me?.active) window.location.replace('/dashboard.html');
+      })();
 
       const form = document.getElementById('login-form');
       form.addEventListener('submit', async (e) => {
@@ -303,8 +302,6 @@
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalHtml;
       });
-
-      document.getElementById('direct-access-btn')?.addEventListener('click', enterDashboardPreview);
 
       lucide.createIcons();
     });
