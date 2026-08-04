@@ -4,6 +4,46 @@ let db = null;
 let enabled = false;
 let lastInitError = null;
 
+function normalizePrivateKey(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+
+  let key = raw.trim();
+
+  // Aspas extras da Vercel
+  if ((key.startsWith('"') && key.endsWith('"')) || (key.startsWith("'") && key.endsWith("'"))) {
+    key = key.slice(1, -1);
+  }
+
+  // \n literal → quebra de linha real
+  key = key.replace(/\\n/g, '\n');
+
+  // Chave colada em uma linha só
+  if (!key.includes('\n') && key.includes('-----BEGIN PRIVATE KEY-----')) {
+    key = key
+      .replace('-----BEGIN PRIVATE KEY-----', '-----BEGIN PRIVATE KEY-----\n')
+      .replace('-----END PRIVATE KEY-----', '\n-----END PRIVATE KEY-----\n')
+      .trim();
+  }
+
+  if (!key.includes('-----BEGIN PRIVATE KEY-----') || !key.includes('-----END PRIVATE KEY-----')) {
+    return null;
+  }
+
+  return key;
+}
+
+function getPrivateKeyDiagnostics() {
+  const raw = process.env.FIREBASE_PRIVATE_KEY || '';
+  return {
+    configured: Boolean(raw),
+    length: raw.length,
+    hasBeginMarker: raw.includes('BEGIN PRIVATE KEY'),
+    hasEndMarker: raw.includes('END PRIVATE KEY'),
+    hasNewlines: raw.includes('\n') || raw.includes('\\n'),
+    normalizedOk: Boolean(normalizePrivateKey(raw)),
+  };
+}
+
 function parseServiceAccountJson(raw) {
   if (!raw || typeof raw !== 'string') return null;
   let text = raw.trim();
@@ -56,11 +96,17 @@ function initFirebase() {
       }
 
       if (!initialized && projectId && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
+        const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
+        if (!privateKey) {
+          throw new Error(
+            'FIREBASE_PRIVATE_KEY inválida. Cole a chave completa com -----BEGIN PRIVATE KEY----- e -----END PRIVATE KEY-----.'
+          );
+        }
         admin.initializeApp({
           credential: admin.credential.cert({
             projectId,
-            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL.trim(),
+            privateKey,
           }),
         });
         initialized = true;
@@ -100,6 +146,7 @@ function isFirebaseEnabled() {
 
 function getFirebaseStatus() {
   const state = initFirebase();
+  const keyHint = getPrivateKeyDiagnostics();
   return {
     enabled: state.enabled,
     storage: state.enabled ? 'firebase' : 'memory',
@@ -111,6 +158,10 @@ function getFirebaseStatus() {
       process.env.FIREBASE_PRIVATE_KEY
     ),
     projectId: process.env.FIREBASE_PROJECT_ID || null,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL
+      ? process.env.FIREBASE_CLIENT_EMAIL.replace(/(.{6}).*(@.*)/, '$1***$2')
+      : null,
+    privateKeyHint: keyHint,
   };
 }
 
