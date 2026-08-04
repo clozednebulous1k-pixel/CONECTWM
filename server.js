@@ -5,6 +5,7 @@ const path = require('path');
 const { OpenAI } = require('openai');
 const { initFirebase } = require('./services/firebase');
 const checkoutService = require('./services/checkout');
+const authService = require('./services/auth');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -159,6 +160,37 @@ app.post('/api/checkout/confirm', async (req, res) => {
       cardLast4: cardLast4 || null,
     });
 
+    let credentials = null;
+    if (!result.alreadyPaid && result.subscription) {
+      credentials = await authService.createUserAccess({
+        email: result.order.email,
+        orderId,
+        planLabel: result.subscription.planLabel,
+        expiresAt: result.subscription.expiresAt,
+      });
+    } else if (result.alreadyPaid && result.order?.email) {
+      const existing = await authService.getUserByEmail(result.order.email);
+      if (!existing && result.subscription) {
+        credentials = await authService.createUserAccess({
+          email: result.order.email,
+          orderId,
+          planLabel: result.subscription.planLabel,
+          expiresAt: result.subscription.expiresAt,
+        });
+      } else {
+        credentials = {
+          email: result.order.email,
+          password: null,
+          welcomeEmail: {
+            subject: 'Acesso já existente',
+            body: 'Sua conta já foi criada. Use o e-mail e a senha enviados na compra anterior.',
+            loginUrl: `/login.html?email=${encodeURIComponent(result.order.email)}`,
+          },
+          existingAccount: true,
+        };
+      }
+    }
+
     console.log(`\n✅ Pagamento confirmado: ${orderId} | ${result.order.email} | ${paymentMethod || 'pix'} | storage: ${result.storage}`);
 
     return res.status(200).json({
@@ -168,6 +200,7 @@ app.post('/api/checkout/confirm', async (req, res) => {
       subscription: result.subscription,
       alreadyPaid: result.alreadyPaid,
       storage: result.storage,
+      credentials,
     });
   } catch (error) {
     console.error('Erro ao confirmar pagamento:', error);
@@ -195,6 +228,65 @@ app.get('/api/subscription/status', async (req, res) => {
   } catch (error) {
     console.error('Erro ao verificar assinatura:', error);
     res.status(500).json({ success: false, message: 'Erro ao verificar assinatura.' });
+  }
+});
+
+// ----------------------------------------------------
+// 3. AUTENTICAÇÃO — LOGIN APÓS COMPRA
+// ----------------------------------------------------
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'E-mail e senha são obrigatórios.' });
+    }
+
+    const loginResult = await authService.loginUser({ email, password });
+    if (!loginResult.success) {
+      return res.status(401).json(loginResult);
+    }
+
+    const subscription = await checkoutService.getSubscription(loginResult.email);
+
+    if (!subscription?.active) {
+      return res.status(403).json({
+        success: false,
+        message: 'Assinatura inativa ou expirada. Renove seu plano para acessar.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'Login realizado com sucesso!',
+      token: loginResult.token,
+      email: loginResult.email,
+      expiresAt: loginResult.expiresAt,
+      subscription,
+    });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    res.status(500).json({ success: false, message: 'Erro interno ao fazer login.' });
+  }
+});
+
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
+    const session = await authService.validateSession(token);
+    if (!session) {
+      return res.status(401).json({ success: false, message: 'Sessão inválida ou expirada.' });
+    }
+
+    const subscription = await checkoutService.getSubscription(session.email);
+    return res.json({
+      success: true,
+      email: session.email,
+      subscription,
+      active: subscription?.active || false,
+    });
+  } catch (error) {
+    console.error('Erro ao validar sessão:', error);
+    res.status(500).json({ success: false, message: 'Erro ao validar sessão.' });
   }
 });
 

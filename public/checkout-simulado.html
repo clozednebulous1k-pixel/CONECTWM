@@ -207,6 +207,46 @@
             <p id="success-order-info" class="text-[11px] text-gray-500 font-mono"></p>
           </div>
 
+      <!-- Simulação do e-mail com login enviado -->
+      <div id="credentials-box" class="hidden text-left space-y-4">
+        <div class="rounded-2xl border border-green-500/30 bg-green-500/5 p-4 space-y-2">
+          <div class="flex items-center gap-2 text-green-400 text-xs font-bold uppercase tracking-wider">
+            <i data-lucide="mail-check" class="h-4 w-4"></i>
+            E-mail de acesso enviado (simulação)
+          </div>
+          <p class="text-xs text-gray-400">Na produção, este e-mail seria enviado automaticamente. Abaixo está o preview com login e senha:</p>
+        </div>
+
+        <div class="bg-slate-950 border border-gray-800 rounded-2xl p-5 space-y-4 text-left">
+          <div>
+            <span class="text-[10px] text-gray-500 uppercase font-bold">Para</span>
+            <p id="cred-email-to" class="text-sm text-white font-semibold"></p>
+          </div>
+          <div>
+            <span class="text-[10px] text-gray-500 uppercase font-bold">Assunto</span>
+            <p id="cred-email-subject" class="text-sm text-sky-300"></p>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="rounded-xl bg-slate-900 border border-gray-800 p-3">
+              <span class="text-[10px] text-gray-500 uppercase font-bold block mb-1">E-mail de login</span>
+              <p id="cred-login-email" class="text-sm text-white font-mono break-all"></p>
+            </div>
+            <div class="rounded-xl bg-slate-900 border border-sky-500/30 p-3">
+              <span class="text-[10px] text-sky-400 uppercase font-bold block mb-1">Senha gerada</span>
+              <p id="cred-login-password" class="text-lg text-sky-300 font-black font-mono tracking-wider"></p>
+            </div>
+          </div>
+          <pre id="cred-email-body" class="text-xs text-gray-400 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto bg-slate-900/50 rounded-xl p-3 border border-gray-800"></pre>
+          <button type="button" id="copy-credentials-btn" class="w-full py-2.5 rounded-xl bg-slate-900 border border-gray-800 hover:border-sky-500/40 text-xs font-bold text-sky-400 transition-all">
+            Copiar login e senha
+          </button>
+        </div>
+      </div>
+
+      <div id="credentials-existing" class="hidden rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-left text-xs text-amber-200">
+        Conta já existente para este e-mail. Use a senha enviada na compra anterior.
+      </div>
+
       <div class="bg-slate-900 border border-gray-800 rounded-2xl p-6 text-left space-y-4">
         <div class="flex gap-4">
           <div class="h-10 w-10 rounded-lg bg-green-500/15 text-green-400 flex items-center justify-center flex-shrink-0">
@@ -238,7 +278,7 @@
       </div>
 
       <a id="success-dashboard-link" href="/login.html" class="inline-block w-full py-4 px-6 rounded-xl bg-white hover:bg-gray-100 text-slate-950 font-black transition-all">
-        Acessar Área de Membros
+        Ir para Login — Área de Membros
       </a>
     </div>
   </div>
@@ -394,24 +434,42 @@
         const successModal = document.getElementById('payment-success-modal');
         const info = document.getElementById('success-order-info');
         const dashLink = document.getElementById('success-dashboard-link');
+        const credBox = document.getElementById('credentials-box');
+        const credExisting = document.getElementById('credentials-existing');
+        const cred = result?.credentials;
 
         if (info) {
           info.textContent = `Pedido ${orderId} | ${transactionId || ''} | Firebase: ${result?.storage || 'ok'}`;
         }
 
-        localStorage.setItem('conectwm_logged_in_user', email);
-        localStorage.setItem('conectwm_user_is_paying', 'true');
-        if (result?.subscription?.expiresAt) {
-          localStorage.setItem('conectwm_subscription_expires', result.subscription.expiresAt);
-        }
+        if (cred?.password && credBox) {
+          credBox.classList.remove('hidden');
+          document.getElementById('cred-email-to').textContent = cred.email;
+          document.getElementById('cred-email-subject').textContent = cred.welcomeEmail?.subject || '';
+          document.getElementById('cred-login-email').textContent = cred.email;
+          document.getElementById('cred-login-password').textContent = cred.password;
+          document.getElementById('cred-email-body').textContent = cred.welcomeEmail?.body || '';
 
-        if (dashLink) {
-          dashLink.href = `/login.html?email=${encodeURIComponent(email)}&paid=1`;
+          document.getElementById('copy-credentials-btn')?.addEventListener('click', () => {
+            const text = `E-mail: ${cred.email}\nSenha: ${cred.password}\nLogin: ${window.location.origin}/login.html?email=${encodeURIComponent(cred.email)}&welcome=1`;
+            navigator.clipboard.writeText(text);
+          }, { once: true });
+
+          if (dashLink) {
+            dashLink.href = `/login.html?email=${encodeURIComponent(cred.email)}&welcome=1`;
+            dashLink.addEventListener('click', () => {
+              sessionStorage.setItem('conectwm_temp_pwd', cred.password);
+            }, { once: true });
+          }
+        } else if (cred?.existingAccount && credExisting) {
+          credExisting.classList.remove('hidden');
+          if (dashLink) dashLink.href = `/login.html?email=${encodeURIComponent(cred.email)}`;
         }
 
         if (successModal) {
           successModal.classList.remove('hidden');
           successModal.classList.add('flex');
+          if (window.lucide?.createIcons) window.lucide.createIcons();
         }
       }
 

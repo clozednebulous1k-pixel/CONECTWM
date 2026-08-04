@@ -274,8 +274,21 @@ const modulesData = [
   }
 ];
 
-// 2. ACESSO ABERTO AO DASHBOARD (demo / preview)
-function checkAuth() {
+// 2. AUTENTICAÇÃO DO DASHBOARD
+async function checkAuth() {
+  const userEmailEl = document.getElementById('user-email');
+  const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('conectwm_auth_token');
+
+  if (token && typeof fetchAuthMe === 'function') {
+    const me = await fetchAuthMe();
+    if (me?.email) {
+      if (userEmailEl) userEmailEl.innerText = me.email;
+      localStorage.setItem('conectwm_logged_in_user', me.email);
+      localStorage.setItem('conectwm_user_is_paying', me.active ? 'true' : 'false');
+      return;
+    }
+  }
+
   let loggedUser = localStorage.getItem('conectwm_logged_in_user');
   if (!loggedUser) {
     loggedUser = 'visitante@conectwm.com.br';
@@ -283,17 +296,18 @@ function checkAuth() {
     localStorage.setItem('conectwm_user_is_paying', 'true');
   }
 
-  const userEmailEl = document.getElementById('user-email');
-  if (userEmailEl) {
-    userEmailEl.innerText = loggedUser;
-  }
+  if (userEmailEl) userEmailEl.innerText = loggedUser;
 }
 
 // 3. LOGOUT
 function handleLogout() {
-  localStorage.removeItem('conectwm_logged_in_user');
-  localStorage.removeItem('conectwm_user_is_paying');
-  window.location.href = "/";
+  if (typeof clearAuthSession === 'function') clearAuthSession();
+  else {
+    localStorage.removeItem('conectwm_logged_in_user');
+    localStorage.removeItem('conectwm_user_is_paying');
+    localStorage.removeItem('conectwm_auth_token');
+  }
+  window.location.href = '/login.html';
 }
 
 // 4. CONTROLE DE NAVEGAÇÃO ENTRE ABAS
@@ -1288,9 +1302,8 @@ function renderSecurityTipsGrid(answers) {
 }
 
 // 13. INICIALIZAÇÃO GERAL DO PAINEL
-document.addEventListener('DOMContentLoaded', () => {
-  // Garantir controle de login
-  checkAuth();
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkAuth();
 
   // Configurar Logout
   const logoutBtn = document.getElementById('btn-logout');

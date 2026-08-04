@@ -133,6 +133,16 @@
         </div>
 
         <!-- Formulário -->
+        <div id="welcome-banner" class="hidden rounded-xl border border-green-500/30 bg-green-500/10 p-4 space-y-2">
+          <p class="text-sm font-bold text-green-400 flex items-center gap-2">
+            <i data-lucide="party-popper" class="h-4 w-4"></i>
+            Compra confirmada! Use o login enviado por e-mail.
+          </p>
+          <p class="text-xs text-gray-400">Digite o e-mail da compra e a senha que apareceu na tela de confirmação (simulação do e-mail).</p>
+        </div>
+
+        <div id="login-error" class="hidden rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300"></div>
+
         <form id="login-form" class="space-y-5">
           
           <!-- E-mail -->
@@ -180,22 +190,22 @@
           <!-- Botões de Ação -->
           <div class="space-y-3 pt-2">
             <!-- Entrar -->
-            <button type="submit" class="w-full py-4 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all btn-glow-tech flex items-center justify-center gap-2 font-outfit">
+            <button type="submit" id="login-submit-btn" class="w-full py-4 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all btn-glow-tech flex items-center justify-center gap-2 font-outfit">
               <i data-lucide="log-in" class="h-4.5 w-4.5"></i>
               <span>ENTRAR</span>
             </button>
 
-            <!-- Acesso direto (demo) -->
-            <button type="button" id="direct-access-btn" class="w-full py-4 px-6 rounded-xl bg-transparent border border-sky-500/40 hover:border-sky-400 text-sky-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
-              <i data-lucide="layout-dashboard" class="h-4.5 w-4.5"></i>
-              <span>ACESSAR DASHBOARD SEM LOGIN</span>
+            <!-- Acesso direto (demo / preview) -->
+            <button type="button" id="direct-access-btn" class="w-full py-3 px-6 rounded-xl bg-transparent border border-gray-800 hover:border-gray-600 text-gray-500 hover:text-gray-300 text-sm font-semibold transition-all flex items-center justify-center gap-2 font-outfit">
+              <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+              <span>Preview do dashboard (sem compra)</span>
             </button>
 
-            <!-- Criar Conta -->
-            <button type="button" class="w-full py-4 px-6 rounded-xl bg-transparent border border-gray-800 hover:border-gray-600 text-gray-300 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
-              <i data-lucide="user-plus" class="h-4.5 w-4.5"></i>
-              <span>CRIAR CONTA</span>
-            </button>
+            <!-- Comprar acesso -->
+            <a href="/index.html#precos" class="w-full py-4 px-6 rounded-xl bg-transparent border border-sky-500/40 hover:border-sky-400 text-sky-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
+              <i data-lucide="shopping-cart" class="h-4.5 w-4.5"></i>
+              <span>COMPRAR ACESSO — R$ 47/mês</span>
+            </a>
           </div>
 
         </form>
@@ -211,72 +221,91 @@
 
   </div>
 
+  <script src="js/auth-client.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Toggle Mostrar/Ocultar Senha
       const passwordInput = document.getElementById('login-password');
       const togglePasswordBtn = document.getElementById('toggle-password-btn');
       const eyeIcon = document.getElementById('password-eye-icon');
+      const loginError = document.getElementById('login-error');
+      const welcomeBanner = document.getElementById('welcome-banner');
+      const submitBtn = document.getElementById('login-submit-btn');
 
       togglePasswordBtn.addEventListener('click', () => {
         const isPassword = passwordInput.getAttribute('type') === 'password';
         passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        
-        // Atualizar ícone
-        if (isPassword) {
-          eyeIcon.setAttribute('data-lucide', 'eye-off');
-        } else {
-          eyeIcon.setAttribute('data-lucide', 'eye');
-        }
+        eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
         lucide.createIcons();
       });
 
       const params = new URLSearchParams(window.location.search);
       const urlEmail = params.get('email');
-      const paid = params.get('paid');
+      const welcome = params.get('welcome');
+      const urlPwd = params.get('pwd');
       const emailInput = document.getElementById('login-email');
-      if (urlEmail && emailInput) emailInput.value = urlEmail;
 
-      async function enterDashboard(email) {
-        const userEmail = email || 'visitante@conectwm.com.br';
-        try {
-          const res = await fetch(`/api/subscription/status?email=${encodeURIComponent(userEmail)}`);
-          const data = await res.json();
-          if (data.success && data.active) {
-            localStorage.setItem('conectwm_user_is_paying', 'true');
-            if (data.subscription?.expiresAt) {
-              localStorage.setItem('conectwm_subscription_expires', data.subscription.expiresAt);
-            }
-          }
-        } catch (err) {
-          console.warn('Verificação de assinatura indisponível:', err);
-        }
-        localStorage.setItem('conectwm_logged_in_user', userEmail);
-        if (!localStorage.getItem('conectwm_user_is_paying')) {
-          localStorage.setItem('conectwm_user_is_paying', 'true');
-        }
+      if (urlEmail && emailInput) emailInput.value = urlEmail;
+      if (welcome === '1' && welcomeBanner) welcomeBanner.classList.remove('hidden');
+
+      const tempPwd = sessionStorage.getItem('conectwm_temp_pwd') || urlPwd;
+      if (tempPwd && passwordInput) {
+        passwordInput.value = tempPwd;
+        sessionStorage.removeItem('conectwm_temp_pwd');
+      }
+
+      function showError(msg) {
+        if (!loginError) return;
+        loginError.textContent = msg;
+        loginError.classList.remove('hidden');
+      }
+
+      async function enterDashboardPreview() {
+        localStorage.setItem('conectwm_logged_in_user', 'preview@conectwm.com.br');
+        localStorage.setItem('conectwm_user_is_paying', 'true');
         window.location.href = '/dashboard.html';
       }
 
-      // Submit do Login
       const form = document.getElementById('login-form');
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('login-email').value.trim();
-        enterDashboard(email);
+        const password = passwordInput.value;
+
+        if (!email || !password) {
+          showError('Informe e-mail e senha.');
+          return;
+        }
+
+        if (loginError) loginError.classList.add('hidden');
+        const originalHtml = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Entrando...</span>';
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json();
+
+          if (data.success) {
+            saveAuthSession(data);
+            window.location.href = '/dashboard.html';
+            return;
+          }
+
+          showError(data.message || 'Não foi possível entrar.');
+        } catch (err) {
+          showError('Erro de conexão. Tente novamente.');
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalHtml;
       });
 
-      if (paid === '1' && urlEmail) {
-        enterDashboard(urlEmail);
-      }
+      document.getElementById('direct-access-btn')?.addEventListener('click', enterDashboardPreview);
 
-      // Acesso direto sem credenciais
-      const directAccessBtn = document.getElementById('direct-access-btn');
-      if (directAccessBtn) {
-        directAccessBtn.addEventListener('click', () => enterDashboard());
-      }
-
-      // Inicializa os ícones do Lucide
       lucide.createIcons();
     });
   </script>
