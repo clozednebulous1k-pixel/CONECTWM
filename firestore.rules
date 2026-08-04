@@ -32,5 +32,10 @@ service cloud.firestore {
       allow read: if false;
       allow write: if false;
     }
+
+    match /hotmart_events/{eventId} {
+      allow read: if false;
+      allow write: if false;
+    }
   }
 }

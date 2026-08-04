@@ -196,9 +196,12 @@
             </button>
 
             <!-- Comprar acesso -->
-            <a href="/index.html#precos" class="w-full py-4 px-6 rounded-xl bg-transparent border border-sky-500/40 hover:border-sky-400 text-sky-400 hover:text-white font-bold transition-all flex items-center justify-center gap-2 font-outfit">
-              <i data-lucide="shopping-cart" class="h-4.5 w-4.5"></i>
-              <span>COMPRAR ACESSO — R$ 47/mês</span>
+            <a href="https://pay.hotmart.com/O107022826R" class="trigger-checkout w-full py-4 px-6 rounded-xl bg-transparent border border-amber-500/40 hover:border-amber-400 text-amber-300 hover:text-white font-bold transition-all flex flex-col items-center justify-center gap-1 font-outfit">
+              <span class="flex items-center gap-2">
+                <i data-lucide="shopping-cart" class="h-4.5 w-4.5"></i>
+                <span>GARANTIR VAGA — R$ 39,99/mês</span>
+              </span>
+              <span class="text-[10px] font-normal text-gray-500">Preço de lançamento · vagas limitadas</span>
             </a>
           </div>
 
@@ -215,6 +218,7 @@
 
   </div>
 
+  <script src="js/checkout-config.js"></script>
   <script src="js/auth-client.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -304,6 +308,14 @@
       });
 
       lucide.createIcons();
+
+      document.querySelectorAll('.trigger-checkout').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (typeof goToCheckout === 'function') goToCheckout();
+          else window.location.href = 'https://pay.hotmart.com/O107022826R';
+        });
+      });
     });
   </script>
   <script src="js/chatbot.js"></script>

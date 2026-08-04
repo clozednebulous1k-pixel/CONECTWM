@@ -187,25 +187,31 @@ function initDiagnosticForm() {
 }
 
 // ----------------------------------------------------
-// 5. MODAL E SIMULAÇÃO DE CHECKOUT
+// 5. CHECKOUT HOTMART + URGÊNCIA
 // ----------------------------------------------------
+function initScarcityCounters() {
+  if (typeof getSpotsRemaining !== 'function') return;
+  const spots = getSpotsRemaining();
+  ['spots-remaining', 'spots-remaining-card', 'spots-remaining-modal'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(spots);
+  });
+}
+
 function initCheckoutModal() {
   const checkoutTriggers = document.querySelectorAll('.trigger-checkout');
   const checkoutModal = document.getElementById('checkout-modal');
   const closeCheckoutBtn = document.getElementById('close-checkout-modal');
-  const checkoutForm = document.getElementById('checkout-form');
-  const checkoutSubmitBtn = document.getElementById('checkout-submit-btn');
+  const hotmartBtn = document.getElementById('checkout-hotmart-btn');
 
-  let selectedProductType = 'comunidade_mensal';
+  initScarcityCounters();
 
-  checkoutTriggers.forEach(trigger => {
+  checkoutTriggers.forEach((trigger) => {
     trigger.addEventListener('click', (e) => {
-      e.preventDefault();
-      selectedProductType = trigger.getAttribute('data-product') || 'comunidade_mensal';
-      
-      if (checkoutModal) {
-        checkoutModal.classList.remove('hidden');
-        checkoutModal.classList.add('flex');
+      if (trigger.getAttribute('href')?.includes('pay.hotmart.com')) {
+        e.preventDefault();
+        if (typeof goToCheckout === 'function') goToCheckout();
+        else window.location.href = 'https://pay.hotmart.com/O107022826R';
       }
     });
   });
@@ -217,46 +223,10 @@ function initCheckoutModal() {
     });
   }
 
-  if (checkoutForm && checkoutSubmitBtn) {
-    checkoutForm.addEventListener('submit', async (e) => {
+  if (hotmartBtn) {
+    hotmartBtn.addEventListener('click', (e) => {
       e.preventDefault();
-
-      const email = document.getElementById('checkout-email').value.trim();
-      if (!email) return;
-
-      // Estado de loading
-      const originalText = checkoutSubmitBtn.innerHTML;
-      checkoutSubmitBtn.disabled = true;
-      checkoutSubmitBtn.innerHTML = `
-        <div class="flex items-center justify-center gap-2">
-          <div class="loader-spinner"></div>
-          <span>Redirecionando...</span>
-        </div>
-      `;
-
-      try {
-        const response = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, type: selectedProductType })
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success && result.checkoutUrl) {
-          // Redireciona para a página de checkout simulado
-          window.location.href = result.checkoutUrl;
-        } else {
-          alert('Erro ao iniciar checkout: ' + (result.message || 'Erro desconhecido.'));
-          checkoutSubmitBtn.disabled = false;
-          checkoutSubmitBtn.innerHTML = originalText;
-        }
-      } catch (err) {
-        console.error('Erro de checkout:', err);
-        alert('Não foi possível contactar o servidor.');
-        checkoutSubmitBtn.disabled = false;
-        checkoutSubmitBtn.innerHTML = originalText;
-      }
+      if (typeof goToCheckout === 'function') goToCheckout();
     });
   }
 }
@@ -349,7 +319,7 @@ function initMobilePathLock() {
     document.body.classList.add('mobile-locked');
     
     // Encontrar os botões dos dois caminhos no Hero
-    const path1Btn = document.querySelector('#caminhos a[href="/login.html"]');
+    const path1Btn = document.querySelector('#caminhos a.trigger-checkout, #caminhos a[href*="pay.hotmart.com"]');
     const path2Btn = document.querySelector('#caminhos a[href="#diagnostico"]');
     
     if (path1Btn) {

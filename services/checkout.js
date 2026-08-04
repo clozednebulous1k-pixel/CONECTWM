@@ -1,8 +1,8 @@
 const { getDb, isFirebaseEnabled, serverTimestamp } = require('./firebase');
 
 const PLANS = {
-  comunidade_mensal: { amount: 47, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
-  comunidade: { amount: 47, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
+  comunidade_mensal: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
+  comunidade: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
   comunidade_anual: { amount: 497, billing: 'annual', days: 365, label: 'Comunidade conectWM — Anual' },
 };
 
@@ -186,6 +186,175 @@ async function confirmPayment({ orderId, paymentMethod, cardLast4 }) {
   };
 }
 
+async function isHotmartEventProcessed(eventKey) {
+  if (!eventKey) return false;
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    const snap = await db.collection('hotmart_events').doc(eventKey).get();
+    return snap.exists;
+  }
+  return memoryOrders.has(`hm_${eventKey}`);
+}
+
+async function markHotmartEventProcessed(eventKey, meta) {
+  if (!eventKey) return;
+  const record = { ...meta, processedAt: new Date().toISOString() };
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('hotmart_events').doc(eventKey).set({
+      ...record,
+      processedAt: serverTimestamp(),
+    });
+  } else {
+    memoryOrders.set(`hm_${eventKey}`, record);
+  }
+}
+
+async function activateFromHotmartPayment({
+  email,
+  transactionId,
+  hotmartEventId,
+  productId,
+  productName,
+  amount,
+  currency = 'BRL',
+  paymentMethod = 'hotmart',
+  billingDays = 30,
+  planLabel = 'Comunidade conectWM — Hotmart',
+  affiliateRef = null,
+}) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    throw new Error('E-mail do comprador inválido no webhook Hotmart.');
+  }
+
+  const eventKey = hotmartEventId || `tx_${transactionId}`;
+  if (await isHotmartEventProcessed(eventKey)) {
+    return {
+      duplicate: true,
+      email: normalizedEmail,
+      subscription: await getSubscription(normalizedEmail),
+      storage: isFirebaseEnabled() ? 'firebase' : 'memory',
+    };
+  }
+
+  const paidAt = new Date();
+  const expiresAt = addDays(paidAt, billingDays);
+  const orderId = `hm_${transactionId || Date.now()}`;
+
+  const orderData = {
+    orderId,
+    email: normalizedEmail,
+    plan: 'comunidade_mensal',
+    planLabel,
+    amount: amount || PLANS.comunidade_mensal.amount,
+    currency,
+    billing: billingDays >= 365 ? 'annual' : 'monthly',
+    status: 'paid',
+    transactionId: transactionId || orderId,
+    hotmartEventId: eventKey,
+    hotmartProductId: productId || null,
+    hotmartProductName: productName || null,
+    paymentMethod,
+    affiliateRef,
+    source: 'hotmart',
+    paidAt: paidAt.toISOString(),
+    createdAt: paidAt.toISOString(),
+  };
+
+  const subscriptionData = {
+    email: normalizedEmail,
+    plan: billingDays >= 365 ? 'comunidade_anual' : 'comunidade_mensal',
+    planLabel,
+    status: 'active',
+    amount: orderData.amount,
+    billing: orderData.billing,
+    orderId,
+    transactionId: orderData.transactionId,
+    hotmartProductId: productId || null,
+    source: 'hotmart',
+    startedAt: paidAt.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    updatedAt: paidAt.toISOString(),
+  };
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    const subDocId = emailToDocId(normalizedEmail);
+    const batch = db.batch();
+
+    batch.set(db.collection('orders').doc(orderId), {
+      ...orderData,
+      createdAt: serverTimestamp(),
+      paidAt: serverTimestamp(),
+    }, { merge: true });
+
+    batch.set(db.collection('subscriptions').doc(subDocId), {
+      ...subscriptionData,
+      startedAt: serverTimestamp(),
+      expiresAt,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    batch.set(db.collection('payments').doc(), {
+      orderId,
+      email: normalizedEmail,
+      amount: orderData.amount,
+      currency,
+      method: paymentMethod,
+      status: 'approved',
+      transactionId: orderData.transactionId,
+      hotmartEventId: eventKey,
+      source: 'hotmart',
+      simulated: false,
+      createdAt: serverTimestamp(),
+    });
+
+    await batch.commit();
+  } else {
+    memoryOrders.set(orderId, orderData);
+    memorySubscriptions.set(emailToDocId(normalizedEmail), subscriptionData);
+  }
+
+  await markHotmartEventProcessed(eventKey, {
+    email: normalizedEmail,
+    transactionId: orderData.transactionId,
+    event: 'purchase_approved',
+  });
+
+  return {
+    duplicate: false,
+    order: orderData,
+    subscription: subscriptionData,
+    storage: isFirebaseEnabled() ? 'firebase' : 'memory',
+  };
+}
+
+async function deactivateSubscription(email, reason = 'canceled') {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return null;
+
+  const subDocId = emailToDocId(normalizedEmail);
+  const payload = {
+    status: 'inactive',
+    inactiveReason: reason,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('subscriptions').doc(subDocId).set({
+      ...payload,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } else if (memorySubscriptions.has(subDocId)) {
+    const sub = memorySubscriptions.get(subDocId);
+    memorySubscriptions.set(subDocId, { ...sub, ...payload });
+  }
+
+  return { email: normalizedEmail, status: 'inactive', reason };
+}
+
 async function getSubscription(email) {
   const normalizedEmail = normalizeEmail(email);
   if (!normalizedEmail) return null;
@@ -218,5 +387,8 @@ module.exports = {
   getOrder,
   confirmPayment,
   getSubscription,
+  activateFromHotmartPayment,
+  deactivateSubscription,
+  isHotmartEventProcessed,
   normalizeEmail,
 };

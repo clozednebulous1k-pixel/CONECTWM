@@ -6,6 +6,7 @@ const { OpenAI } = require('openai');
 const { initFirebase } = require('./services/firebase');
 const checkoutService = require('./services/checkout');
 const authService = require('./services/auth');
+const hotmartService = require('./services/hotmart');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -162,21 +163,23 @@ app.post('/api/checkout/confirm', async (req, res) => {
 
     let credentials = null;
     if (!result.alreadyPaid && result.subscription) {
-      credentials = await authService.createUserAccess({
+      credentials = await authService.provisionUserAccess({
         email: result.order.email,
         orderId,
         planLabel: result.subscription.planLabel,
         expiresAt: result.subscription.expiresAt,
       });
+      await authService.dispatchWelcomeEmail(credentials.welcomeEmail, credentials.password);
     } else if (result.alreadyPaid && result.order?.email) {
       const existing = await authService.getUserByEmail(result.order.email);
       if (!existing && result.subscription) {
-        credentials = await authService.createUserAccess({
+        credentials = await authService.provisionUserAccess({
           email: result.order.email,
           orderId,
           planLabel: result.subscription.planLabel,
           expiresAt: result.subscription.expiresAt,
         });
+        await authService.dispatchWelcomeEmail(credentials.welcomeEmail, credentials.password);
       } else {
         credentials = {
           email: result.order.email,
@@ -291,7 +294,47 @@ app.get('/api/auth/me', async (req, res) => {
 });
 
 // ----------------------------------------------------
-// 3. ENDPOINT: CHATBOT DE IA (CONECTWM ASSISTANT)
+// 4. WEBHOOK HOTMART — LIBERA LOGIN APÓS COMPRA REAL
+// ----------------------------------------------------
+app.post('/api/webhooks/hotmart', async (req, res) => {
+  try {
+    const result = await hotmartService.handleHotmartWebhook(req.body, req.headers);
+    console.log(`✅ Hotmart processado: ${result.action} | ${result.email || '—'}`);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    console.error('Erro webhook Hotmart:', error.message);
+    const status = error.statusCode || 500;
+    return res.status(status).json({ success: false, message: error.message });
+  }
+});
+
+/** Simula compra Hotmart (dev) — POST { "email": "..." } */
+app.post('/api/webhooks/hotmart/simulate', async (req, res) => {
+  try {
+    const allowSim = process.env.HOTMART_ALLOW_SIMULATE === 'true' || process.env.NODE_ENV !== 'production';
+    if (!allowSim) {
+      return res.status(403).json({ success: false, message: 'Simulação desabilitada em produção.' });
+    }
+
+    const email = req.body?.email;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Informe { "email": "..." }.' });
+    }
+
+    const result = await hotmartService.simulateHotmartPurchase(email);
+    return res.status(200).json({
+      success: true,
+      message: 'Compra Hotmart simulada. Verifique login gerado.',
+      ...result,
+    });
+  } catch (error) {
+    console.error('Erro simulação Hotmart:', error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ----------------------------------------------------
+// 5. ENDPOINT: CHATBOT DE IA (CONECTWM ASSISTANT)
 // ----------------------------------------------------
 // Contexto institucional da conectWM que orienta a IA
 const SYSTEM_PROMPT = `

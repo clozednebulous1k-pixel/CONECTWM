@@ -75,7 +75,7 @@ Equipe conectWM`,
   };
 }
 
-async function createUserAccess({ email, orderId, planLabel, expiresAt }) {
+async function createUserAccess({ email, orderId, planLabel, expiresAt, channel = 'checkout_success' }) {
   const normalizedEmail = normalizeEmail(email);
   const password = generateAccessPassword();
   const passwordHash = hashPassword(password);
@@ -106,7 +106,7 @@ async function createUserAccess({ email, orderId, planLabel, expiresAt }) {
       subject: buildWelcomeEmail({ email: normalizedEmail, password, planLabel, expiresAt }).subject,
       sentAt: serverTimestamp(),
       simulated: true,
-      channel: 'checkout_success',
+      channel,
     });
   } else {
     memoryUsers.set(docId, userData);
@@ -124,6 +124,75 @@ async function createUserAccess({ email, orderId, planLabel, expiresAt }) {
     password,
     welcomeEmail,
   };
+}
+
+/** Cria acesso novo ou reutiliza conta existente (não reseta senha). */
+async function provisionUserAccess({ email, orderId, planLabel, expiresAt, channel = 'checkout_success' }) {
+  const normalizedEmail = normalizeEmail(email);
+  const existing = await getUserByEmail(normalizedEmail);
+
+  if (existing) {
+    const loginUrl = `${getAppUrl()}/login.html?email=${encodeURIComponent(normalizedEmail)}`;
+    return {
+      email: normalizedEmail,
+      password: null,
+      existingAccount: true,
+      welcomeEmail: {
+        to: normalizedEmail,
+        subject: 'Seu acesso conectWM Academy continua ativo',
+        body: `Olá!
+
+Seu pagamento foi confirmado e sua assinatura foi renovada/atualizada.
+
+Use o mesmo e-mail e a senha enviados na sua primeira compra.
+
+👉 Entrar: ${loginUrl}
+
+Se esqueceu a senha, fale conosco no WhatsApp.
+
+Equipe conectWM`,
+        loginUrl,
+      },
+    };
+  }
+
+  return createUserAccess({ email: normalizedEmail, orderId, planLabel, expiresAt, channel });
+}
+
+async function dispatchWelcomeEmail(welcomeEmail, password) {
+  const webhookUrl = process.env.ACCESS_EMAIL_WEBHOOK_URL;
+  const payload = {
+    to: welcomeEmail.to,
+    subject: welcomeEmail.subject,
+    body: welcomeEmail.body,
+    loginUrl: welcomeEmail.loginUrl,
+    password: password || null,
+    source: 'conectwm_academy',
+  };
+
+  if (webhookUrl && webhookUrl.startsWith('http')) {
+    try {
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      console.log(`📧 Webhook de e-mail disparado para ${welcomeEmail.to}`);
+      return { sent: true, channel: 'webhook' };
+    } catch (err) {
+      console.error('Erro ao enviar webhook de e-mail:', err.message);
+    }
+  }
+
+  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('📧 E-MAIL DE ACESSO (simulado / log servidor)');
+  console.log(`Para: ${welcomeEmail.to}`);
+  console.log(`Assunto: ${welcomeEmail.subject}`);
+  if (password) console.log(`Senha: ${password}`);
+  console.log(`Login: ${welcomeEmail.loginUrl}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+  return { sent: false, channel: 'log' };
 }
 
 async function getUserByEmail(email) {
@@ -217,6 +286,8 @@ async function loginUser({ email, password }) {
 
 module.exports = {
   createUserAccess,
+  provisionUserAccess,
+  dispatchWelcomeEmail,
   loginUser,
   validateSession,
   getUserByEmail,
