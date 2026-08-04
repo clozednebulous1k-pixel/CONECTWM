@@ -513,8 +513,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Inicializar Servidor
-app.listen(PORT, () => {
-  console.log(`\n🚀 Servidor conectWM rodando na porta ${PORT}`);
-  console.log(`🔗 Acesse localmente em: http://localhost:${PORT}`);
-});
+// Inicializar Servidor (local) ou exportar para Vercel
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 Servidor conectWM rodando na porta ${PORT}`);
+    console.log(`🔗 Acesse localmente em: http://localhost:${PORT}`);
+  });
+}

@@ -103,13 +103,9 @@ function buildServiceAccountFromEnv() {
 }
 
 function resetFirebaseApps() {
-  for (const app of admin.apps) {
-    try {
-      app.delete();
-    } catch {
-      // ignore
-    }
-  }
+  // Evita delete() assíncrono que pode quebrar cold starts na Vercel
+  db = null;
+  enabled = false;
 }
 
 function initFirebase() {
