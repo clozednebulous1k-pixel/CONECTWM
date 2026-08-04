@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { OpenAI } = require('openai');
-const { initFirebase } = require('./services/firebase');
+const { initFirebase, getFirebaseStatus } = require('./services/firebase');
 const checkoutService = require('./services/checkout');
 const authService = require('./services/auth');
 const hotmartService = require('./services/hotmart');
@@ -12,6 +12,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 initFirebase();
+
+app.get('/api/system/status', (req, res) => {
+  const firebase = getFirebaseStatus();
+  res.json({
+    success: true,
+    firebase,
+    hotmartSimulate: process.env.HOTMART_ALLOW_SIMULATE === 'true',
+    appUrl: process.env.APP_URL || process.env.VERCEL_URL || null,
+  });
+});
 
 // Middleware
 app.use(cors());
