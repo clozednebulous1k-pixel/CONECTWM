@@ -53,15 +53,25 @@
       </div>
 
       <!-- Logged Profile Card -->
-      <div class="bg-slate-950/60 border border-gray-900 rounded-2xl p-4 mb-6 flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20 font-bold">
-          U
-        </div>
-        <div class="min-w-0">
-          <span id="user-email" class="text-xs text-white font-semibold truncate block">aluno@conectwm.com.br</span>
-          <span class="inline-flex items-center gap-1 rounded bg-green-500/10 text-green-400 text-[9px] px-1.5 py-0.5 mt-0.5 font-bold uppercase tracking-wider">
-            Assinatura Ativa
-          </span>
+      <div class="relative mb-6" id="user-profile-menu">
+        <button type="button" id="user-profile-toggle" class="w-full bg-slate-950/60 border border-gray-900 rounded-2xl p-4 flex items-center gap-3 hover:border-gray-700 transition-colors cursor-pointer text-left group">
+          <div id="user-avatar" class="h-10 w-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20 font-bold shrink-0">
+            U
+          </div>
+          <div class="min-w-0 flex-1">
+            <span id="user-email" class="text-xs text-white font-semibold truncate block">aluno@conectwm.com.br</span>
+            <span class="inline-flex items-center gap-1 rounded bg-green-500/10 text-green-400 text-[9px] px-1.5 py-0.5 mt-0.5 font-bold uppercase tracking-wider">
+              Assinatura Ativa
+            </span>
+          </div>
+          <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 group-hover:text-gray-300 shrink-0 transition-colors"></i>
+        </button>
+
+        <div id="user-profile-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-xl border border-gray-800 bg-[#0b0f17] shadow-xl overflow-hidden">
+          <button type="button" id="btn-profile-logout" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-semibold text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-colors">
+            <i data-lucide="log-out" class="h-4 w-4"></i>
+            <span>Sair e voltar ao site</span>
+          </button>
         </div>
       </div>
 

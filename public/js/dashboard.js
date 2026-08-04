@@ -277,6 +277,7 @@ const modulesData = [
 // 2. AUTENTICAÇÃO DO DASHBOARD — exige login válido
 async function checkAuth() {
   const userEmailEl = document.getElementById('user-email');
+  const userAvatarEl = document.getElementById('user-avatar');
   const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('conectwm_auth_token');
 
   if (!token) {
@@ -288,6 +289,7 @@ async function checkAuth() {
     const me = await fetchAuthMe();
     if (me?.email && me?.active) {
       if (userEmailEl) userEmailEl.innerText = me.email;
+      if (userAvatarEl) userAvatarEl.innerText = me.email.charAt(0).toUpperCase();
       localStorage.setItem('conectwm_logged_in_user', me.email);
       localStorage.setItem('conectwm_user_is_paying', 'true');
       if (me.subscription?.expiresAt) {
@@ -316,8 +318,35 @@ function handleLogout() {
     localStorage.removeItem('conectwm_logged_in_user');
     localStorage.removeItem('conectwm_user_is_paying');
     localStorage.removeItem('conectwm_auth_token');
+    localStorage.removeItem('conectwm_subscription_expires');
   }
-  window.location.href = '/login.html';
+  window.location.href = '/';
+}
+
+function initProfileMenu() {
+  const menu = document.getElementById('user-profile-menu');
+  const toggle = document.getElementById('user-profile-toggle');
+  const dropdown = document.getElementById('user-profile-dropdown');
+  const profileLogout = document.getElementById('btn-profile-logout');
+
+  if (!menu || !toggle || !dropdown) return;
+
+  toggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    dropdown.classList.toggle('hidden');
+    if (window.lucide?.createIcons) window.lucide.createIcons();
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!menu.contains(e.target)) dropdown.classList.add('hidden');
+  });
+
+  if (profileLogout) {
+    profileLogout.addEventListener('click', (e) => {
+      e.preventDefault();
+      handleLogout();
+    });
+  }
 }
 
 // 4. CONTROLE DE NAVEGAÇÃO ENTRE ABAS
@@ -1317,6 +1346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!authed) return;
 
   // Configurar Logout
+  initProfileMenu();
   const logoutBtn = document.getElementById('btn-logout');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', (e) => {
