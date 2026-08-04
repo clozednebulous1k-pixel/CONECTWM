@@ -38,23 +38,40 @@ function initFirebase() {
 
   try {
     if (admin.apps.length === 0) {
+      let initialized = false;
+
       if (json) {
-        const serviceAccount = parseServiceAccountJson(json);
-        if (!serviceAccount?.client_email || !serviceAccount?.private_key) {
-          throw new Error('JSON da service account incompleto (client_email ou private_key).');
+        try {
+          const serviceAccount = parseServiceAccountJson(json);
+          if (serviceAccount?.client_email && serviceAccount?.private_key) {
+            admin.initializeApp({
+              credential: admin.credential.cert(serviceAccount),
+              projectId: serviceAccount.project_id || projectId,
+            });
+            initialized = true;
+          }
+        } catch (jsonErr) {
+          console.warn('⚠️ FIREBASE_SERVICE_ACCOUNT_JSON inválido, tentando variáveis separadas:', jsonErr.message);
         }
-        admin.initializeApp({
-          credential: admin.credential.cert(serviceAccount),
-          projectId: serviceAccount.project_id || projectId,
-        });
-      } else {
+      }
+
+      if (!initialized && projectId && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
         admin.initializeApp({
           credential: admin.credential.cert({
             projectId,
             clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+            privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
           }),
         });
+        initialized = true;
+      }
+
+      if (!initialized) {
+        throw new Error(
+          json
+            ? 'JSON da service account inválido na Vercel. Use o arquivo .json em uma linha ou configure FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY.'
+            : 'Configure FIREBASE_SERVICE_ACCOUNT_JSON ou FIREBASE_PROJECT_ID + FIREBASE_CLIENT_EMAIL + FIREBASE_PRIVATE_KEY.'
+        );
       }
     }
     db = admin.firestore();
@@ -88,6 +105,11 @@ function getFirebaseStatus() {
     storage: state.enabled ? 'firebase' : 'memory',
     error: state.error || null,
     hasServiceAccountJson: Boolean(process.env.FIREBASE_SERVICE_ACCOUNT_JSON),
+    hasSplitCredentials: Boolean(
+      process.env.FIREBASE_PROJECT_ID &&
+      process.env.FIREBASE_CLIENT_EMAIL &&
+      process.env.FIREBASE_PRIVATE_KEY
+    ),
     projectId: process.env.FIREBASE_PROJECT_ID || null,
   };
 }
