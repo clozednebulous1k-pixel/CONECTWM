@@ -349,25 +349,13 @@ function initMobilePathLock() {
     document.body.classList.add('mobile-locked');
     
     // Encontrar os botões dos dois caminhos no Hero
-    const path1Btn = document.querySelector('#caminhos .trigger-checkout');
+    const path1Btn = document.querySelector('#caminhos a[href="/dashboard.html"]');
     const path2Btn = document.querySelector('#caminhos a[href="#diagnostico"]');
     
     if (path1Btn) {
       path1Btn.addEventListener('click', (e) => {
         if (document.body.classList.contains('mobile-locked')) {
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Destravar a tela
           document.body.classList.remove('mobile-locked');
-          
-          // Rolar para comunidade
-          setTimeout(() => {
-            const targetSection = document.getElementById('comunidade');
-            if (targetSection) {
-              targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }, 100);
         }
       }, true);
     }

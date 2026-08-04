@@ -37,28 +37,28 @@ const modulesData = [
     title: "Aplicativos Secretos",
     subtitle: "Ferramentas Avançadas",
     image: "images/module_secret.jpg",
-    description: "Desenvolva utilitários ocultos e extensões automatizadas que resolvem gargalos complexos e geram renda passiva recorrente.",
+    description: "Apps e extensões secretas do mundo tech que poucos conhecem — Vimium, Workona, Bardeen, Merlin, Raycast e mais. Produtividade extrema + opcional criar extensão própria.",
     lessons: [
-      { 
-        id: "2_1", 
-        title: "Descobrindo APIs Ocultas via Inspeção", 
-        duration: "15 min", 
-        desc: "Aprenda a monitorar e inspecionar o tráfego HTTP na aba 'Network' (Rede) dos navegadores. Útil para entender como grandes portais públicos processam dados e como você pode simular essas requisições no seu robô sem pagar por APIs oficiais caras.", 
-        prompt: "Escreva um script Node.js usando fetch que faz uma requisição GET imitando os cabeçalhos de um navegador real (User-Agent, Accept, Referer, Cookie) para obter dados JSON de um endpoint público e salvar localmente." 
+      {
+        id: "2_1",
+        title: "Pack Extensões Chrome Secretas",
+        duration: "18 min",
+        desc: "Instale Vimium, Workona, GoFullPage, WhatRuns, Text Blaze e Automa — ferramentas que a maioria dos devs brasileiros ainda não usa no dia a dia.",
+        prompt: "Guia completo: instalar e configurar Vimium, Workona, GoFullPage, WhatRuns, Text Blaze e Automa no Chrome. Onde clicar, atalhos e 1 caso de uso por extensão."
       },
-      { 
-        id: "2_2", 
-        title: "Construindo Extensões para Google Chrome", 
-        duration: "20 min", 
-        desc: "Crie utilitários e extensões em Javascript que lêem o DOM da página ativa e automatizam tarefas complexas de automação e scraping para o cliente diretamente no navegador.", 
-        prompt: "Gere os arquivos manifest.json (v3), background.js e content.js para uma extensão do Chrome que detecta números de telefone na página ativa e adiciona um botão ao lado para enviar uma mensagem rápida via API do WhatsApp Web." 
+      {
+        id: "2_2",
+        title: "Apps de IA e Automação Escondidos",
+        duration: "20 min",
+        desc: "Merlin, Tactiq, Fireflies, Bardeen e Perplexity — IA e automação integradas na rotina sem trocar de aba o tempo todo.",
+        prompt: "Setup de rotina com Merlin (sidebar GPT), Tactiq (transcrição Meet), Bardeen (automação Chrome) e Perplexity (pesquisa). Passo a passo instalação e fluxo diário."
       },
-      { 
-        id: "2_3", 
-        title: "Empacotando Scripts NodeJS em Executáveis (.exe)", 
-        duration: "25 min", 
-        desc: "Como compilar seus robôs criados em NodeJS em executáveis standalone (.exe para Windows e .app para Mac) utilizando a biblioteca 'pkg'. Excelente método para distribuir softwares e vender licenças físicas sem revelar o código-fonte.", 
-        prompt: "Explique o passo a passo para usar a biblioteca 'pkg' do npm para empacotar um script index.js em um único arquivo .exe executável que roda de forma autônoma sem necessitar do Node.js instalado no sistema do cliente." 
+      {
+        id: "2_3",
+        title: "Criar Extensão ou Bot Próprio (Opcional)",
+        duration: "25 min",
+        desc: "Depois de dominar apps prontos, crie extensão Chrome MV3 ou bot Node.js empacotado em .exe para vender como produto.",
+        prompt: "Extensão Chrome Manifest V3 ou bot Node.js com pkg (.exe). Código completo + chrome://extensions passo a passo + como monetizar licenças."
       }
     ]
   },
@@ -360,9 +360,9 @@ function renderModulesList() {
           <p class="text-gray-400 text-xs line-clamp-3 leading-relaxed">${mod.description}</p>
         </div>
         <div class="flex justify-between items-center pt-4 border-t border-gray-800/60 mt-3 text-xs text-gray-500">
-          <span>${mod.lessons.length} Aulas completas</span>
+          <span>${moduleWizardsData[mod.id] ? moduleWizardsData[mod.id].steps.length + ' etapas' : mod.lessons.length + ' aulas'}</span>
           <span class="text-sky-400 font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1">
-            Acessar Aulas <i data-lucide="chevron-right" class="h-4 w-4"></i>
+            Iniciar Passo a Passo <i data-lucide="chevron-right" class="h-4 w-4"></i>
           </span>
         </div>
       </div>
@@ -377,7 +377,7 @@ function renderModulesList() {
   lucide.createIcons();
 }
 
-// 6. ABRIR MÓDULO E EXIBIR COMPONENTES DA AULA
+// 6. ABRIR MÓDULO — Wizard Interativo Passo a Passo
 function openModule(moduleId) {
   const mod = modulesData.find(m => m.id === moduleId);
   if (!mod) return;
@@ -390,42 +390,49 @@ function openModule(moduleId) {
     lessonViewerDiv.classList.remove('hidden');
   }
 
-  // Atualizar cabeçalho do módulo no viewer
   document.getElementById('current-module-title').innerText = `Módulo ${mod.id}: ${mod.title}`;
   document.getElementById('current-module-subtitle').innerText = mod.subtitle;
 
-  // Renderizar Playlist de Aulas
-  const playlistContainer = document.getElementById('lessons-playlist');
-  if (playlistContainer) {
-    playlistContainer.innerHTML = '';
-    mod.lessons.forEach((lesson, index) => {
-      const item = document.createElement('button');
-      item.className = "w-full p-4 rounded-xl flex items-center gap-3 border text-left transition-all " +
-                       (index === 0 ? "bg-sky-500/10 border-sky-500/30 text-white" : "bg-slate-900/50 border-gray-800 hover:border-gray-700 text-gray-400");
-      item.setAttribute('data-lesson-id', lesson.id);
+  const wizard = moduleWizardsData[moduleId];
+  const introEl = document.getElementById('wizard-step-container');
+  const saved = loadWizardProgress(moduleId);
+  const isDone = localStorage.getItem(`conectwm_module_done_${moduleId}`) === 'true';
 
-      item.innerHTML = `
-        <div class="h-8 w-8 rounded-lg bg-slate-950 border border-gray-800 flex items-center justify-center flex-shrink-0 text-sky-400 text-xs font-bold font-outfit">
-          ${index + 1}
+  if (introEl && wizard) {
+    introEl.innerHTML = `
+      <div class="fade-in space-y-4 text-center py-8">
+        <div class="inline-flex items-center gap-2 rounded-full bg-sky-500/10 border border-sky-500/30 px-4 py-1.5 text-xs font-bold text-sky-400 uppercase tracking-wider">
+          Módulo ${mod.id} — Passo a Passo
         </div>
-        <div class="flex-1 min-w-0">
-          <h5 class="font-bold text-xs truncate leading-snug">${lesson.title}</h5>
-          <span class="text-[10px] text-gray-500">${lesson.duration} • Vídeoaula</span>
+        ${isDone ? '<span class="inline-block text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/30 px-3 py-1 rounded-full">✓ Módulo Concluído</span>' : ''}
+        <h3 class="text-2xl font-bold font-outfit text-white">${wizard.title}</h3>
+        <p class="text-gray-400 text-sm max-w-lg mx-auto leading-relaxed">${wizard.intro}</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center mt-4">
+          <button id="wizard-start-btn" class="px-8 py-4 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition-all btn-glow-tech font-outfit">
+            ${saved ? 'Continuar de Onde Parou →' : 'Começar Agora →'}
+          </button>
+          ${saved ? '<button id="wizard-restart-intro-btn" class="px-6 py-4 rounded-xl bg-slate-900 border border-gray-800 text-gray-400 hover:text-white font-bold text-sm transition-all font-outfit">Recomeçar do Zero</button>' : ''}
         </div>
-      `;
-
-      item.addEventListener('click', () => {
-        selectLesson(mod.id, lesson.id);
-      });
-
-      playlistContainer.appendChild(item);
+      </div>
+    `;
+    document.getElementById('wizard-start-btn')?.addEventListener('click', () => {
+      initModuleWizard(moduleId);
+    });
+    document.getElementById('wizard-restart-intro-btn')?.addEventListener('click', () => {
+      localStorage.removeItem(getWizardProgressKey(moduleId));
+      initModuleWizard(moduleId);
     });
   }
 
-  // Selecionar por padrão a primeira aula
-  if (mod.lessons.length > 0) {
-    selectLesson(mod.id, mod.lessons[0].id);
+  const playlistContainer = document.getElementById('lessons-playlist');
+  if (playlistContainer) {
+    playlistContainer.innerHTML = '<p class="text-xs text-gray-500 p-3">Clique em "Começar Agora" para ver as etapas.</p>';
   }
+
+  const progressBar = document.getElementById('wizard-progress-bar');
+  const progressLabel = document.getElementById('wizard-progress-label');
+  if (progressBar) progressBar.style.width = '0%';
+  if (progressLabel) progressLabel.textContent = 'Pronto para iniciar';
 }
 
 // Retornar para a lista de módulos
@@ -953,8 +960,253 @@ const securityTipsData = [
   }
 ];
 
+// 11. FORMULÁRIO DE STACK — SEGURANÇA
+const SECURITY_WIZARD_KEY = 'conectwm_security_stack';
+
+const securityWizardSteps = [
+  {
+    id: 'linguagem',
+    title: 'Etapa 1 — Linguagem de Programação',
+    question: 'Qual linguagem seu sistema usa no backend?',
+    tip: 'Isso personaliza os prompts de auditoria para a sintaxe e frameworks corretos.',
+    field: 'linguagem',
+    options: [
+      { value: 'nodejs', label: 'JavaScript / Node.js (Express, Fastify, NestJS)' },
+      { value: 'python', label: 'Python (Django, Flask, FastAPI)' },
+      { value: 'php', label: 'PHP (Laravel, WordPress, CodeIgniter)' },
+      { value: 'csharp', label: 'C# / .NET (ASP.NET Core)' },
+      { value: 'java', label: 'Java (Spring Boot)' },
+      { value: 'outra', label: 'Outra linguagem' }
+    ]
+  },
+  {
+    id: 'banco',
+    title: 'Etapa 2 — Banco de Dados',
+    question: 'Qual banco de dados seu projeto utiliza?',
+    tip: 'Cada banco tem riscos específicos: SQL Injection, regras Firestore, RLS no Supabase, etc.',
+    field: 'banco',
+    options: [
+      { value: 'postgresql', label: 'PostgreSQL (Supabase, Neon, VPS)' },
+      { value: 'mysql', label: 'MySQL / MariaDB' },
+      { value: 'firebase', label: 'Firebase Firestore (NoSQL)' },
+      { value: 'mongodb', label: 'MongoDB' },
+      { value: 'sqlite', label: 'SQLite' },
+      { value: 'sqlserver', label: 'Microsoft SQL Server' },
+      { value: 'nenhum', label: 'Ainda não tenho banco definido' }
+    ]
+  },
+  {
+    id: 'sistema',
+    title: 'Etapa 3 — Sistema / Framework',
+    question: 'Qual é o tipo do seu sistema ou framework principal?',
+    field: 'sistema',
+    options: [
+      { value: 'saas_express', label: 'SaaS com API REST (Express / Fastify)' },
+      { value: 'nextjs', label: 'Next.js (React full-stack)' },
+      { value: 'firebase_full', label: 'Firebase completo (Auth + Firestore + Hosting)' },
+      { value: 'supabase_full', label: 'Supabase (Auth + PostgreSQL + Edge Functions)' },
+      { value: 'wordpress', label: 'WordPress / CMS' },
+      { value: 'laravel', label: 'Laravel (PHP)' },
+      { value: 'django', label: 'Django / FastAPI (Python)' },
+      { value: 'landing', label: 'Site estático / Landing page (HTML/JS)' },
+      { value: 'outro', label: 'Outro / ainda definindo' }
+    ]
+  },
+  {
+    id: 'hospedagem_sec',
+    title: 'Etapa 4 — Onde está hospedado?',
+    question: 'Onde seu sistema roda em produção (ou vai rodar)?',
+    field: 'hospedagem',
+    options: [
+      { value: 'firebase', label: 'Firebase Hosting / Functions' },
+      { value: 'vercel', label: 'Vercel / Netlify' },
+      { value: 'vps', label: 'VPS (DigitalOcean, Hetzner, AWS EC2)' },
+      { value: 'shared', label: 'Hospedagem compartilhada (cPanel)' },
+      { value: 'local', label: 'Ainda só local / em desenvolvimento' }
+    ]
+  }
+];
+
+const securityLabels = {
+  linguagem: { nodejs: 'Node.js', python: 'Python', php: 'PHP', csharp: 'C#/.NET', java: 'Java', outra: 'Outra' },
+  banco: { postgresql: 'PostgreSQL', mysql: 'MySQL', firebase: 'Firebase Firestore', mongodb: 'MongoDB', sqlite: 'SQLite', sqlserver: 'SQL Server', nenhum: 'Sem banco ainda' },
+  sistema: { saas_express: 'SaaS API REST', nextjs: 'Next.js', firebase_full: 'Firebase Full-Stack', supabase_full: 'Supabase', wordpress: 'WordPress', laravel: 'Laravel', django: 'Django/FastAPI', landing: 'Site estático', outro: 'Outro' },
+  hospedagem: { firebase: 'Firebase', vercel: 'Vercel/Netlify', vps: 'VPS', shared: 'Hospedagem compartilhada', local: 'Local/dev' }
+};
+
+let securityWizardState = { step: 0, answers: {} };
+
+function loadSecurityStack() {
+  try {
+    const saved = localStorage.getItem(SECURITY_WIZARD_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
+function saveSecurityStack(answers) {
+  localStorage.setItem(SECURITY_WIZARD_KEY, JSON.stringify(answers));
+}
+
+function buildSecurityMasterPrompt(answers) {
+  const lang = securityLabels.linguagem[answers.linguagem] || 'Node.js';
+  const db = securityLabels.banco[answers.banco] || 'PostgreSQL';
+  const sys = securityLabels.sistema[answers.sistema] || 'SaaS';
+  const host = securityLabels.hospedagem[answers.hospedagem] || 'VPS';
+
+  return `Aja como auditor AppSec sênior especialista em ${lang} e ${sys}.
+
+CONTEXTO DO MEU PROJETO:
+- Linguagem: ${lang}
+- Banco de dados: ${db}
+- Sistema/Framework: ${sys}
+- Hospedagem: ${host}
+
+Analise o código que vou colar e verifique vulnerabilidades críticas ESPECÍFICAS para este stack:
+${answers.banco === 'firebase' ? '- Regras Firestore inseguras, Auth mal configurado, API keys expostas' : ''}
+${answers.banco === 'postgresql' || answers.banco === 'mysql' ? '- SQL Injection, queries sem parametrização, credenciais expostas' : ''}
+${answers.linguagem === 'nodejs' ? '- XSS, CSRF, JWT em localStorage, CORS *, dependências npm vulneráveis' : ''}
+${answers.linguagem === 'php' ? '- SQLi, XSS, includes locais, uploads inseguros, versão PHP desatualizada' : ''}
+${answers.linguagem === 'python' ? '- Django/Flask misconfig, SECRET_KEY exposta, SQLAlchemy injection' : ''}
+- Headers de segurança faltantes (Helmet/CSP)
+- Rate limiting ausente
+- .env ou secrets no Git
+- IDOR / Broken Access Control
+- Uploads de arquivo inseguros
+- Logs com dados sensíveis
+
+Para cada falha encontrada: nome da vulnerabilidade, linha/arquivo, risco, e código corrigido para ${lang} + ${db}.`;
+}
+
+function personalizeSecurityPrompt(basePrompt, answers) {
+  const lang = securityLabels.linguagem[answers.linguagem] || 'Node.js';
+  const db = securityLabels.banco[answers.banco] || 'PostgreSQL';
+  return `[Stack: ${lang} + ${db}] ${basePrompt}`;
+}
+
+function initSecurityWizard() {
+  const saved = loadSecurityStack();
+  if (saved && saved.linguagem && saved.banco && saved.sistema) {
+    securityWizardState.answers = saved;
+    showSecurityContent(saved);
+    return;
+  }
+  renderSecurityWizardStep();
+}
+
+function renderSecurityWizardStep() {
+  const wrapper = document.getElementById('security-wizard-wrapper');
+  if (!wrapper) return;
+
+  const step = securityWizardSteps[securityWizardState.step];
+  if (!step) return;
+
+  const saved = securityWizardState.answers[step.field];
+  const total = securityWizardSteps.length;
+  const pct = Math.round(((securityWizardState.step + 1) / total) * 100);
+
+  const optionsHtml = step.options.map(opt => `
+    <button type="button" class="security-choice-btn text-left p-4 rounded-xl border transition-all w-full ${
+      saved === opt.value
+        ? 'bg-sky-500/15 border-sky-500/40 text-white ring-1 ring-sky-500/30'
+        : 'bg-slate-900/60 border-gray-800 hover:border-sky-500/30 text-gray-300 hover:text-white'
+    }" data-value="${opt.value}">
+      <span class="text-sm font-semibold">${opt.label}</span>
+    </button>
+  `).join('');
+
+  wrapper.innerHTML = `
+    <div class="space-y-5 fade-in">
+      <div class="flex items-center justify-between gap-4">
+        <span class="inline-flex items-center gap-2 rounded-full bg-sky-500/10 border border-sky-500/30 px-3 py-1 text-xs font-bold text-sky-400 uppercase tracking-wider">
+          🛡️ ${step.title}
+        </span>
+        <span class="text-xs text-gray-500 font-mono">${securityWizardState.step + 1}/${total}</span>
+      </div>
+      <div class="w-full h-1.5 rounded-full bg-gray-800 overflow-hidden">
+        <div class="h-full bg-sky-400 transition-all duration-300" style="width:${pct}%"></div>
+      </div>
+      <h3 class="text-xl font-bold font-outfit text-white">${step.question}</h3>
+      ${step.tip ? `<p class="text-gray-500 text-sm">💡 ${step.tip}</p>` : ''}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${optionsHtml}</div>
+      <div class="flex justify-between pt-4 border-t border-gray-900">
+        <button id="sec-wiz-prev" class="px-5 py-3 rounded-xl bg-slate-900 border border-gray-800 text-sm font-bold text-gray-400 hover:text-white transition-all ${securityWizardState.step === 0 ? 'opacity-40 cursor-not-allowed' : ''}" ${securityWizardState.step === 0 ? 'disabled' : ''}>← Anterior</button>
+        <button id="sec-wiz-next" class="px-6 py-3 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 text-sm font-bold transition-all btn-glow-tech">
+          ${securityWizardState.step === total - 1 ? 'Ver Dicas de Segurança →' : 'Próxima →'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  wrapper.querySelectorAll('.security-choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wrapper.querySelectorAll('.security-choice-btn').forEach(b => {
+        b.className = 'security-choice-btn text-left p-4 rounded-xl border transition-all w-full bg-slate-900/60 border-gray-800 hover:border-sky-500/30 text-gray-300 hover:text-white';
+      });
+      btn.className = 'security-choice-btn text-left p-4 rounded-xl border transition-all w-full bg-sky-500/15 border-sky-500/40 text-white ring-1 ring-sky-500/30';
+      securityWizardState.answers[step.field] = btn.dataset.value;
+    });
+  });
+
+  document.getElementById('sec-wiz-prev')?.addEventListener('click', () => {
+    if (securityWizardState.step > 0) {
+      securityWizardState.step--;
+      renderSecurityWizardStep();
+    }
+  });
+
+  document.getElementById('sec-wiz-next')?.addEventListener('click', () => {
+    if (!securityWizardState.answers[step.field]) {
+      alert('Selecione uma opção para continuar.');
+      return;
+    }
+    if (securityWizardState.step < total - 1) {
+      securityWizardState.step++;
+      renderSecurityWizardStep();
+    } else {
+      saveSecurityStack(securityWizardState.answers);
+      showSecurityContent(securityWizardState.answers);
+    }
+  });
+}
+
+function showSecurityContent(answers) {
+  const wizardWrap = document.getElementById('security-wizard-wrapper');
+  const contentWrap = document.getElementById('security-content-wrapper');
+  const summary = document.getElementById('security-stack-summary');
+
+  if (wizardWrap) wizardWrap.classList.add('hidden');
+  if (contentWrap) contentWrap.classList.remove('hidden');
+
+  if (summary) {
+    summary.innerHTML = `
+      <div class="flex flex-wrap gap-2 text-xs">
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Linguagem:</strong> ${securityLabels.linguagem[answers.linguagem] || '—'}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Banco:</strong> ${securityLabels.banco[answers.banco] || '—'}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Sistema:</strong> ${securityLabels.sistema[answers.sistema] || '—'}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Hospedagem:</strong> ${securityLabels.hospedagem[answers.hospedagem] || '—'}</span>
+      </div>
+      <button id="sec-wiz-reconfig" class="text-xs font-bold text-sky-400 hover:text-sky-300 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20">Reconfigurar Stack</button>
+    `;
+    document.getElementById('sec-wiz-reconfig')?.addEventListener('click', () => {
+      securityWizardState = { step: 0, answers: {} };
+      localStorage.removeItem(SECURITY_WIZARD_KEY);
+      if (wizardWrap) wizardWrap.classList.remove('hidden');
+      if (contentWrap) contentWrap.classList.add('hidden');
+      renderSecurityWizardStep();
+    });
+  }
+
+  const masterText = document.getElementById('master-prompt-text');
+  if (masterText) {
+    masterText.value = buildSecurityMasterPrompt(answers);
+  }
+
+  renderSecurityTipsGrid(answers);
+}
+
 // 12. RENDERIZAR DIRETRIZES DE SEGURANÇA E CONFIGURAR CLIQUES
-function initSecurityTips() {
+function renderSecurityTipsGrid(answers) {
   const container = document.getElementById('security-tips-grid');
   if (!container) return;
 
@@ -974,7 +1226,7 @@ function initSecurityTips() {
         
         <div class="space-y-2">
           <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider block">Prompt de Validação</span>
-          <textarea id="prompt-text-${tip.id}" readonly class="w-full h-16 bg-slate-950 border border-gray-900 rounded-xl p-2.5 text-[11px] text-sky-200/80 font-mono focus:outline-none resize-none leading-relaxed">${tip.prompt}</textarea>
+          <textarea id="prompt-text-${tip.id}" readonly class="w-full h-16 bg-slate-950 border border-gray-900 rounded-xl p-2.5 text-[11px] text-sky-200/80 font-mono focus:outline-none resize-none leading-relaxed">${personalizeSecurityPrompt(tip.prompt, answers || {})}</textarea>
         </div>
       </div>
       <button data-tip-id="${tip.id}" class="copy-tip-prompt-btn w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 text-xs font-bold transition-all mt-2">
@@ -1061,11 +1313,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnBackModules.addEventListener('click', showModulesList);
   }
 
-  // Controles extras do player e prompt
-  initVideoPlayer();
-  initPromptCopy();
-  initLessonProgress();
-  
-  // Renderizar e iniciar tela de segurança
-  initSecurityTips();
+  // Controles extras do wizard, TikTok Shop e segurança
+  if (typeof initTikTokShop === 'function') initTikTokShop();
+  if (typeof initDevResources === 'function') initDevResources();
+  if (typeof initAfiliados === 'function') initAfiliados();
+  initSecurityWizard();
 });

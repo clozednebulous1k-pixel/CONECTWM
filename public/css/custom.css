@@ -77,6 +77,68 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
   transform: translateY(-4px);
 }
 
+/* Borda rotativa animada — cards hero */
+.border-beam {
+  position: relative;
+  border-radius: 1.5rem;
+  padding: 2px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.border-beam::before {
+  content: '';
+  position: absolute;
+  inset: -150%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 260deg,
+    var(--beam-glow, rgba(56, 189, 248, 0.15)) 280deg,
+    var(--beam-color, #38bdf8) 310deg,
+    var(--beam-glow, rgba(56, 189, 248, 0.15)) 340deg,
+    transparent 360deg
+  );
+  animation: border-beam-spin 3.5s linear infinite;
+  z-index: 0;
+}
+
+.border-beam-sky {
+  --beam-color: #38bdf8;
+  --beam-glow: rgba(56, 189, 248, 0.25);
+}
+
+.border-beam-purple {
+  --beam-color: #a855f7;
+  --beam-glow: rgba(168, 85, 247, 0.25);
+}
+
+.border-beam-inner {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(11, 15, 23, 0.92) !important;
+}
+
+.border-beam-inner:hover {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+@keyframes border-beam-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .border-beam::before {
+    animation: none;
+    inset: 0;
+    background: linear-gradient(135deg, var(--beam-color), transparent 60%);
+    opacity: 0.35;
+  }
+}
+
 /* 3. GLOWING BUTTONS & INPUTS */
 .btn-glow-tech {
   box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
@@ -420,5 +482,41 @@ h1, h2, h3, h4, h5, h6, .font-outfit {
   body.mobile-locked #chat-widget-container {
     display: none !important;
   }
+}
+
+/* Wizard Interativo — Módulos Passo a Passo */
+.wizard-choice-btn {
+  cursor: pointer;
+  user-select: none;
+}
+
+.wizard-step {
+  animation: wizardFadeIn 0.3s ease-out;
+}
+
+@keyframes wizardFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: wizardFadeIn 0.35s ease-out;
+}
+
+#lessons-playlist::-webkit-scrollbar {
+  width: 4px;
+}
+
+.wizard-guide-box strong {
+  color: #fcd34d;
+  font-weight: 600;
+}
+
+.wizard-guide-box code {
+  background: rgba(0,0,0,0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #7dd3fc;
 }
 
