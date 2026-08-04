@@ -339,7 +339,10 @@
       const authError = params.get('error');
 
       if (urlEmail && emailInput) emailInput.value = urlEmail;
-      if (welcomeFromUrl && welcomeBanner && authMode === 'login') welcomeBanner.classList.remove('hidden');
+      if (welcomeFromUrl) {
+        setAuthMode('first-access');
+        if (welcomeBanner) welcomeBanner.classList.remove('hidden');
+      }
       if (authError === 'sessao') {
         showError('Sessão expirada ou inválida. Faça login novamente.');
       }
@@ -408,6 +411,8 @@
 
           if (data.code === 'MUST_SET_PASSWORD' || data.mustSetPassword) {
             setAuthMode('first-access');
+            showError('Primeiro acesso: crie sua senha nos campos abaixo.');
+            return;
           }
 
           showError(data.message || 'Não foi possível entrar.');

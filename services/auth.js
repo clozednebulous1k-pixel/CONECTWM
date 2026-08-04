@@ -15,7 +15,12 @@ function emailToDocId(email) {
 const MIN_PASSWORD_LENGTH = 6;
 
 function needsPasswordSetup(user) {
-  return Boolean(user?.mustSetPassword || !user?.passwordHash);
+  if (!user) return false;
+  if (user.mustSetPassword === true) return true;
+  if (!user.passwordHash) return true;
+  // Contas antigas: senha gerada automaticamente (usuário nunca escolheu)
+  if (!user.passwordSetAt) return true;
+  return false;
 }
 
 function validateNewPassword(password, passwordConfirm) {
@@ -141,23 +146,35 @@ async function provisionUserAccess({ email, orderId, planLabel, expiresAt, chann
   const existing = await getUserByEmail(normalizedEmail);
 
   if (existing) {
-    const loginUrl = `${getAppUrl()}/login.html?email=${encodeURIComponent(normalizedEmail)}`;
+    const loginUrl = `${getAppUrl()}/login.html?email=${encodeURIComponent(normalizedEmail)}&welcome=1`;
+    const mustSetPassword = needsPasswordSetup(existing);
     return {
       email: normalizedEmail,
       password: null,
       existingAccount: true,
+      mustSetPassword,
       welcomeEmail: {
         to: normalizedEmail,
-        subject: 'Seu acesso conectWM Academy continua ativo',
-        body: `Olá!
+        subject: mustSetPassword
+          ? 'Seu acesso conectWM Academy — crie sua senha'
+          : 'Seu acesso conectWM Academy continua ativo',
+        body: mustSetPassword
+          ? `Olá!
+
+Seu pagamento foi confirmado.
+
+👉 Crie sua senha e entre: ${loginUrl}
+
+Use o e-mail da compra e defina uma senha (digite duas vezes para confirmar).
+
+Equipe conectWM`
+          : `Olá!
 
 Seu pagamento foi confirmado e sua assinatura foi renovada/atualizada.
 
-Use o mesmo e-mail e a senha enviados na sua primeira compra.
+Use o mesmo e-mail e senha da sua conta.
 
 👉 Entrar: ${loginUrl}
-
-Se esqueceu a senha, fale conosco no WhatsApp.
 
 Equipe conectWM`,
         loginUrl,
