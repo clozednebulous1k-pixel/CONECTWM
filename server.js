@@ -247,6 +247,58 @@ app.get('/api/subscription/status', async (req, res) => {
 // ----------------------------------------------------
 // 3. AUTENTICAÇÃO — LOGIN APÓS COMPRA
 // ----------------------------------------------------
+app.get('/api/auth/first-access', async (req, res) => {
+  try {
+    const email = req.query.email;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Informe o e-mail.' });
+    }
+
+    const status = await authService.getFirstAccessStatus(email);
+    return res.json({ success: true, ...status });
+  } catch (error) {
+    console.error('Erro ao verificar primeiro acesso:', error);
+    res.status(500).json({ success: false, message: 'Erro ao verificar primeiro acesso.' });
+  }
+});
+
+app.post('/api/auth/set-password', async (req, res) => {
+  try {
+    const { email, password, passwordConfirm } = req.body;
+    if (!email || !password || !passwordConfirm) {
+      return res.status(400).json({
+        success: false,
+        message: 'E-mail, senha e confirmação de senha são obrigatórios.',
+      });
+    }
+
+    const result = await authService.setInitialPassword({ email, password, passwordConfirm });
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    const subscription = await checkoutService.getSubscription(result.email);
+    if (!subscription?.active) {
+      return res.status(403).json({
+        success: false,
+        message: 'Assinatura inativa ou expirada. Renove seu plano para acessar.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: result.message,
+      token: result.token,
+      email: result.email,
+      expiresAt: result.expiresAt,
+      subscription,
+    });
+  } catch (error) {
+    console.error('Erro ao criar senha:', error);
+    res.status(500).json({ success: false, message: 'Erro interno ao criar senha.' });
+  }
+});
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;

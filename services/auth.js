@@ -12,11 +12,23 @@ function emailToDocId(email) {
   return normalizeEmail(email).replace(/\./g, '_dot_').replace(/@/g, '_at_');
 }
 
-function generateAccessPassword() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-  let pwd = 'CW';
-  for (let i = 0; i < 8; i++) pwd += chars[Math.floor(Math.random() * chars.length)];
-  return pwd;
+const MIN_PASSWORD_LENGTH = 6;
+
+function needsPasswordSetup(user) {
+  return Boolean(user?.mustSetPassword || !user?.passwordHash);
+}
+
+function validateNewPassword(password, passwordConfirm) {
+  if (!password || typeof password !== 'string') {
+    return { valid: false, message: 'Informe uma senha.' };
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return { valid: false, message: `A senha deve ter no mínimo ${MIN_PASSWORD_LENGTH} caracteres.` };
+  }
+  if (password !== passwordConfirm) {
+    return { valid: false, message: 'As senhas não coincidem. Digite a mesma senha nos dois campos.' };
+  }
+  return { valid: true, message: null };
 }
 
 function hashPassword(password) {
@@ -47,7 +59,7 @@ function getAppUrl() {
   return 'http://localhost:3000';
 }
 
-function buildWelcomeEmail({ email, password, planLabel, expiresAt }) {
+function buildWelcomeEmail({ email, planLabel, expiresAt }) {
   const loginUrl = `${getAppUrl()}/login.html?email=${encodeURIComponent(email)}&welcome=1`;
   const expires = expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : '—';
 
@@ -60,15 +72,15 @@ Seu pagamento foi confirmado e sua conta na conectWM Academy está ativa.
 
 ━━━━━━━━━━━━━━━━━━━━
 📧 E-mail: ${email}
-🔑 Senha de acesso: ${password}
+🔑 No primeiro acesso, você cria sua própria senha
 ━━━━━━━━━━━━━━━━━━━━
 
 Plano: ${planLabel || 'Comunidade conectWM'}
 Válido até: ${expires}
 
-👉 Entrar agora: ${loginUrl}
+👉 Criar senha e entrar: ${loginUrl}
 
-Guarde esta senha em local seguro. Recomendamos alterá-la após o primeiro acesso.
+Use o e-mail acima e defina uma senha segura (digite duas vezes para confirmar).
 
 Equipe conectWM`,
     loginUrl,
@@ -77,17 +89,20 @@ Equipe conectWM`,
 
 async function createUserAccess({ email, orderId, planLabel, expiresAt, channel = 'checkout_success' }) {
   const normalizedEmail = normalizeEmail(email);
-  const password = generateAccessPassword();
-  const passwordHash = hashPassword(password);
   const docId = emailToDocId(normalizedEmail);
+  const welcomeEmail = buildWelcomeEmail({
+    email: normalizedEmail,
+    planLabel,
+    expiresAt,
+  });
 
   const userData = {
     email: normalizedEmail,
-    passwordHash,
+    passwordHash: null,
     orderId: orderId || null,
     planLabel: planLabel || null,
     status: 'active',
-    mustChangePassword: false,
+    mustSetPassword: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -103,7 +118,7 @@ async function createUserAccess({ email, orderId, planLabel, expiresAt, channel 
     await db.collection('access_emails').add({
       email: normalizedEmail,
       orderId: orderId || null,
-      subject: buildWelcomeEmail({ email: normalizedEmail, password, planLabel, expiresAt }).subject,
+      subject: welcomeEmail.subject,
       sentAt: serverTimestamp(),
       simulated: true,
       channel,
@@ -112,16 +127,10 @@ async function createUserAccess({ email, orderId, planLabel, expiresAt, channel 
     memoryUsers.set(docId, userData);
   }
 
-  const welcomeEmail = buildWelcomeEmail({
-    email: normalizedEmail,
-    password,
-    planLabel,
-    expiresAt,
-  });
-
   return {
     email: normalizedEmail,
-    password,
+    password: null,
+    mustSetPassword: true,
     welcomeEmail,
   };
 }
@@ -251,6 +260,85 @@ async function validateSession(token) {
   return session;
 }
 
+async function getFirstAccessStatus(email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) {
+    return { exists: false, mustSetPassword: false };
+  }
+
+  const user = await getUserByEmail(normalizedEmail);
+  if (!user) {
+    return { exists: false, mustSetPassword: false, email: normalizedEmail };
+  }
+
+  return {
+    exists: true,
+    mustSetPassword: needsPasswordSetup(user),
+    status: user.status || 'active',
+    email: normalizedEmail,
+  };
+}
+
+async function setInitialPassword({ email, password, passwordConfirm }) {
+  const normalizedEmail = normalizeEmail(email);
+  const user = await getUserByEmail(normalizedEmail);
+
+  if (!user) {
+    return { success: false, message: 'Conta não encontrada. Finalize a compra para liberar seu acesso.' };
+  }
+
+  if (user.status !== 'active') {
+    return { success: false, message: 'Conta inativa. Entre em contato com o suporte.' };
+  }
+
+  if (!needsPasswordSetup(user)) {
+    return { success: false, message: 'Esta conta já possui senha. Use o login normal.' };
+  }
+
+  const pwdCheck = validateNewPassword(password, passwordConfirm);
+  if (!pwdCheck.valid) {
+    return { success: false, message: pwdCheck.message };
+  }
+
+  const docId = emailToDocId(normalizedEmail);
+  const passwordHash = hashPassword(password);
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('users').doc(docId).update({
+      passwordHash,
+      mustSetPassword: false,
+      passwordSetAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } else {
+    const stored = memoryUsers.get(docId);
+    if (stored) {
+      stored.passwordHash = passwordHash;
+      stored.mustSetPassword = false;
+      stored.updatedAt = new Date().toISOString();
+      memoryUsers.set(docId, stored);
+    }
+  }
+
+  const session = await createSession(normalizedEmail);
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('users').doc(docId).update({
+      lastLoginAt: serverTimestamp(),
+    });
+  }
+
+  return {
+    success: true,
+    token: session.token,
+    email: normalizedEmail,
+    expiresAt: session.expiresAt,
+    message: 'Senha criada com sucesso!',
+  };
+}
+
 async function loginUser({ email, password }) {
   const normalizedEmail = normalizeEmail(email);
   const user = await getUserByEmail(normalizedEmail);
@@ -261,6 +349,15 @@ async function loginUser({ email, password }) {
 
   if (user.status !== 'active') {
     return { success: false, message: 'Conta inativa. Entre em contato com o suporte.' };
+  }
+
+  if (needsPasswordSetup(user)) {
+    return {
+      success: false,
+      code: 'MUST_SET_PASSWORD',
+      mustSetPassword: true,
+      message: 'Primeiro acesso: crie sua senha antes de entrar.',
+    };
   }
 
   if (!verifyPassword(password, user.passwordHash)) {
@@ -288,6 +385,8 @@ module.exports = {
   createUserAccess,
   provisionUserAccess,
   dispatchWelcomeEmail,
+  getFirstAccessStatus,
+  setInitialPassword,
   loginUser,
   validateSession,
   getUserByEmail,

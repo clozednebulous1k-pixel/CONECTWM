@@ -164,9 +164,13 @@ async function handleHotmartWebhook(rawBody, headers = {}, options = {}) {
     email: parsed.email,
     transactionId: parsed.transactionId,
     subscription: activation.subscription,
-    credentials: credentials.password
-      ? { email: credentials.email, passwordSent: true, emailChannel: emailDispatch.channel }
-      : { email: credentials.email, existingAccount: true, emailChannel: emailDispatch.channel },
+    credentials: credentials.existingAccount
+      ? { email: credentials.email, existingAccount: true, emailChannel: emailDispatch.channel }
+      : {
+          email: credentials.email,
+          mustSetPassword: true,
+          emailChannel: emailDispatch.channel,
+        },
     storage: activation.storage,
   };
 }

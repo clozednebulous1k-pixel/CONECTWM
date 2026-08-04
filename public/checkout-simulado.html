@@ -214,7 +214,7 @@
             <i data-lucide="mail-check" class="h-4 w-4"></i>
             E-mail de acesso enviado (simulação)
           </div>
-          <p class="text-xs text-gray-400">Na produção, este e-mail seria enviado automaticamente. Abaixo está o preview com login e senha:</p>
+          <p class="text-xs text-gray-400">Na produção, este e-mail seria enviado automaticamente. No primeiro acesso, o aluno cria a própria senha:</p>
         </div>
 
         <div class="bg-slate-950 border border-gray-800 rounded-2xl p-5 space-y-4 text-left">
@@ -232,13 +232,13 @@
               <p id="cred-login-email" class="text-sm text-white font-mono break-all"></p>
             </div>
             <div class="rounded-xl bg-slate-900 border border-sky-500/30 p-3">
-              <span class="text-[10px] text-sky-400 uppercase font-bold block mb-1">Senha gerada</span>
-              <p id="cred-login-password" class="text-lg text-sky-300 font-black font-mono tracking-wider"></p>
+              <span class="text-[10px] text-sky-400 uppercase font-bold block mb-1">Próximo passo</span>
+              <p id="cred-first-access-hint" class="text-sm text-sky-300 font-semibold">Criar senha no primeiro login</p>
             </div>
           </div>
           <pre id="cred-email-body" class="text-xs text-gray-400 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto bg-slate-900/50 rounded-xl p-3 border border-gray-800"></pre>
           <button type="button" id="copy-credentials-btn" class="w-full py-2.5 rounded-xl bg-slate-900 border border-gray-800 hover:border-sky-500/40 text-xs font-bold text-sky-400 transition-all">
-            Copiar login e senha
+            Copiar link de acesso
           </button>
         </div>
       </div>
@@ -442,24 +442,22 @@
           info.textContent = `Pedido ${orderId} | ${transactionId || ''} | Firebase: ${result?.storage || 'ok'}`;
         }
 
-        if (cred?.password && credBox) {
+        if (cred && !cred.existingAccount && credBox) {
           credBox.classList.remove('hidden');
           document.getElementById('cred-email-to').textContent = cred.email;
           document.getElementById('cred-email-subject').textContent = cred.welcomeEmail?.subject || '';
           document.getElementById('cred-login-email').textContent = cred.email;
-          document.getElementById('cred-login-password').textContent = cred.password;
+          const hint = document.getElementById('cred-first-access-hint');
+          if (hint) hint.textContent = 'Acesse o login e crie sua senha (digite duas vezes)';
           document.getElementById('cred-email-body').textContent = cred.welcomeEmail?.body || '';
 
+          const loginUrl = `${window.location.origin}/login.html?email=${encodeURIComponent(cred.email)}&welcome=1`;
           document.getElementById('copy-credentials-btn')?.addEventListener('click', () => {
-            const text = `E-mail: ${cred.email}\nSenha: ${cred.password}\nLogin: ${window.location.origin}/login.html?email=${encodeURIComponent(cred.email)}&welcome=1`;
-            navigator.clipboard.writeText(text);
+            navigator.clipboard.writeText(`E-mail: ${cred.email}\nLink: ${loginUrl}\n\nNo primeiro acesso, crie sua senha e confirme digitando duas vezes.`);
           }, { once: true });
 
           if (dashLink) {
-            dashLink.href = `/login.html?email=${encodeURIComponent(cred.email)}&welcome=1`;
-            dashLink.addEventListener('click', () => {
-              sessionStorage.setItem('conectwm_temp_pwd', cred.password);
-            }, { once: true });
+            dashLink.href = loginUrl;
           }
         } else if (cred?.existingAccount && credExisting) {
           credExisting.classList.remove('hidden');

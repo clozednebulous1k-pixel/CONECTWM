@@ -128,17 +128,25 @@
           <div class="h-14 w-14 rounded-2xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
             <i data-lucide="shield-check" class="h-8 w-8"></i>
           </div>
-          <h2 class="text-2xl font-bold font-outfit mt-4 text-white">Acesse sua Conta</h2>
-          <p class="text-sm text-gray-400">Entre para gerenciar seus projetos e acessar a comunidade.</p>
+          <h2 id="login-title" class="text-2xl font-bold font-outfit mt-4 text-white">Acesse sua Conta</h2>
+          <p id="login-subtitle" class="text-sm text-gray-400">Entre para gerenciar seus projetos e acessar a comunidade.</p>
         </div>
 
         <!-- Formulário -->
         <div id="welcome-banner" class="hidden rounded-xl border border-green-500/30 bg-green-500/10 p-4 space-y-2">
           <p class="text-sm font-bold text-green-400 flex items-center gap-2">
             <i data-lucide="party-popper" class="h-4 w-4"></i>
-            Compra confirmada! Use o login enviado por e-mail.
+            Compra confirmada! Crie sua senha para acessar.
           </p>
-          <p class="text-xs text-gray-400">Digite o e-mail da compra e a senha que apareceu na tela de confirmação (simulação do e-mail).</p>
+          <p class="text-xs text-gray-400">Use o e-mail da compra e defina uma senha segura. Digite a mesma senha nos dois campos.</p>
+        </div>
+
+        <div id="first-access-banner" class="hidden rounded-xl border border-sky-500/30 bg-sky-500/10 p-4 space-y-2">
+          <p class="text-sm font-bold text-sky-400 flex items-center gap-2">
+            <i data-lucide="key-round" class="h-4 w-4"></i>
+            Primeiro acesso — crie sua senha
+          </p>
+          <p class="text-xs text-gray-400">Esta conta ainda não tem senha. Defina uma agora para entrar na plataforma.</p>
         </div>
 
         <div id="login-error" class="hidden rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300"></div>
@@ -159,7 +167,7 @@
           </div>
 
           <!-- Senha -->
-          <div>
+          <div id="login-password-group">
             <div class="flex justify-between items-center mb-2">
               <label class="block text-xs font-semibold text-gray-400 uppercase">Senha</label>
             </div>
@@ -178,6 +186,25 @@
             </div>
           </div>
 
+          <!-- Confirmar senha (primeiro acesso) -->
+          <div id="confirm-password-group" class="hidden">
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-semibold text-gray-400 uppercase">Confirmar senha</label>
+            </div>
+            <div class="relative">
+              <span class="absolute left-4 top-3.5 text-gray-500">
+                <i data-lucide="lock-keyhole" class="h-5 w-5"></i>
+              </span>
+              <input type="password" id="login-password-confirm" 
+                     class="input-focus-glow w-full bg-slate-950 border border-gray-800 rounded-xl pl-12 pr-12 py-3.5 text-sm text-white placeholder-gray-600 transition-all" 
+                     placeholder="Repita a senha...">
+              <button type="button" id="toggle-confirm-password-btn" class="absolute right-4 top-3.5 text-gray-500 hover:text-white transition-colors" aria-label="Mostrar confirmação de senha">
+                <i data-lucide="eye" id="confirm-password-eye-icon" class="h-5 w-5"></i>
+              </button>
+            </div>
+            <p class="text-[11px] text-gray-500 mt-2">Mínimo de 6 caracteres.</p>
+          </div>
+
           <!-- Lembrar-me e Esqueci Senha -->
           <div class="flex items-center justify-between text-xs pt-1">
             <label class="flex items-center gap-2 cursor-pointer select-none text-gray-400 hover:text-white transition-colors">
@@ -191,8 +218,8 @@
           <div class="space-y-3 pt-2">
             <!-- Entrar -->
             <button type="submit" id="login-submit-btn" class="w-full py-4 px-6 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold transition-all btn-glow-tech flex items-center justify-center gap-2 font-outfit">
-              <i data-lucide="log-in" class="h-4.5 w-4.5"></i>
-              <span>ENTRAR</span>
+              <i data-lucide="log-in" id="login-submit-icon" class="h-4.5 w-4.5"></i>
+              <span id="login-submit-label">ENTRAR</span>
             </button>
 
             <!-- Comprar acesso -->
@@ -223,18 +250,38 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const passwordInput = document.getElementById('login-password');
+      const confirmPasswordInput = document.getElementById('login-password-confirm');
+      const confirmPasswordGroup = document.getElementById('confirm-password-group');
       const togglePasswordBtn = document.getElementById('toggle-password-btn');
+      const toggleConfirmPasswordBtn = document.getElementById('toggle-confirm-password-btn');
       const eyeIcon = document.getElementById('password-eye-icon');
+      const confirmEyeIcon = document.getElementById('confirm-password-eye-icon');
       const loginError = document.getElementById('login-error');
       const welcomeBanner = document.getElementById('welcome-banner');
+      const firstAccessBanner = document.getElementById('first-access-banner');
       const submitBtn = document.getElementById('login-submit-btn');
+      const submitLabel = document.getElementById('login-submit-label');
+      const submitIcon = document.getElementById('login-submit-icon');
+      const loginTitle = document.getElementById('login-title');
+      const loginSubtitle = document.getElementById('login-subtitle');
+      const emailInput = document.getElementById('login-email');
 
-      togglePasswordBtn.addEventListener('click', () => {
-        const isPassword = passwordInput.getAttribute('type') === 'password';
-        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        eyeIcon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
-        lucide.createIcons();
-      });
+      let authMode = 'login';
+      const params = new URLSearchParams(window.location.search);
+      const welcomeFromUrl = params.get('welcome') === '1';
+
+      function bindPasswordToggle(btn, input, iconEl) {
+        if (!btn || !input || !iconEl) return;
+        btn.addEventListener('click', () => {
+          const isPassword = input.getAttribute('type') === 'password';
+          input.setAttribute('type', isPassword ? 'text' : 'password');
+          iconEl.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+          lucide.createIcons();
+        });
+      }
+
+      bindPasswordToggle(togglePasswordBtn, passwordInput, eyeIcon);
+      bindPasswordToggle(toggleConfirmPasswordBtn, confirmPasswordInput, confirmEyeIcon);
 
       function showError(msg) {
         if (!loginError) return;
@@ -242,23 +289,64 @@
         loginError.classList.remove('hidden');
       }
 
-      const params = new URLSearchParams(window.location.search);
+      function setAuthMode(mode) {
+        authMode = mode;
+        const isFirstAccess = mode === 'first-access';
+
+        if (confirmPasswordGroup) confirmPasswordGroup.classList.toggle('hidden', !isFirstAccess);
+        if (confirmPasswordInput) confirmPasswordInput.required = isFirstAccess;
+
+        if (loginTitle) loginTitle.textContent = isFirstAccess ? 'Crie sua senha' : 'Acesse sua Conta';
+        if (loginSubtitle) {
+          loginSubtitle.textContent = isFirstAccess
+            ? 'Defina uma senha segura para acessar a plataforma.'
+            : 'Entre para gerenciar seus projetos e acessar a comunidade.';
+        }
+        if (passwordInput) {
+          passwordInput.placeholder = isFirstAccess ? 'Crie sua senha...' : 'Digite sua senha...';
+        }
+        if (submitLabel) submitLabel.textContent = isFirstAccess ? 'CRIAR SENHA E ENTRAR' : 'ENTRAR';
+        if (submitIcon) submitIcon.setAttribute('data-lucide', isFirstAccess ? 'key-round' : 'log-in');
+
+        if (welcomeBanner) {
+          welcomeBanner.classList.toggle('hidden', isFirstAccess || !welcomeFromUrl);
+        }
+        if (firstAccessBanner) {
+          firstAccessBanner.classList.toggle('hidden', !isFirstAccess);
+        }
+
+        lucide.createIcons();
+      }
+
+      async function checkFirstAccess(email) {
+        const normalized = (email || '').trim();
+        if (!normalized || !normalized.includes('@')) return;
+
+        try {
+          const res = await fetch(`/api/auth/first-access?email=${encodeURIComponent(normalized)}`);
+          const data = await res.json();
+          if (data.success && data.exists && data.mustSetPassword) {
+            setAuthMode('first-access');
+          } else {
+            setAuthMode('login');
+          }
+        } catch {
+          setAuthMode('login');
+        }
+      }
+
       const urlEmail = params.get('email');
-      const welcome = params.get('welcome');
-      const urlPwd = params.get('pwd');
       const authError = params.get('error');
-      const emailInput = document.getElementById('login-email');
 
       if (urlEmail && emailInput) emailInput.value = urlEmail;
-      if (welcome === '1' && welcomeBanner) welcomeBanner.classList.remove('hidden');
+      if (welcomeFromUrl && welcomeBanner && authMode === 'login') welcomeBanner.classList.remove('hidden');
       if (authError === 'sessao') {
         showError('Sessão expirada ou inválida. Faça login novamente.');
       }
 
-      const tempPwd = sessionStorage.getItem('conectwm_temp_pwd') || urlPwd;
-      if (tempPwd && passwordInput) {
-        passwordInput.value = tempPwd;
-        sessionStorage.removeItem('conectwm_temp_pwd');
+      if (emailInput) {
+        emailInput.addEventListener('blur', () => checkFirstAccess(emailInput.value));
+        if (urlEmail) checkFirstAccess(urlEmail);
       }
 
       // Já logado → vai direto pro dashboard
@@ -271,24 +359,44 @@
       const form = document.getElementById('login-form');
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
+        const email = emailInput.value.trim();
         const password = passwordInput.value;
+        const passwordConfirm = confirmPasswordInput?.value || '';
 
-        if (!email || !password) {
-          showError('Informe e-mail e senha.');
+        if (!email) {
+          showError('Informe seu e-mail.');
+          return;
+        }
+
+        if (authMode === 'first-access') {
+          if (!password || !passwordConfirm) {
+            showError('Informe e confirme sua senha.');
+            return;
+          }
+          if (password !== passwordConfirm) {
+            showError('As senhas não coincidem. Digite a mesma senha nos dois campos.');
+            return;
+          }
+        } else if (!password) {
+          showError('Informe sua senha.');
           return;
         }
 
         if (loginError) loginError.classList.add('hidden');
         const originalHtml = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span>Entrando...</span>';
+        submitBtn.innerHTML = `<span>${authMode === 'first-access' ? 'Criando senha...' : 'Entrando...'}</span>`;
 
         try {
-          const res = await fetch('/api/auth/login', {
+          const endpoint = authMode === 'first-access' ? '/api/auth/set-password' : '/api/auth/login';
+          const body = authMode === 'first-access'
+            ? { email, password, passwordConfirm }
+            : { email, password };
+
+          const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify(body),
           });
           const data = await res.json();
 
@@ -298,6 +406,10 @@
             return;
           }
 
+          if (data.code === 'MUST_SET_PASSWORD' || data.mustSetPassword) {
+            setAuthMode('first-access');
+          }
+
           showError(data.message || 'Não foi possível entrar.');
         } catch (err) {
           showError('Erro de conexão. Tente novamente.');
@@ -305,6 +417,7 @@
 
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalHtml;
+        lucide.createIcons();
       });
 
       lucide.createIcons();
