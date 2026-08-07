@@ -731,7 +731,7 @@ const securityTipsData = [
     id: 4,
     title: "Falta de Rate Limiting",
     icon: "zap",
-    desc: "Endpoints sem limite de taxa são suscetíveis a ataques DDoS e ataques de força bruta, além de estouro de faturamento de APIs.",
+    desc: "Endpoints sem limite de taxa são suscetíveis a DDoS, força bruta e estouro de faturamento de APIs (OpenAI/Firebase). A conectWM já limita /api/chat, login e certificados.",
     prompt: "Identifique se os endpoints deste código Express.js possuem Rate Limiting. Escreva um middleware limitador de requisições para proteger as rotas contra spam."
   },
   {
@@ -1055,6 +1055,41 @@ const securityTipsData = [
     icon: "file-warning",
     desc: "Não salve logs verbosos em ambientes de produção. Configure o nível do logger para logs críticos de aviso e erro.",
     prompt: "Configure um logger profissional como Winston ou Pino no Node.js para alternar automaticamente o nível de log entre verbose (desenvolvimento) e error/critical (produção)."
+  },
+  {
+    id: 51,
+    title: "Chatbot de IA Sem Limite (Custo e Abuso)",
+    icon: "bot",
+    desc: "Chatbots públicos sem rate limit geram spam, estouro de quota OpenAI e sobrecarga no servidor. Limite por IP, intervalo entre mensagens e tamanho do histórico.",
+    prompt: "Implemente rate limiting no endpoint POST /api/chat: máx. 20 req/15min por IP, mensagens até 800 caracteres, histórico truncado em 12 mensagens, headers Retry-After em 429."
+  },
+  {
+    id: 52,
+    title: "Firestore / Firebase · Leituras em Excesso",
+    icon: "database",
+    desc: "Sincronizar progresso a cada clique dispara centenas de reads/writes. Use debounce (3–5s), batch writes e cache local antes de persistir no banco.",
+    prompt: "Refatore sync de progresso do aluno: debounce 4s, agrupar completedModules em uma única escrita Firestore, evitar GET+POST duplicados na mesma sessão."
+  },
+  {
+    id: 53,
+    title: "Debounce e Throttle no Frontend",
+    icon: "timer",
+    desc: "Botões de salvar, emitir certificado e enviar chat devem aguardar cooldown. Desabilite o botão durante requisição e bloqueie double-click.",
+    prompt: "Adicione debounce/throttle em botões críticos do dashboard: chat (2.5s entre envios), sync certificados (4s), login (desabilitar após submit)."
+  },
+  {
+    id: 54,
+    title: "Payload JSON Gigante (DoS de Memória)",
+    icon: "hard-drive",
+    desc: "express.json() sem limit aceita bodies de MB e derruba o Node. Defina limit: '64kb' e valide arrays grandes antes de gravar no banco.",
+    prompt: "Configure express.json({ limit: '64kb' }) e middleware que rejeita arrays com mais de 500 itens em rotas de sync de progresso."
+  },
+  {
+    id: 55,
+    title: "Cache e Idempotência em APIs Caras",
+    icon: "layers",
+    desc: "Rotas de verificação pública (certificados) e catálogo devem cachear resposta 1–5 min. Emissão de certificado deve ser idempotente (não duplicar no DB).",
+    prompt: "Adicione cache in-memory TTL 60s em GET /api/certificates/catalog e garanta que POST /issue retorne certificado existente se já emitido."
   }
 ];
 
@@ -1304,6 +1339,51 @@ function showSecurityContent(answers) {
 }
 
 // 12. RENDERIZAR DIRETRIZES DE SEGURANÇA E CONFIGURAR CLIQUES
+function renderPlatformSecurityLimits() {
+  const el = document.getElementById('platform-security-limits');
+  if (!el) return;
+
+  el.innerHTML = `
+    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+      <div class="space-y-3">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-green-500/10 border border-green-500/25 text-green-400 text-[10px] px-2.5 py-1 font-bold uppercase tracking-wider">
+          <i data-lucide="shield-check" class="h-3 w-3"></i> Proteções ativas na conectWM
+        </span>
+        <h3 class="text-xl font-bold font-outfit text-white">Rate limit · Chat · Banco · APIs</h3>
+        <p class="text-sm text-gray-400 max-w-3xl leading-relaxed">
+          A plataforma já aplica limites para evitar spam, estouro de custo da OpenAI e excesso de leituras/gravações no Firebase.
+          Replique essas práticas no seu SaaS.
+        </p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pt-2">
+      ${[
+        { icon: 'bot', title: 'Chat /api/chat', limit: '20 msg / 15 min por IP', extra: 'Máx. 800 chars · histórico 12 msgs · cooldown 2.5s no widget' },
+        { icon: 'key', title: 'Login /api/auth/login', limit: '12 tentativas / 15 min', extra: 'Protege força bruta e spam de autenticação' },
+        { icon: 'award', title: 'Certificados (sync/issue)', limit: '40 sync / 15 min · 15 emissões / hora', extra: 'Debounce 4s no frontend antes de gravar progresso' },
+        { icon: 'badge-check', title: 'Validar certificado', limit: '80 consultas / 15 min', extra: 'Evita scraping e leituras em massa' },
+        { icon: 'clipboard-list', title: 'Formulários & checkout', limit: '10 diagnósticos / hora · 15 checkouts / hora', extra: 'Anti-spam em leads e simulações' },
+        { icon: 'gauge', title: 'API geral', limit: '120 req / min por IP', extra: 'Body JSON limitado a 64 KB por requisição' },
+      ].map((row) => `
+        <div class="rounded-xl bg-slate-950/70 border border-gray-800 p-4 space-y-2">
+          <div class="flex items-center gap-2">
+            <i data-lucide="${row.icon}" class="h-4 w-4 text-sky-400"></i>
+            <h4 class="text-sm font-bold text-white">${row.title}</h4>
+          </div>
+          <p class="text-xs font-bold text-amber-300">${row.limit}</p>
+          <p class="text-[11px] text-gray-500 leading-relaxed">${row.extra}</p>
+        </div>
+      `).join('')}
+    </div>
+    <p class="text-[11px] text-gray-500 border-t border-gray-800/80 pt-4">
+      Resposta HTTP <strong class="text-gray-400">429</strong> com header <code class="text-sky-300">Retry-After</code> quando o limite é atingido.
+      Em escala multi-servidor, migre o rate limit para Redis (Upstash).
+    </p>
+  `;
+
+  if (window.lucide?.createIcons) window.lucide.createIcons();
+}
+
 function renderSecurityTipsGrid(answers) {
   const container = document.getElementById('security-tips-grid');
   if (!container) return;
@@ -1417,5 +1497,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof initDevResources === 'function') initDevResources();
   if (typeof initAfiliados === 'function') initAfiliados();
   initSecurityWizard();
+  renderPlatformSecurityLimits();
   if (window.Certificates?.init) await Certificates.init();
 });

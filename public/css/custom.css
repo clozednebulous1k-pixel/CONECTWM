@@ -661,3 +661,12 @@ body.landing-page::-webkit-scrollbar {
   }
 }
 
+.prize-banner-glow {
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prize-banner-glow .animate-pulse {
+    animation: none;
+  }
+}

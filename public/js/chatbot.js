@@ -51,7 +51,7 @@ function injectChatbotMarkup() {
 
       <!-- Chat Input Form -->
       <div class="p-3 bg-slate-950 border-t border-gray-800 flex gap-2">
-        <input type="text" id="chat-input" class="flex-1 bg-slate-900 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 input-focus-glow transition-all" placeholder="Escreva sua dúvida...">
+        <input type="text" id="chat-input" maxlength="800" class="flex-1 bg-slate-900 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 input-focus-glow transition-all" placeholder="Escreva sua dúvida... (máx. 800 caracteres)">
         <button id="chat-send-btn" class="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center transition-all">
           <i data-lucide="send-horizontal" class="h-4.5 w-4.5"></i>
         </button>
@@ -82,6 +82,15 @@ function initChatbot() {
 
   let chatHistory = [];
   let isChatbotOpened = false;
+  let lastSendAt = 0;
+  const CHAT_MIN_INTERVAL_MS = 2500;
+  const CHAT_MAX_HISTORY = 10;
+
+  function trimChatHistory() {
+    if (chatHistory.length > CHAT_MAX_HISTORY) {
+      chatHistory = chatHistory.slice(-CHAT_MAX_HISTORY);
+    }
+  }
 
   if (chatbotToggle && chatbotWindow) {
     chatbotToggle.addEventListener('click', () => {
@@ -116,11 +125,24 @@ function initChatbot() {
     const text = chatInput.value.trim();
     if (!text) return;
 
+    if (text.length > 800) {
+      addMessageBubble('Mensagem muito longa. Use no máximo 800 caracteres.', 'bot');
+      return;
+    }
+
+    const now = Date.now();
+    if (now - lastSendAt < CHAT_MIN_INTERVAL_MS) {
+      addMessageBubble('Aguarde alguns segundos antes de enviar outra mensagem.', 'bot');
+      return;
+    }
+    lastSendAt = now;
+
     chatInput.value = '';
     addMessageBubble(text, 'user');
     scrollToBottom();
 
     chatHistory.push({ role: 'user', content: text });
+    trimChatHistory();
 
     if (chatTypingIndicator) {
       chatTypingIndicator.classList.remove('hidden');
@@ -140,15 +162,26 @@ function initChatbot() {
         chatTypingIndicator.classList.add('hidden');
       }
 
+      if (response.status === 429) {
+        const wait = result.retryAfter ? ` Aguarde ~${result.retryAfter}s.` : '';
+        addMessageBubble(`⏳ ${result.message || 'Limite de mensagens atingido.'}${wait}`, 'bot');
+        chatHistory.pop();
+        return;
+      }
+
       if (response.ok && result.success) {
         const botReply = result.reply;
         addMessageBubble(botReply, 'bot');
         chatHistory.push({ role: 'assistant', content: botReply });
+        trimChatHistory();
+      } else if (response.status === 400) {
+        addMessageBubble(result.message || 'Mensagem inválida. Tente encurtar o texto.', 'bot');
+        chatHistory.pop();
       } else {
-        // Fallback local caso o endpoint retorne erro
         const botReply = getFrontendFallbackResponse(text);
         addMessageBubble(botReply, 'bot');
         chatHistory.push({ role: 'assistant', content: botReply });
+        trimChatHistory();
       }
     } catch (error) {
       console.warn('Erro de rede ao conectar à API do chat, usando fallback local...', error);

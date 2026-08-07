@@ -12,10 +12,11 @@
 <body class="bg-[#0b0f17] text-white font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6 relative">
   <div class="grid-bg-overlay !fixed"></div>
 
-  <div class="glass-card rounded-3xl p-8 md:p-10 max-w-lg w-full border border-sky-500/20 relative z-10 space-y-6">
-    <div class="text-center space-y-2">
-      <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mx-auto">
-        <i data-lucide="badge-check" class="h-7 w-7"></i>
+  <div class="glass-card rounded-3xl p-8 md:p-10 max-w-2xl w-full border border-sky-500/20 relative z-10 space-y-6">
+    <div class="text-center space-y-3">
+      <img src="images/logo.png" alt="conectWM" class="h-12 w-auto mx-auto">
+      <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mx-auto">
+        <i data-lucide="badge-check" class="h-6 w-6"></i>
       </div>
       <h1 class="text-2xl font-bold font-outfit">Validar Certificado</h1>
       <p class="text-sm text-gray-400">Digite o código impresso no certificado conectWM Academy.</p>
@@ -29,9 +30,12 @@
 
     <div id="verify-result" class="hidden rounded-xl border p-4 text-sm space-y-2"></div>
 
+    <div id="cert-preview-wrap" class="hidden rounded-xl overflow-hidden border border-sky-500/20 bg-slate-950"></div>
+
     <a href="/login.html" class="block text-center text-xs text-gray-500 hover:text-sky-400 transition-colors">Área de membros conectWM</a>
   </div>
 
+  <script src="js/certificates.js"></script>
   <script>
     lucide.createIcons();
 
@@ -41,12 +45,17 @@
 
     function showResult(ok, cert, message) {
       const box = document.getElementById('verify-result');
+      const previewWrap = document.getElementById('cert-preview-wrap');
       box.classList.remove('hidden');
+      previewWrap.classList.add('hidden');
+      previewWrap.innerHTML = '';
+
       if (!ok) {
         box.className = 'rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300';
         box.innerHTML = `<strong>Certificado não encontrado.</strong><br>${message || 'Verifique o código e tente novamente.'}`;
         return;
       }
+
       const date = cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString('pt-BR') : '';
       box.className = 'rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-sm space-y-2 text-gray-200';
       box.innerHTML = `
@@ -58,6 +67,17 @@
         <p class="text-xs font-mono text-gray-500">Código ${cert.code}</p>
       `;
       lucide.createIcons();
+
+      if (window.Certificates?.drawCertificateCanvas) {
+        Certificates.drawCertificateCanvas(cert).then((canvas) => {
+          canvas.style.width = '100%';
+          canvas.style.height = 'auto';
+          canvas.style.display = 'block';
+          previewWrap.innerHTML = '';
+          previewWrap.appendChild(canvas);
+          previewWrap.classList.remove('hidden');
+        }).catch(() => {});
+      }
     }
 
     async function verify(code) {

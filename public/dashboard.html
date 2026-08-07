@@ -205,6 +205,7 @@
         <p class="text-gray-400 text-sm mt-1">Conclua os módulos no passo a passo e emita certificados oficiais da conectWM Academy.</p>
         <p id="certificates-summary" class="text-xs mt-3 flex flex-wrap gap-2 items-center"></p>
       </div>
+      <div id="academy-prize-banner"></div>
       <div id="certificates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </section>
 
@@ -447,6 +448,11 @@
         <p class="text-gray-400 text-sm mt-1">Responda sobre seu stack e receba dicas + prompts personalizados para o seu sistema.</p>
       </div>
 
+      <!-- Proteções ativas na plataforma conectWM -->
+      <div id="platform-security-limits" class="glass-card rounded-2xl p-6 md:p-8 border border-sky-500/20 bg-sky-500/5 space-y-4">
+        <!-- Renderizado via dashboard.js -->
+      </div>
+
       <!-- Formulário de Stack (antes das dicas) -->
       <div id="security-wizard-wrapper" class="glass-card rounded-2xl p-6 md:p-8 border border-sky-500/15 max-w-3xl mx-auto">
         <!-- Renderizado via dashboard.js -->
@@ -486,51 +492,69 @@
     <section id="sec-recursos" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
         <h2 class="text-3xl font-bold font-outfit text-white">Biblioteca de Recursos & Prompts</h2>
-        <p class="text-gray-400 text-sm mt-1">Materiais para acelerar o desenvolvimento do seu MicroSaaS e integrações de automação.</p>
+        <p class="text-gray-400 text-sm mt-1">Repositórios GitHub, prompts prontos e ferramentas open-source para acelerar SaaS, IA e automação.</p>
       </div>
 
-      <!-- Vault Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-        
+      <!-- Destaques rápidos -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass-card rounded-2xl p-5 border border-gray-800 space-y-3 flex flex-col justify-between">
           <div>
             <div class="h-10 w-10 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 border border-sky-500/20">
-              <i data-lucide="code" class="h-5 w-5"></i>
+              <i data-lucide="github" class="h-5 w-5"></i>
             </div>
-            <h5 class="text-lg font-bold font-outfit">SaaS Boilerplate Base</h5>
-            <p class="text-xs text-gray-400 leading-relaxed mt-2">Modelo completo de Node.js e Tailwind CSS estruturado pronto para iniciar novos projetos com autenticação simulada pré-configurada.</p>
+            <h5 class="text-lg font-bold font-outfit">Boilerplate conectWM</h5>
+            <p class="text-xs text-gray-400 leading-relaxed mt-2">Código base desta plataforma (Node.js + Express + área de membros). Clone, estude a estrutura e adapte para o seu SaaS.</p>
           </div>
-          <button class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 text-xs font-bold transition-all mt-4">
-            Baixar Template
-          </button>
+          <a href="https://github.com/clozednebulous1k-pixel/CONECTWM" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 hover:border-sky-500/30 text-xs font-bold transition-all mt-4">
+            <span>Abrir GitHub</span>
+            <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
         </div>
 
         <div class="glass-card rounded-2xl p-5 border border-gray-800 space-y-3 flex flex-col justify-between">
           <div>
-            <div class="h-10 w-10 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 border border-sky-500/20">
+            <div class="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 mb-4 border border-emerald-500/20">
               <i data-lucide="bot" class="h-5 w-5"></i>
             </div>
-            <h5 class="text-lg font-bold font-outfit">Guia de Prompts do Cursor</h5>
-            <p class="text-xs text-gray-400 leading-relaxed mt-2">Documento de engenharia de prompt avançado com instruções de sistema (System Prompts) para configurar assistentes no Cursor Editor.</p>
+            <h5 class="text-lg font-bold font-outfit">Cursor Rules · IA no Editor</h5>
+            <p class="text-xs text-gray-400 leading-relaxed mt-2">Coleção curada de regras (.cursorrules) para Cursor, Copilot e Windsurf · React, Node, SaaS, segurança e produtividade.</p>
           </div>
-          <button class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 text-xs font-bold transition-all mt-4">
-            Acessar Prompts
-          </button>
+          <a href="https://github.com/PatrickJS/awesome-cursorrules" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 hover:border-emerald-500/30 text-xs font-bold transition-all mt-4">
+            <span>Abrir GitHub</span>
+            <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
         </div>
 
         <div class="glass-card rounded-2xl p-5 border border-gray-800 space-y-3 flex flex-col justify-between">
           <div>
-            <div class="h-10 w-10 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400 mb-4 border border-sky-500/20">
-              <i data-lucide="git-merge" class="h-5 w-5"></i>
+            <div class="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 mb-4 border border-amber-500/20">
+              <i data-lucide="workflow" class="h-5 w-5"></i>
             </div>
-            <h5 class="text-lg font-bold font-outfit">Fluxos Integrados (n8n JSON)</h5>
-            <p class="text-xs text-gray-400 leading-relaxed mt-2">Arquivo de exportação JSON contendo fluxos do n8n prontos para conectar formulários de site a canais do WhatsApp e do Pipedrive.</p>
+            <h5 class="text-lg font-bold font-outfit">n8n · Automação Open Source</h5>
+            <p class="text-xs text-gray-400 leading-relaxed mt-2">Repositório oficial do n8n. Importe workflows, conecte WhatsApp, OpenAI, Google Sheets e webhooks do seu SaaS.</p>
           </div>
-          <button class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 text-xs font-bold transition-all mt-4">
-            Importar JSON
-          </button>
+          <a href="https://github.com/n8n-io/n8n" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 hover:border-amber-500/30 text-xs font-bold transition-all mt-4">
+            <span>Abrir GitHub</span>
+            <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+          </a>
         </div>
+      </div>
 
+      <div class="pt-2 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-bold font-outfit text-white">Repositórios IA & Prompts</h3>
+            <p class="text-xs text-gray-500 mt-1">Links curados para engenharia de prompt, SDKs de IA, WhatsApp bots e stacks do curso.</p>
+          </div>
+          <div id="ai-filter-bar" class="flex flex-wrap gap-2">
+            <button type="button" data-filter="all" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950 transition-all">Todos</button>
+            <button type="button" data-filter="prompts" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Prompts</button>
+            <button type="button" data-filter="cursor" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Cursor & IDE</button>
+            <button type="button" data-filter="repos" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">SDKs & APIs</button>
+            <button type="button" data-filter="automation" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Automação</button>
+          </div>
+        </div>
+        <div id="ai-resources-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
     </section>
 

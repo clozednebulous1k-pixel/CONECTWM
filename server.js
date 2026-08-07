@@ -8,11 +8,17 @@ const checkoutService = require('./services/checkout');
 const authService = require('./services/auth');
 const hotmartService = require('./services/hotmart');
 const certService = require('./services/certificates');
+const { limiters, validateChatPayload } = require('./services/rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 initFirebase();
+
+app.use(cors());
+app.use(express.json({ limit: '64kb' }));
+app.use(express.urlencoded({ extended: true, limit: '32kb' }));
+app.use(limiters.apiGeneral);
 
 app.get('/api/system/status', (req, res) => {
   const firebase = getFirebaseStatus();
@@ -24,12 +30,6 @@ app.get('/api/system/status', (req, res) => {
   });
 });
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Servir arquivos estáticos da pasta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Inicializar cliente OpenAI se a chave estiver configurada
@@ -46,7 +46,7 @@ if (process.env.OPENAI_API_KEY) {
 // ----------------------------------------------------
 // 1. ENDPOINT: DIAGNÓSTICO EMPRESARIAL (WEBHOOK CRM)
 // ----------------------------------------------------
-app.post('/api/diagnostico', async (req, res) => {
+app.post('/api/diagnostico', limiters.forms, async (req, res) => {
   try {
     const { name, email, whatsapp, companySize, challenge } = req.body;
 
@@ -108,7 +108,7 @@ app.post('/api/diagnostico', async (req, res) => {
 // ----------------------------------------------------
 // 2. ENDPOINTS: CHECKOUT + FIREBASE (COMPRA SIMULADA)
 // ----------------------------------------------------
-app.post('/api/checkout', async (req, res) => {
+app.post('/api/checkout', limiters.checkout, async (req, res) => {
   try {
     const { email, type, affiliateRef } = req.body;
 
@@ -263,7 +263,7 @@ app.get('/api/auth/first-access', async (req, res) => {
   }
 });
 
-app.post('/api/auth/set-password', async (req, res) => {
+app.post('/api/auth/set-password', limiters.authPassword, async (req, res) => {
   try {
     const { email, password, passwordConfirm } = req.body;
     if (!email || !password || !passwordConfirm) {
@@ -300,7 +300,7 @@ app.post('/api/auth/set-password', async (req, res) => {
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', limiters.authLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -386,7 +386,7 @@ app.get('/api/certificates/progress', async (req, res) => {
   }
 });
 
-app.post('/api/certificates/progress', async (req, res) => {
+app.post('/api/certificates/progress', limiters.certificatesWrite, async (req, res) => {
   try {
     const session = await requireAuth(req, res);
     if (!session) return;
@@ -398,7 +398,7 @@ app.post('/api/certificates/progress', async (req, res) => {
   }
 });
 
-app.post('/api/certificates/issue', async (req, res) => {
+app.post('/api/certificates/issue', limiters.certificatesIssue, async (req, res) => {
   try {
     const session = await requireAuth(req, res);
     if (!session) return;
@@ -414,7 +414,7 @@ app.post('/api/certificates/issue', async (req, res) => {
   }
 });
 
-app.get('/api/certificates/verify/:code', async (req, res) => {
+app.get('/api/certificates/verify/:code', limiters.certificatesVerify, async (req, res) => {
   try {
     const cert = await certService.verifyCertificate(req.params.code);
     if (!cert) {
@@ -508,16 +508,9 @@ Instruções importantes:
 - Se o usuário perguntar algo fora do contexto da conectWM ou de tecnologia/IA/automação, responda educadamente puxando o assunto de volta para como a conectWM pode ajudá-lo na criação de software ou automação de processos.
 `;
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', limiters.chat, validateChatPayload, async (req, res) => {
   try {
     const { messages } = req.body;
-
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'A lista de mensagens está vazia ou é inválida.',
-      });
-    }
 
     const lastUserMessage = messages[messages.length - 1].content;
     console.log(`\n💬 Mensagem recebida no chat: "${lastUserMessage}"`);

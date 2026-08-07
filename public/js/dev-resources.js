@@ -246,24 +246,185 @@ const backendResources = [
 
 const categoryLabels = {
   design: 'Design & UI',
-  logic: 'Lógica & Código'
+  logic: 'Lógica & Código',
+  prompts: 'Prompts & IA',
+  cursor: 'Cursor & IDE',
+  repos: 'SDK & API',
+  automation: 'Automação',
 };
+
+const aiResources = [
+  {
+    name: 'Awesome ChatGPT Prompts',
+    url: 'https://github.com/f/awesome-chatgpt-prompts',
+    icon: 'message-square-text',
+    category: 'prompts',
+    desc: 'Milhares de prompts prontos para ChatGPT, Claude e Gemini. Copie, adapte ao seu nicho e use nos wizards da Academy.',
+  },
+  {
+    name: 'Prompt Engineering Guide',
+    url: 'https://github.com/dair-ai/Prompt-Engineering-Guide',
+    icon: 'book-open',
+    category: 'prompts',
+    desc: 'Guia completo de engenharia de prompt: few-shot, chain-of-thought, RAG e técnicas avançadas · referência gratuita.',
+  },
+  {
+    name: 'Awesome Generative AI',
+    url: 'https://github.com/steven2358/awesome-generative-ai',
+    icon: 'sparkles',
+    category: 'prompts',
+    desc: 'Lista curada de ferramentas, papers, prompts e recursos de IA generativa · atualizada pela comunidade.',
+  },
+  {
+    name: 'GPT Prompt Engineer',
+    url: 'https://github.com/mshumer/gpt-prompt-engineer',
+    icon: 'flask-conical',
+    category: 'prompts',
+    desc: 'Script que gera e testa prompts automaticamente com LLM. Útil para refinar system prompts de atendimento WhatsApp.',
+  },
+  {
+    name: 'Awesome Cursor Rules',
+    url: 'https://github.com/PatrickJS/awesome-cursorrules',
+    icon: 'file-code-2',
+    category: 'cursor',
+    desc: 'Regras prontas para Cursor/Windsurf: React, Next.js, Node, Python, SaaS. Cole no .cursorrules do seu projeto.',
+  },
+  {
+    name: 'Cursor Directory',
+    url: 'https://cursor.directory/',
+    icon: 'folder-git-2',
+    category: 'cursor',
+    desc: 'Diretório com rules, MCP servers e prompts para Cursor. Busque por stack (Firebase, Supabase, Tailwind).',
+  },
+  {
+    name: 'Continue.dev',
+    url: 'https://github.com/continuedev/continue',
+    icon: 'terminal',
+    category: 'cursor',
+    desc: 'Assistente de IA open-source para VS Code/JetBrains. Alternativa ao Cursor com modelos locais ou cloud.',
+  },
+  {
+    name: 'OpenAI Node SDK',
+    url: 'https://github.com/openai/openai-node',
+    icon: 'brain',
+    category: 'repos',
+    desc: 'SDK oficial OpenAI para Node.js. Base para funcionário virtual WhatsApp, chatbots e features de IA no SaaS.',
+  },
+  {
+    name: 'Vercel AI SDK',
+    url: 'https://github.com/vercel/ai',
+    icon: 'zap',
+    category: 'repos',
+    desc: 'Biblioteca para streaming de chat, tools e RAG em Next.js/Node. Integração limpa com OpenAI, Anthropic e Google.',
+  },
+  {
+    name: 'LangChain.js',
+    url: 'https://github.com/langchain-ai/langchainjs',
+    icon: 'link-2',
+    category: 'repos',
+    desc: 'Framework para chains, agents, memória e RAG em JavaScript. Conecte PDFs, APIs e banco ao seu assistente de IA.',
+  },
+  {
+    name: 'Hugging Face Transformers.js',
+    url: 'https://github.com/huggingface/transformers.js',
+    icon: 'cpu',
+    category: 'repos',
+    desc: 'Rode modelos de IA no browser ou Node sem GPU dedicada. Classificação, embeddings e NLP leve no frontend.',
+  },
+  {
+    name: 'Evolution API',
+    url: 'https://github.com/EvolutionAPI/evolution-api',
+    icon: 'message-circle',
+    category: 'automation',
+    desc: 'API WhatsApp open-source (Docker). Usada no Módulo 10 · conecte QR Code, webhooks e envie mensagens via REST.',
+  },
+  {
+    name: 'Typebot',
+    url: 'https://github.com/baptisteArno/typebot.io',
+    icon: 'messages-square',
+    category: 'automation',
+    desc: 'Construtor visual de chatbots (WhatsApp, web). Fluxos de qualificação low-code · self-hosted ou cloud.',
+  },
+  {
+    name: 'n8n Workflows',
+    url: 'https://github.com/n8n-io/n8n',
+    icon: 'workflow',
+    category: 'automation',
+    desc: 'Automação visual open-source. Importe templates da comunidade: lead → CRM → e-mail → WhatsApp → OpenAI.',
+  },
+  {
+    name: 'n8n Workflow Templates',
+    url: 'https://n8n.io/workflows/',
+    icon: 'download',
+    category: 'automation',
+    desc: 'Galeria oficial de workflows prontos (não é GitHub, mas export JSON direto). WhatsApp, Stripe, Notion, OpenAI.',
+  },
+  {
+    name: 'Chatwoot',
+    url: 'https://github.com/chatwoot/chatwoot',
+    icon: 'headphones',
+    category: 'automation',
+    desc: 'CRM de atendimento omnichannel open-source. Integre WhatsApp, Instagram e handoff humano após o bot de IA.',
+  },
+  {
+    name: 'Supabase AI Examples',
+    url: 'https://github.com/supabase/supabase/tree/master/examples/ai',
+    icon: 'database',
+    category: 'repos',
+    desc: 'Exemplos oficiais Supabase + IA: embeddings, vector search e chat com PostgreSQL · stack moderna para SaaS.',
+  },
+  {
+    name: 'shadcn/ui · GitHub',
+    url: 'https://github.com/shadcn-ui/ui',
+    icon: 'github',
+    category: 'repos',
+    desc: 'Código-fonte dos componentes shadcn. Copie para o Cursor e peça: "instale este componente no meu SaaS".',
+  },
+  {
+    name: 'Screenshot to Code',
+    url: 'https://github.com/abi/screenshot-to-code',
+    icon: 'image',
+    category: 'cursor',
+    desc: 'Transforme screenshot ou Figma em código React/Tailwind com IA. Prototipe telas do SaaS em minutos.',
+  },
+  {
+    name: 'System Prompts (Leaks Curated)',
+    url: 'https://github.com/asgeirtj/system_prompts_leaks',
+    icon: 'shield',
+    category: 'prompts',
+    desc: 'Referência de system prompts de produtos reais (estudo). Inspire estrutura de prompts profissionais · use com ética.',
+  },
+];
 
 function renderResourceCard(item, section) {
   const cat = item.category || 'logic';
   const isDesign = cat === 'design';
-  const badgeClass = isDesign
-    ? 'bg-violet-500/10 text-violet-400 border-violet-500/20'
-    : 'bg-sky-500/10 text-sky-400 border-sky-500/20';
-  const iconWrap = section === 'frontend'
-    ? 'bg-violet-500/10 text-violet-400 border-violet-500/20'
-    : 'bg-sky-500/10 text-sky-400 border-sky-500/20';
-  const hoverBorder = section === 'frontend'
-    ? 'hover:border-violet-500/30'
-    : 'hover:border-sky-500/30';
-  const linkHover = section === 'frontend'
-    ? 'hover:border-violet-500/30'
-    : 'hover:border-sky-500/30';
+  const isAi = section === 'ai';
+  const aiCatStyles = {
+    prompts: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+    cursor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+    repos: 'bg-sky-500/10 text-sky-400 border-sky-500/20',
+    automation: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  };
+  const badgeClass = isAi
+    ? (aiCatStyles[cat] || aiCatStyles.repos)
+    : isDesign
+      ? 'bg-violet-500/10 text-violet-400 border-violet-500/20'
+      : 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+  const iconWrap = isAi
+    ? (aiCatStyles[cat] || aiCatStyles.repos)
+    : section === 'frontend'
+      ? 'bg-violet-500/10 text-violet-400 border-violet-500/20'
+      : 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+  const hoverBorder = isAi
+    ? 'hover:border-emerald-500/30'
+    : section === 'frontend'
+      ? 'hover:border-violet-500/30'
+      : 'hover:border-sky-500/30';
+  const linkHover = hoverBorder;
+  const isGithub = item.url.includes('github.com');
+  const linkText = item.linkLabel || (isGithub ? 'Abrir GitHub' : 'Acessar recurso');
+  const linkIcon = isGithub ? 'github' : 'external-link';
 
   return `
     <div class="glass-card rounded-2xl p-5 border border-gray-800 ${hoverBorder} transition-all flex flex-col justify-between group">
@@ -272,14 +433,14 @@ function renderResourceCard(item, section) {
           <div class="h-10 w-10 rounded-lg flex items-center justify-center border shrink-0 ${iconWrap}">
             <i data-lucide="${item.icon}" class="h-5 w-5"></i>
           </div>
-          <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${badgeClass}">${categoryLabels[cat]}</span>
+          <span class="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-full border ${badgeClass}">${categoryLabels[cat] || cat}</span>
         </div>
         <h5 class="text-base font-bold font-outfit text-white">${item.name}</h5>
         <p class="text-xs text-gray-400 leading-relaxed">${item.desc}</p>
       </div>
       <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="mt-4 w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-gray-800 ${linkHover} text-xs font-bold transition-all">
-        <span>Acessar Site</span>
-        <i data-lucide="external-link" class="h-3.5 w-3.5"></i>
+        <i data-lucide="${linkIcon}" class="h-3.5 w-3.5"></i>
+        <span>${linkText}</span>
       </a>
     </div>
   `;
@@ -307,13 +468,22 @@ function renderDevResourcesGrid(containerId, items, filterId, section) {
     filterBar.querySelectorAll('[data-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         activeFilter = btn.dataset.filter;
+        const inactive = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all';
         filterBar.querySelectorAll('[data-filter]').forEach(b => {
-          b.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all';
+          b.className = inactive;
         });
         if (activeFilter === 'all') {
-          btn.className = `px-4 py-2 rounded-xl text-xs font-bold transition-all ${isFrontend ? 'bg-violet-500 text-white' : 'bg-sky-400 text-slate-950'}`;
+          if (section === 'frontend') btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-violet-500 text-white';
+          else if (section === 'ai') btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-emerald-500 text-slate-950';
+          else btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-sky-400 text-slate-950';
         } else if (activeFilter === 'design') {
           btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-violet-500 text-white transition-all';
+        } else if (activeFilter === 'prompts') {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-slate-950 transition-all';
+        } else if (activeFilter === 'cursor') {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-violet-500 text-white transition-all';
+        } else if (activeFilter === 'automation') {
+          btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 transition-all';
         } else {
           btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-sky-400 text-slate-950 transition-all';
         }
@@ -328,4 +498,5 @@ function renderDevResourcesGrid(containerId, items, filterId, section) {
 function initDevResources() {
   renderDevResourcesGrid('frontend-resources-grid', frontendResources, 'frontend-filter-bar', 'frontend');
   renderDevResourcesGrid('backend-resources-grid', backendResources, 'backend-filter-bar', 'backend');
+  renderDevResourcesGrid('ai-resources-grid', aiResources, 'ai-filter-bar', 'ai');
 }
