@@ -1495,6 +1495,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Controles extras do wizard, TikTok Shop e segurança
   if (typeof initTikTokShop === 'function') initTikTokShop();
   if (typeof initDevResources === 'function') initDevResources();
+  if (typeof initAprenderPlus === 'function') initAprenderPlus();
   if (typeof initAfiliados === 'function') initAfiliados();
   initSecurityWizard();
   renderPlatformSecurityLimits();

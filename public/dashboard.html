@@ -81,6 +81,10 @@
           <i data-lucide="book-open" class="h-4.5 w-4.5"></i>
           <span>Módulos & Aulas</span>
         </a>
+        <a href="#" data-target="sec-aprender" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
+          <i data-lucide="graduation-cap" class="h-4.5 w-4.5"></i>
+          <span>APRENDER +</span>
+        </a>
         <a href="#" data-target="sec-certificados" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
           <i data-lucide="award" class="h-4.5 w-4.5"></i>
           <span>Certificados</span>
@@ -196,6 +200,23 @@
 
       </div>
 
+    </section>
+
+    <!-- SEÇÃO: APRENDER + · Fundamentos de programação -->
+    <section id="sec-aprender" class="dashboard-section space-y-6 hidden">
+      <div class="border-b border-gray-900 pb-4">
+        <h2 class="text-3xl font-bold font-outfit text-white">APRENDER +</h2>
+        <p class="text-gray-400 text-sm mt-1">O básico de programação, linguagens e conceitos · para você saber o que está fazendo em cada módulo.</p>
+      </div>
+      <div id="aprender-intro"></div>
+      <div class="flex flex-wrap gap-2" id="aprender-filter-bar">
+        <button type="button" data-filter="all" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-500 text-white transition-all">Todos</button>
+        <button type="button" data-filter="fundamentos" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Fundamentos</button>
+        <button type="button" data-filter="linguagens" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Linguagens</button>
+        <button type="button" data-filter="conceitos" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Conceitos</button>
+        <button type="button" data-filter="saas" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 text-gray-400 border border-gray-800 transition-all">Seu SaaS</button>
+      </div>
+      <div id="aprender-topics-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
     </section>
 
     <!-- SEÇÃO: CERTIFICADOS -->
@@ -604,6 +625,7 @@
   <script src="js/module-wizards.js"></script>
   <script src="js/tiktok-shop.js"></script>
   <script src="js/dev-resources.js"></script>
+  <script src="js/aprender-plus.js"></script>
   <script src="js/afiliados.js"></script>
   <script src="js/dashboard.js"></script>
   <script>
