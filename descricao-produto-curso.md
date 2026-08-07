@@ -15,7 +15,7 @@
 
 A **conectWM Academy** é uma comunidade de assinatura para quem quer **criar Sites, Apps Web e MicroSaaS usando Inteligência Artificial**, mesmo começando do zero.
 
-O aluno recebe acesso a uma **área de membros online** com **9 módulos práticos**, wizards interativos passo a passo, biblioteca de **prompts prontos** para Cursor/ChatGPT/Copilot, templates de código, chatbot de IA integrado, suporte técnico e **grupo exclusivo no WhatsApp** para networking.
+O aluno recebe acesso a uma **área de membros online** com **10 módulos práticos**, wizards interativos passo a passo, biblioteca de **prompts prontos** para Cursor/ChatGPT/Copilot, templates de código, chatbot de IA integrado, suporte técnico e **grupo exclusivo no WhatsApp** para networking.
 
 **Conteúdo principal:**
 - Módulo 1: Criando um SaaS (arquitetura, banco de dados, autenticação, deploy)
@@ -38,13 +38,13 @@ O aluno recebe acesso a uma **área de membros online** com **9 módulos prátic
 
 ## Descrição curta (até 500 caracteres — se o campo limitar)
 
-Comunidade online para criar Sites, Apps e SaaS com IA. 9 módulos, prompts prontos, wizards interativos, templates, suporte e grupo WhatsApp. Acesso imediato após pagamento. Ideal para iniciantes e empreendedores digitais.
+Comunidade online para criar Sites, Apps e SaaS com IA. 10 módulos, prompts prontos, wizards interativos, templates, suporte e grupo WhatsApp. Acesso imediato após pagamento. Ideal para iniciantes e empreendedores digitais.
 
 ---
 
 ## O que o aluno recebe
 
-- Área de membros com 9 módulos completos
+- Área de membros com 10 módulos completos
 - Wizards interativos (passo a passo visual)
 - Biblioteca de prompts para IA
 - Templates e códigos base
@@ -102,7 +102,7 @@ Primeira live com alunos: 15/08/2026
 ```
 A conectWM Academy é uma comunidade de assinatura 100% online para criar Sites, Apps Web e MicroSaaS com Inteligência Artificial, mesmo sem experiência prévia em programação.
 
-O aluno acessa 9 módulos práticos com wizards interativos, prompts prontos para Cursor e ChatGPT, templates de código, chatbot de IA, suporte técnico e grupo exclusivo no WhatsApp.
+O aluno acessa 10 módulos práticos com wizards interativos, prompts prontos para Cursor e ChatGPT, templates de código, chatbot de IA, suporte técnico e grupo exclusivo no WhatsApp.
 
 Após a compra, recebe login e senha por e-mail e entra imediatamente na área de membros.
 

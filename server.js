@@ -7,6 +7,7 @@ const { initFirebase, getFirebaseStatus } = require('./services/firebase');
 const checkoutService = require('./services/checkout');
 const authService = require('./services/auth');
 const hotmartService = require('./services/hotmart');
+const certService = require('./services/certificates');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -355,13 +356,97 @@ app.get('/api/auth/me', async (req, res) => {
   }
 });
 
+async function requireAuth(req, res) {
+  const token = req.headers.authorization?.replace('Bearer ', '') || req.query.token;
+  const session = await authService.validateSession(token);
+  if (!session) {
+    res.status(401).json({ success: false, message: 'Sessão inválida ou expirada.' });
+    return null;
+  }
+  return session;
+}
+
 // ----------------------------------------------------
-// 4. WEBHOOK HOTMART — LIBERA LOGIN APÓS COMPRA REAL
+// 3b. CERTIFICADOS ACADEMY
+// ----------------------------------------------------
+app.get('/api/certificates/catalog', (req, res) => {
+  res.json({ success: true, modules: certService.getCatalog(), totalModules: certService.TOTAL_MODULES });
+});
+
+app.get('/api/certificates/progress', async (req, res) => {
+  try {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    const progress = await certService.getProgress(session.email);
+    const certificates = await certService.listCertificates(session.email);
+    res.json({ success: true, progress, certificates });
+  } catch (error) {
+    console.error('Erro progresso certificados:', error);
+    res.status(500).json({ success: false, message: 'Erro ao carregar progresso.' });
+  }
+});
+
+app.post('/api/certificates/progress', async (req, res) => {
+  try {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    const progress = await certService.syncProgress(session.email, req.body || {});
+    res.json({ success: true, progress });
+  } catch (error) {
+    console.error('Erro sync progresso:', error);
+    res.status(500).json({ success: false, message: 'Erro ao sincronizar progresso.' });
+  }
+});
+
+app.post('/api/certificates/issue', async (req, res) => {
+  try {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    const { type, moduleId } = req.body || {};
+    const result = await certService.issueCertificate(session.email, { type, moduleId });
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+    res.json(result);
+  } catch (error) {
+    console.error('Erro emitir certificado:', error);
+    res.status(500).json({ success: false, message: 'Erro ao emitir certificado.' });
+  }
+});
+
+app.get('/api/certificates/verify/:code', async (req, res) => {
+  try {
+    const cert = await certService.verifyCertificate(req.params.code);
+    if (!cert) {
+      return res.status(404).json({ success: false, message: 'Certificado não encontrado.' });
+    }
+    res.json({
+      success: true,
+      valid: true,
+      certificate: {
+        code: cert.code,
+        holderName: cert.holderName,
+        title: cert.title,
+        subtitle: cert.subtitle,
+        workload: cert.workload,
+        type: cert.type,
+        moduleId: cert.moduleId || null,
+        issuedAt: cert.issuedAt,
+      },
+    });
+  } catch (error) {
+    console.error('Erro verificar certificado:', error);
+    res.status(500).json({ success: false, message: 'Erro ao verificar certificado.' });
+  }
+});
+
+// ----------------------------------------------------
+// 4. WEBHOOK HOTMART · LIBERA LOGIN APÓS COMPRA REAL
 // ----------------------------------------------------
 app.post('/api/webhooks/hotmart', async (req, res) => {
   try {
     const result = await hotmartService.handleHotmartWebhook(req.body, req.headers);
-    console.log(`✅ Hotmart processado: ${result.action} | ${result.email || '—'}`);
+    console.log(`✅ Hotmart processado: ${result.action} | ${result.email || 'n/a'}`);
     return res.status(200).json({ success: true, ...result });
   } catch (error) {
     console.error('Erro webhook Hotmart:', error.message);

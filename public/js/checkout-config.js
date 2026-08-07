@@ -1,8 +1,10 @@
-// Checkout Hotmart — conectWM Academy
+// Checkout Hotmart 
+ · conectWM Academy
 const HOTMART_CHECKOUT_URL = 'https://pay.hotmart.com/O107022826R';
 const PRODUCT_PRICE = 'R$ 39,99';
 const PRODUCT_PRICE_FULL = 'R$ 97,00';
 const PRODUCT_PRICE_LABEL = 'R$ 39,99/mês';
+const LAUNCH_SPOTS_TOTAL = 30;
 
 function goToCheckout() {
   window.location.href = HOTMART_CHECKOUT_URL;

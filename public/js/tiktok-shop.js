@@ -1,4 +1,4 @@
-// conectWM Academy — TikTok Shop: passo a passo, estratégia e crescimento
+// conectWM Academy · TikTok Shop: passo a passo, estratégia e crescimento
 
 const TIKTOK_WIZARD_KEY = 'conectwm_tiktok_shop_v2';
 const TIKTOK_MIN_SEGUIDORES_AFILIADO = 2000;
@@ -10,16 +10,16 @@ const tiktokWizardSteps = [
     question: 'O que você quer fazer no TikTok Shop?',
     tip: 'Para divulgar produtos de outras lojas como afiliado, você precisa de conta real no TikTok + mínimo de 2.000 seguidores.',
     options: [
-      { value: 'afiliado', label: 'Afiliado TikTok Shop — conta real + divulgar produtos de lojas' },
-      { value: 'proprio', label: 'Vendedor próprio — abrir minha loja e vender meus produtos' },
-      { value: 'dropship', label: 'Dropshipping — loja própria com fornecedor enviando' }
+      { value: 'afiliado', label: 'Afiliado TikTok Shop · conta real + divulgar produtos de lojas' },
+      { value: 'proprio', label: 'Vendedor próprio · abrir minha loja e vender meus produtos' },
+      { value: 'dropship', label: 'Dropshipping · loja própria com fornecedor enviando' }
     ]
   },
   {
     field: 'conta_tiktok',
     title: 'Conta TikTok',
     question: 'Você já tem uma conta TikTok ativa?',
-    tip: 'Afiliado também precisa de perfil real e verificado no app — não basta só criar conta no site.',
+    tip: 'Afiliado também precisa de perfil real e verificado no app · não basta só criar conta no site.',
     options: [
       { value: 'sim', label: 'Sim, já tenho conta TikTok' },
       { value: 'nao', label: 'Não, ainda não tenho conta' },
@@ -32,8 +32,8 @@ const tiktokWizardSteps = [
     question: 'Quantos seguidores você tem hoje no TikTok?',
     tip: `Para divulgar produtos como afiliado no TikTok Shop são necessários no mínimo ${TIKTOK_MIN_SEGUIDORES_AFILIADO.toLocaleString('pt-BR')} seguidores. Se tiver menos, use a WinxSMM abaixo.`,
     options: [
-      { value: 'abaixo_2k', label: 'Menos de 2.000 — preciso comprar seguidores (WinxSMM)' },
-      { value: 'acima_2k', label: '2.000 ou mais — já posso divulgar produtos' },
+      { value: 'abaixo_2k', label: 'Menos de 2.000 · preciso comprar seguidores (WinxSMM)' },
+      { value: 'acima_2k', label: '2.000 ou mais · já posso divulgar produtos' },
       { value: 'zero', label: 'Conta nova / quase zero seguidores' }
     ]
   },
@@ -43,8 +43,8 @@ const tiktokWizardSteps = [
     question: 'Qual documento você vai usar no cadastro?',
     tip: 'Afiliados usam CPF na maioria dos casos. Vendedores próprios costumam usar CNPJ ou MEI.',
     options: [
-      { value: 'cpf', label: 'CPF — pessoa física (comum para afiliado)' },
-      { value: 'cnpj', label: 'CNPJ / MEI — empresa formalizada' },
+      { value: 'cpf', label: 'CPF · pessoa física (comum para afiliado)' },
+      { value: 'cnpj', label: 'CNPJ / MEI · empresa formalizada' },
       { value: 'pendente', label: 'Ainda não tenho documento definido' }
     ]
   },
@@ -55,8 +55,8 @@ const tiktokWizardSteps = [
     tip: 'Se faltar seguidor, a WinxSMM acelera. Combine com conteúdo orgânico para não depender só de números comprados.',
     options: [
       { value: 'winxsmm', label: 'Comprar na WinxSMM até bater 2.000 seguidores' },
-      { value: 'mix', label: 'Mix — WinxSMM + conteúdo orgânico' },
-      { value: 'organico', label: 'Só orgânico — vou postar até chegar em 2k' }
+      { value: 'mix', label: 'Mix · WinxSMM + conteúdo orgânico' },
+      { value: 'organico', label: 'Só orgânico · vou postar até chegar em 2k' }
     ]
   }
 ];
@@ -181,7 +181,7 @@ function renderTikTokWizardStep() {
 function guideBox(steps) {
   return `
     <div class="wizard-guide-box rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2 text-sm text-gray-300">
-      <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-2">📍 Onde clicar — passo a passo</span>
+      <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-2">📍 Onde clicar · passo a passo</span>
       <ol class="list-decimal list-inside space-y-1.5 text-xs leading-relaxed">
         ${steps.map(s => `<li>${s}</li>`).join('')}
       </ol>
@@ -237,10 +237,10 @@ function getAfiliadoTikTokShopSteps(answers) {
     'No app: <strong>Perfil</strong> → ícone <strong>TikTok Shop</strong> (ou <strong>Ferramentas do criador</strong>)',
     'Toque <strong>Programa de Afiliados</strong> / <strong>Afilie-se ao TikTok Shop</strong> → leia os termos → <strong>Inscrever-se</strong>',
     'Preencha dados com <strong>CPF</strong> (ou CNPJ se tiver) + conta bancária para receber comissões',
-    `Aguarde aprovação. Confirme que tem <strong>mínimo ${TIKTOK_MIN_SEGUIDORES_AFILIADO.toLocaleString('pt-BR')} seguidores</strong> — sem isso o botão de adicionar produtos fica bloqueado`,
+    `Aguarde aprovação. Confirme que tem <strong>mínimo ${TIKTOK_MIN_SEGUIDORES_AFILIADO.toLocaleString('pt-BR')} seguidores</strong> · sem isso o botão de adicionar produtos fica bloqueado`,
     'Após aprovado + 2k seguidores: <strong>Produtos</strong> → escolha itens do marketplace → <strong>Adicionar à vitrine</strong>',
     'Grave vídeo mostrando o produto → ao postar, toque <strong>Adicionar link</strong> → selecione o produto da vitrine',
-    'Use hashtags (#tiktokshopbr #achadinho) + CTA "link na loja" — cada venda gera comissão automática'
+    'Use hashtags (#tiktokshopbr #achadinho) + CTA "link na loja" · cada venda gera comissão automática'
   );
   if (answers.seguidores === 'abaixo_2k' || answers.seguidores === 'zero') {
     steps.push(
@@ -297,7 +297,7 @@ function getEstrategiaCards(answers) {
     {
       icon: 'bar-chart-2',
       title: 'Métricas que importam',
-      desc: 'GMV (faturamento), taxa de conversão da live, ROI por vídeo e custo por aquisição — não apenas seguidores.'
+      desc: 'GMV (faturamento), taxa de conversão da live, ROI por vídeo e custo por aquisição · não apenas seguidores.'
     }
   ];
 
@@ -305,7 +305,7 @@ function getEstrategiaCards(answers) {
     base.unshift({
       icon: 'link',
       title: 'Afiliado com conta real',
-      desc: `Conta TikTok verificada + programa de afiliados ativo + ${TIKTOK_MIN_SEGUIDORES_AFILIADO.toLocaleString('pt-BR')} seguidores. Adicione produtos à vitrine e grave vídeos com link — comissão cai na conta bancária cadastrada.`
+      desc: `Conta TikTok verificada + programa de afiliados ativo + ${TIKTOK_MIN_SEGUIDORES_AFILIADO.toLocaleString('pt-BR')} seguidores. Adicione produtos à vitrine e grave vídeos com link · comissão cai na conta bancária cadastrada.`
     });
     base.unshift({
       icon: 'target',

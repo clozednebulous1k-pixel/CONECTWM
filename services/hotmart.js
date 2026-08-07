@@ -108,7 +108,7 @@ async function handleHotmartWebhook(rawBody, headers = {}, options = {}) {
     return { ok: true, action: 'ignored', reason: 'produto_diferente', productId: parsed.productId };
   }
 
-  console.log(`\n🔔 Hotmart webhook: ${parsed.event} | ${parsed.email || 'sem email'} | tx: ${parsed.transactionId || '—'}`);
+  console.log(`\n🔔 Hotmart webhook: ${parsed.event} | ${parsed.email || 'sem email'} | tx: ${parsed.transactionId || 'n/a'}`);
 
   if (isCancelEvent(parsed)) {
     if (!parsed.email) {
@@ -132,7 +132,7 @@ async function handleHotmartWebhook(rawBody, headers = {}, options = {}) {
     currency: parsed.currency,
     paymentMethod: parsed.paymentMethod,
     billingDays: getBillingDays(parsed),
-    planLabel: `Comunidade conectWM — ${parsed.productName || 'Hotmart'}`,
+    planLabel: `Comunidade conectWM ·  ${parsed.productName || 'Hotmart'}`,
     affiliateRef: parsed.affiliate?.code || null,
   });
 

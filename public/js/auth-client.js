@@ -1,4 +1,4 @@
-// Cliente — sessão de autenticação conectWM
+// Cliente · sessão de autenticação conectWM
 
 function saveAuthSession(data) {
   if (data.token) localStorage.setItem('conectwm_auth_token', data.token);

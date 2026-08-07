@@ -11,17 +11,17 @@ const HOSTING_STEP = {
   options: [
     {
       value: "firebase",
-      label: "100% gratuito — Firebase (recomendado para iniciar)",
+      label: "100% gratuito · Firebase (recomendado para iniciar)",
       prompt: "Quero criar meu SaaS 100% gratuito usando Firebase. Me guie passo a passo: 1) Criar projeto no Firebase Console, 2) Configurar Authentication (email/senha e Google), 3) Criar coleções no Cloud Firestore, 4) Conectar com HTML/JS ou React, 5) Deploy gratuito no Firebase Hosting. Gere código completo com comentários."
     },
     {
       value: "supabase",
-      label: "Posso pagar um pouco — Supabase (PostgreSQL na nuvem)",
+      label: "Posso pagar um pouco · Supabase (PostgreSQL na nuvem)",
       prompt: "Quero usar Supabase para meu SaaS. Me guie: 1) Criar projeto no supabase.com (tier free), 2) Modelar tabelas no PostgreSQL, 3) Configurar Supabase Auth, 4) Row Level Security (RLS), 5) Conectar frontend com @supabase/supabase-js. Gere código completo Node.js + JavaScript."
     },
     {
       value: "vps",
-      label: "Quero controle total — VPS própria (DigitalOcean, Hetzner...)",
+      label: "Quero controle total · VPS própria (DigitalOcean, Hetzner...)",
       prompt: "Quero hospedar meu SaaS em uma VPS. Me guie completo: 1) Escolher VPS barata (Hetzner/DigitalOcean), 2) Instalar Ubuntu + Node.js + PostgreSQL + Nginx, 3) Configurar PM2, 4) SSL com Certbot, 5) Deploy do Express.js. Inclua comandos Linux e estrutura de pastas."
     }
   ]
@@ -29,9 +29,9 @@ const HOSTING_STEP = {
 
 function getHostingLabel(h) {
   return {
-    firebase: "Firebase (100% gratuito — Auth + Firestore + Hosting)",
-    supabase: "Supabase (PostgreSQL na nuvem — tier free + planos pagos)",
-    vps: "VPS própria (Node.js + PostgreSQL + Nginx — controle total)"
+    firebase: "Firebase (100% gratuito · Auth + Firestore + Hosting)",
+    supabase: "Supabase (PostgreSQL na nuvem · tier free + planos pagos)",
+    vps: "VPS própria (Node.js + PostgreSQL + Nginx · controle total)"
   }[h] || "Firebase (gratuito para começar)";
 }
 
@@ -43,7 +43,7 @@ function getHostingInstructions(h, context) {
 - Cloud Firestore (banco NoSQL em tempo real)
 - Firebase Hosting (deploy gratuito do frontend)
 - Cloud Functions (backend serverless, se precisar)
-- Plano Spark é grátis — ideal para MVP e primeiros clientes`;
+- Plano Spark é grátis · ideal para MVP e primeiros clientes`;
   }
   if (h === "supabase") {
     return `Use Supabase (tier free generoso, escala com plano pago ~$25/mês):
@@ -54,7 +54,7 @@ function getHostingInstructions(h, context) {
 - Edge Functions para webhooks e lógica backend`;
   }
   if (h === "vps") {
-    return `Use VPS própria (a partir de ~R$25-50/mês — Hetzner, DigitalOcean, Contabo):
+    return `Use VPS própria (a partir de ~R$25-50/mês · Hetzner, DigitalOcean, Contabo):
 - Ubuntu 22.04 + Node.js + Express + PostgreSQL
 - Nginx como reverse proxy + SSL (Certbot/Let's Encrypt)
 - PM2 para manter o app sempre online
@@ -63,48 +63,48 @@ function getHostingInstructions(h, context) {
   return getHostingInstructions("firebase", ctx);
 }
 
-// Catálogo de apps secretos — Módulo 2
+// Catálogo de apps secretos · Módulo 2
 const SECRET_APPS_CATALOG = {
   browser: [
-    { name: 'Vimium', url: 'https://vimium.github.io/', type: 'Extensão', desc: 'Navegue qualquer site só com o teclado — estilo Vim.' },
-    { name: 'Workona', url: 'https://workona.com/', type: 'Extensão', desc: 'Workspaces de abas por projeto — nunca mais perca contexto.' },
+    { name: 'Vimium', url: 'https://vimium.github.io/', type: 'Extensão', desc: 'Navegue qualquer site só com o teclado · estilo Vim.' },
+    { name: 'Workona', url: 'https://workona.com/', type: 'Extensão', desc: 'Workspaces de abas por projeto · nunca mais perca contexto.' },
     { name: 'GoFullPage', url: 'https://gofullpage.com/', type: 'Extensão', desc: 'Screenshot de página inteira com um clique.' },
     { name: 'WhatRuns', url: 'https://www.whatruns.com/', type: 'Extensão', desc: 'Descubra frameworks, analytics e tech stack de qualquer site.' },
-    { name: 'Text Blaze', url: 'https://blaze.today/', type: 'Extensão', desc: 'Snippets de texto com atalho — emails e respostas instantâneas.' },
-    { name: 'Automa', url: 'https://automa.site/', type: 'Extensão', desc: 'Automação visual no browser — scrape, clique, preenchimento.' },
+    { name: 'Text Blaze', url: 'https://blaze.today/', type: 'Extensão', desc: 'Snippets de texto com atalho · emails e respostas instantâneas.' },
+    { name: 'Automa', url: 'https://automa.site/', type: 'Extensão', desc: 'Automação visual no browser · scrape, clique, preenchimento.' },
     { name: 'Hoverify', url: 'https://hoverify.com/', type: 'Extensão', desc: 'Inspecione CSS, cores e fontes de qualquer elemento rapidamente.' }
   ],
   dev: [
-    { name: 'Thunder Client', url: 'https://www.thunderclient.com/', type: 'Extensão VS Code', desc: 'Postman dentro do Cursor/VS Code — teste APIs sem sair do editor.' },
-    { name: 'Error Lens', url: 'https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens', type: 'Extensão VS Code', desc: 'Erros e warnings inline na linha — menos clique no Problems.' },
-    { name: 'Pieces', url: 'https://pieces.app/', type: 'App', desc: 'Salva snippets com contexto e busca com IA — memória do dev.' },
+    { name: 'Thunder Client', url: 'https://www.thunderclient.com/', type: 'Extensão VS Code', desc: 'Postman dentro do Cursor/VS Code · teste APIs sem sair do editor.' },
+    { name: 'Error Lens', url: 'https://marketplace.visualstudio.com/items?itemName=usernamehw.errorlens', type: 'Extensão VS Code', desc: 'Erros e warnings inline na linha · menos clique no Problems.' },
+    { name: 'Pieces', url: 'https://pieces.app/', type: 'App', desc: 'Salva snippets com contexto e busca com IA · memória do dev.' },
     { name: 'REST Client', url: 'https://marketplace.visualstudio.com/items?itemName=humao.rest-client', type: 'Extensão VS Code', desc: 'Arquivos .http para testar endpoints versionados no Git.' },
-    { name: 'GitLens', url: 'https://gitlens.amod.io/', type: 'Extensão VS Code', desc: 'Blame, histórico e autoria inline — entenda código legado.' },
-    { name: 'Warp', url: 'https://www.warp.dev/', type: 'Terminal', desc: 'Terminal moderno com IA integrada — comandos sugeridos.' }
+    { name: 'GitLens', url: 'https://gitlens.amod.io/', type: 'Extensão VS Code', desc: 'Blame, histórico e autoria inline · entenda código legado.' },
+    { name: 'Warp', url: 'https://www.warp.dev/', type: 'Terminal', desc: 'Terminal moderno com IA integrada · comandos sugeridos.' }
   ],
   automacao: [
     { name: 'Bardeen', url: 'https://www.bardeen.ai/', type: 'Extensão', desc: 'Automação no Chrome: scrape → planilha → CRM sem código.' },
     { name: 'Automa', url: 'https://automa.site/', type: 'Extensão', desc: 'Grave fluxos visuais e repita tarefas em qualquer site.' },
     { name: 'Tally', url: 'https://tally.so/', type: 'Web', desc: 'Formulários lindos grátis com webhook para n8n/Make.' },
-    { name: 'Apify', url: 'https://apify.com/', type: 'Web', desc: 'Scrapers prontos e actors na nuvem — dados em escala.' },
+    { name: 'Apify', url: 'https://apify.com/', type: 'Web', desc: 'Scrapers prontos e actors na nuvem · dados em escala.' },
     { name: 'Phantombuster', url: 'https://phantombuster.com/', type: 'Web', desc: 'Automação LinkedIn/Instagram para prospecção B2B.' },
     { name: 'Typefully', url: 'https://typefully.com/', type: 'Web', desc: 'Agende threads no X/Twitter com analytics.' }
   ],
   ia: [
     { name: 'Merlin', url: 'https://www.getmerlin.in/', type: 'Extensão', desc: 'GPT/Claude em sidebar em qualquer página aberta.' },
-    { name: 'Tactiq', url: 'https://tactiq.io/', type: 'Extensão', desc: 'Transcreve Google Meet/Zoom grátis — notas automáticas.' },
+    { name: 'Tactiq', url: 'https://tactiq.io/', type: 'Extensão', desc: 'Transcreve Google Meet/Zoom grátis · notas automáticas.' },
     { name: 'Fireflies.ai', url: 'https://fireflies.ai/', type: 'Web', desc: 'Bot entra na reunião e gera resumo + action items.' },
-    { name: 'Perplexity', url: 'https://www.perplexity.ai/', type: 'Web', desc: 'Pesquisa com IA e fontes citadas — substitui Google em research.' },
+    { name: 'Perplexity', url: 'https://www.perplexity.ai/', type: 'Web', desc: 'Pesquisa com IA e fontes citadas · substitui Google em research.' },
     { name: 'Otter.ai', url: 'https://otter.ai/', type: 'App', desc: 'Transcrição de áudio e reuniões em tempo real.' },
     { name: 'SparkToro', url: 'https://sparktoro.com/', type: 'Web', desc: 'Descubra onde seu público passa tempo online (poucos usam no BR).' }
   ],
   geral: [
-    { name: 'Raycast', url: 'https://www.raycast.com/', type: 'App Mac', desc: 'Launcher que substitui Spotlight — atalhos, extensões, IA.' },
-    { name: 'PowerToys', url: 'https://learn.microsoft.com/en-us/windows/powertoys/', type: 'App Windows', desc: 'FancyZones, renomear em lote, color picker — grátis Microsoft.' },
-    { name: 'Espanso', url: 'https://espanso.org/', type: 'App', desc: 'Expansor de texto cross-platform — :email vira assinatura completa.' },
-    { name: 'ShareX', url: 'https://getsharex.com/', type: 'App Windows', desc: 'Captura de tela/OCR/gravação — alternativa gratuita ao Snagit.' },
-    { name: 'Excalidraw', url: 'https://excalidraw.com/', type: 'Web', desc: 'Diagramas hand-drawn colaborativos — wireframes rápidos.' },
-    { name: 'Cron', url: 'https://cron.com/', type: 'App', desc: 'Calendário moderno com scheduling links — menos fricção que Calendly.' }
+    { name: 'Raycast', url: 'https://www.raycast.com/', type: 'App Mac', desc: 'Launcher que substitui Spotlight · atalhos, extensões, IA.' },
+    { name: 'PowerToys', url: 'https://learn.microsoft.com/en-us/windows/powertoys/', type: 'App Windows', desc: 'FancyZones, renomear em lote, color picker · grátis Microsoft.' },
+    { name: 'Espanso', url: 'https://espanso.org/', type: 'App', desc: 'Expansor de texto cross-platform · :email vira assinatura completa.' },
+    { name: 'ShareX', url: 'https://getsharex.com/', type: 'App Windows', desc: 'Captura de tela/OCR/gravação · alternativa gratuita ao Snagit.' },
+    { name: 'Excalidraw', url: 'https://excalidraw.com/', type: 'Web', desc: 'Diagramas hand-drawn colaborativos · wireframes rápidos.' },
+    { name: 'Cron', url: 'https://cron.com/', type: 'App', desc: 'Calendário moderno com scheduling links · menos fricção que Calendly.' }
   ],
   packs: {
     extensoes: ['Vimium', 'Workona', 'GoFullPage', 'WhatRuns', 'Text Blaze', 'Automa', 'Merlin'],
@@ -141,7 +141,7 @@ function renderSecretAppsGrid(apps) {
   if (!apps?.length) return '';
   return `
     <div class="space-y-3 mt-2">
-      <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">🔒 Apps Secretos — Instale Agora</h4>
+      <h4 class="text-sm font-bold text-emerald-400 uppercase tracking-wider">🔒 Apps Secretos · Instale Agora</h4>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         ${apps.map(app => `
           <div class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-2">
@@ -165,7 +165,7 @@ const moduleWizardsData = {
     steps: [
       {
         id: "ia_pronta",
-        title: "Etapa 1 — Ferramentas de IA",
+        title: "Etapa 1 · Ferramentas de IA",
         question: "Você já tem uma ferramenta de IA configurada para programar?",
         tip: "Recomendamos o Cursor Editor (gratuito para começar) ou ChatGPT/Claude no navegador.",
         type: "choice",
@@ -179,7 +179,7 @@ const moduleWizardsData = {
       },
       {
         id: "ideia_saas",
-        title: "Etapa 2 — Ideia do Produto",
+        title: "Etapa 2 · Ideia do Produto",
         question: "Você já tem uma ideia definida para o seu SaaS?",
         tip: "Não precisa ser perfeita. Uma ideia simples já basta para a IA gerar a estrutura.",
         type: "choice",
@@ -192,16 +192,16 @@ const moduleWizardsData = {
       },
       {
         id: "nome_saas",
-        title: "Etapa 3 — Detalhes do Projeto",
+        title: "Etapa 3 · Detalhes do Projeto",
         question: "Descreva brevemente seu SaaS (nome, o que resolve, para quem):",
-        tip: "Exemplo: 'AgendaPro — sistema de agendamento para barbearias que envia lembrete automático no WhatsApp.'",
+        tip: "Exemplo: 'AgendaPro · sistema de agendamento para barbearias que envia lembrete automático no WhatsApp.'",
         type: "text",
         field: "descricao_saas",
-        placeholder: "Ex: MeuSaaS — automação de orçamentos para imobiliárias..."
+        placeholder: "Ex: MeuSaaS · automação de orçamentos para imobiliárias..."
       },
       {
         id: "hospedagem",
-        title: "Etapa 4 — Hospedagem e Infraestrutura",
+        title: "Etapa 4 · Hospedagem e Infraestrutura",
         question: "Como você quer hospedar seu SaaS? Quer começar 100% gratuito ou pode investir?",
         tip: "Firebase é 100% grátis no começo (Auth + Firestore + Hosting). Quando crescer, migre para Supabase ou compre uma VPS.",
         type: "choice",
@@ -234,14 +234,14 @@ const moduleWizardsData = {
       },
       {
         id: "nivel",
-        title: "Etapa 5 — Seu Nível",
+        title: "Etapa 5 · Seu Nível",
         question: "Qual é o seu nível atual de programação?",
         type: "choice",
         field: "nivel",
         options: [
-          { value: "iniciante", label: "Iniciante — nunca programei", prompt: null },
-          { value: "basico", label: "Básico — já vi HTML/CSS/JS", prompt: null },
-          { value: "intermediario", label: "Intermediário — já fiz projetos pequenos", prompt: null }
+          { value: "iniciante", label: "Iniciante · nunca programei", prompt: null },
+          { value: "basico", label: "Básico · já vi HTML/CSS/JS", prompt: null },
+          { value: "intermediario", label: "Intermediário · já fiz projetos pequenos", prompt: null }
         ]
       }
     ],
@@ -251,7 +251,7 @@ const moduleWizardsData = {
 
       let stackDetail = "";
       if (hosp === "firebase") {
-        stackDetail = "Firebase SDK (Auth + Firestore + Hosting) — 100% gratuito no plano Spark";
+        stackDetail = "Firebase SDK (Auth + Firestore + Hosting) · 100% gratuito no plano Spark";
       } else if (hosp === "supabase") {
         stackDetail = "Supabase (@supabase/supabase-js) + PostgreSQL + Supabase Auth";
       } else {
@@ -282,26 +282,26 @@ Seja prático, gere código completo e comentado para ${hosp === "firebase" ? "F
 
   2: {
     title: "Aplicativos Secretos",
-    intro: "Ferramentas e extensões que poucos conhecem no mundo tech — para produtividade extrema. Instale, configure e opcionalmente crie a sua própria extensão.",
+    intro: "Ferramentas e extensões que poucos conhecem no mundo tech · para produtividade extrema. Instale, configure e opcionalmente crie a sua própria extensão.",
     steps: [
       {
         id: "area",
-        title: "Etapa 1 — Área de Produtividade",
+        title: "Etapa 1 · Área de Produtividade",
         question: "Onde você mais precisa ganhar produtividade?",
-        tip: "Cada área tem apps secretos diferentes — escolha onde perde mais tempo hoje.",
+        tip: "Cada área tem apps secretos diferentes · escolha onde perde mais tempo hoje.",
         type: "choice",
         field: "area",
         options: [
-          { value: "browser", label: "Navegador — abas, foco, extensões Chrome", guide: ["Abra Chrome → <strong>chrome://extensions</strong>", "Ative <strong>Modo desenvolvedor</strong> para instalar extensões", "Use packs abaixo: Toby, Vimium, GoFullPage..."], prompt: "Liste as 10 melhores extensões Chrome secretas para produtividade (Toby, Vimium, Automa, etc.) com link e como instalar cada uma passo a passo." },
-          { value: "dev", label: "Desenvolvimento — código, APIs, terminal", guide: ["VS Code / Cursor → Extensions (Ctrl+Shift+X)", "Busque: Thunder Client, GitLens, Error Lens", "Terminal: instale Fig/Warp ou use PowerToys no Windows"], prompt: "Extensões VS Code/Cursor secretas para dev: Thunder Client, Pieces, Error Lens, Live Server. Como instalar e usar cada uma." },
-          { value: "automacao", label: "Automação — tarefas repetitivas sem código", guide: ["Teste <strong>bardeen.ai</strong> (extensão Chrome grátis)", "<strong>automa.site</strong> — automação visual no browser", "<strong>n8n.io</strong> — fluxos webhook quando escalar"], prompt: "Compare Bardeen, Automa, n8n e Make para automação no browser. Qual usar primeiro sendo iniciante? Passo a passo de instalação." },
-          { value: "ia", label: "IA escondida — chat, resumo, reuniões", guide: ["Extensão <strong>Merlin</strong> ou <strong>Monica</strong> no Chrome", "<strong>tactiq.io</strong> — transcreve Google Meet grátis", "<strong>fireflies.ai</strong> — notas automáticas de call"], prompt: "Apps de IA pouco conhecidos: Merlin, Tactiq, Fireflies, Otter. Como instalar e integrar na rotina de trabalho diária." },
-          { value: "geral", label: "Produtividade geral — clipboard, captura, atalhos", guide: ["Windows: instale <strong>Powertoys</strong> (Microsoft Store grátis)", "Mac: <strong>Raycast</strong> (raycast.com) substitui Spotlight", "Clipboard: <strong>Paste</strong> (Mac) ou <strong>Ditto</strong> (Windows)"], prompt: "Ferramentas secretas de produtividade: Raycast, PowerToys, Espanso, ShareX, CleanShot. Setup completo Windows e Mac." }
+          { value: "browser", label: "Navegador · abas, foco, extensões Chrome", guide: ["Abra Chrome → <strong>chrome://extensions</strong>", "Ative <strong>Modo desenvolvedor</strong> para instalar extensões", "Use packs abaixo: Toby, Vimium, GoFullPage..."], prompt: "Liste as 10 melhores extensões Chrome secretas para produtividade (Toby, Vimium, Automa, etc.) com link e como instalar cada uma passo a passo." },
+          { value: "dev", label: "Desenvolvimento · código, APIs, terminal", guide: ["VS Code / Cursor → Extensions (Ctrl+Shift+X)", "Busque: Thunder Client, GitLens, Error Lens", "Terminal: instale Fig/Warp ou use PowerToys no Windows"], prompt: "Extensões VS Code/Cursor secretas para dev: Thunder Client, Pieces, Error Lens, Live Server. Como instalar e usar cada uma." },
+          { value: "automacao", label: "Automação · tarefas repetitivas sem código", guide: ["Teste <strong>bardeen.ai</strong> (extensão Chrome grátis)", "<strong>automa.site</strong> · automação visual no browser", "<strong>n8n.io</strong> · fluxos webhook quando escalar"], prompt: "Compare Bardeen, Automa, n8n e Make para automação no browser. Qual usar primeiro sendo iniciante? Passo a passo de instalação." },
+          { value: "ia", label: "IA escondida · chat, resumo, reuniões", guide: ["Extensão <strong>Merlin</strong> ou <strong>Monica</strong> no Chrome", "<strong>tactiq.io</strong> · transcreve Google Meet grátis", "<strong>fireflies.ai</strong> · notas automáticas de call"], prompt: "Apps de IA pouco conhecidos: Merlin, Tactiq, Fireflies, Otter. Como instalar e integrar na rotina de trabalho diária." },
+          { value: "geral", label: "Produtividade geral · clipboard, captura, atalhos", guide: ["Windows: instale <strong>Powertoys</strong> (Microsoft Store grátis)", "Mac: <strong>Raycast</strong> (raycast.com) substitui Spotlight", "Clipboard: <strong>Paste</strong> (Mac) ou <strong>Ditto</strong> (Windows)"], prompt: "Ferramentas secretas de produtividade: Raycast, PowerToys, Espanso, ShareX, CleanShot. Setup completo Windows e Mac." }
         ]
       },
       {
         id: "sistema",
-        title: "Etapa 2 — Seu Sistema",
+        title: "Etapa 2 · Seu Sistema",
         question: "Qual sistema você usa no dia a dia?",
         type: "choice",
         field: "sistema",
@@ -313,21 +313,21 @@ Seja prático, gere código completo e comentado para ${hosp === "firebase" ? "F
       },
       {
         id: "pack",
-        title: "Etapa 3 — Pack de Apps Secretos",
+        title: "Etapa 3 · Pack de Apps Secretos",
         question: "Qual pack de ferramentas secretas instalar primeiro?",
-        tip: "São apps que a maioria dos devs BR ainda não usa — vantagem competitiva imediata.",
+        tip: "São apps que a maioria dos devs BR ainda não usa · vantagem competitiva imediata.",
         type: "choice",
         field: "pack",
         options: [
-          { value: "extensoes", label: "Pack Extensões Chrome (7 ferramentas)", guide: ["<strong>Vimium</strong> — navegue sites só com teclado", "<strong>Toby</strong> ou <strong>Workona</strong> — organize abas em projetos", "<strong>GoFullPage</strong> — screenshot página inteira", "<strong>WhatRuns</strong> — descubra tech stack de qualquer site", "<strong>Text Blaze</strong> — snippets de texto com atalho", "<strong>Automa</strong> — automação visual no browser", "<strong>Superpower ChatGPT</strong> — GPT em qualquer aba"], prompt: "Guia instalação pack Chrome: Vimium, Workona, GoFullPage, WhatRuns, Text Blaze, Automa, Superpower ChatGPT. Onde clicar em cada um e 1 caso de uso." },
-          { value: "devpack", label: "Pack Dev (Cursor/VS Code + APIs)", guide: ["Thunder Client — testa API dentro do editor", "Error Lens — erros inline no código", "Pieces — salva snippets com IA", "REST Client — .http files para APIs", "GitLens — histórico Git visual"], prompt: "Configurar pack dev no Cursor: Thunder Client, Error Lens, Pieces, REST Client. Exemplos práticos de uso em projeto Node.js." },
-          { value: "autopack", label: "Pack Automação (sem programar)", guide: ["<strong>bardeen.ai</strong> — scrape + planilha + CRM", "<strong>automa.site</strong> — clique/grave fluxos", "<strong>tally.so</strong> — formulários que disparam webhook", "<strong>typefully.com</strong> — agendar threads Twitter/X"], prompt: "Montar 3 automações com Bardeen + Tally + webhook n8n. Passo a passo visual para iniciante." },
-          { value: "iapack", label: "Pack IA Produtividade", guide: ["<strong>Merlin</strong> — GPT sidebar em qualquer site", "<strong>tactiq.io</strong> — transcrição Google Meet", "<strong>fireflies.ai</strong> — bot entra na call e resume", "<strong>perplexity.ai</strong> — pesquisa com fontes"], prompt: "Rotina diária com Merlin + Tactiq + Perplexity: reuniões, pesquisa e redação. Setup em 15 minutos." }
+          { value: "extensoes", label: "Pack Extensões Chrome (7 ferramentas)", guide: ["<strong>Vimium</strong> · navegue sites só com teclado", "<strong>Toby</strong> ou <strong>Workona</strong> · organize abas em projetos", "<strong>GoFullPage</strong> · screenshot página inteira", "<strong>WhatRuns</strong> · descubra tech stack de qualquer site", "<strong>Text Blaze</strong> · snippets de texto com atalho", "<strong>Automa</strong> · automação visual no browser", "<strong>Superpower ChatGPT</strong> · GPT em qualquer aba"], prompt: "Guia instalação pack Chrome: Vimium, Workona, GoFullPage, WhatRuns, Text Blaze, Automa, Superpower ChatGPT. Onde clicar em cada um e 1 caso de uso." },
+          { value: "devpack", label: "Pack Dev (Cursor/VS Code + APIs)", guide: ["Thunder Client · testa API dentro do editor", "Error Lens · erros inline no código", "Pieces · salva snippets com IA", "REST Client · .http files para APIs", "GitLens · histórico Git visual"], prompt: "Configurar pack dev no Cursor: Thunder Client, Error Lens, Pieces, REST Client. Exemplos práticos de uso em projeto Node.js." },
+          { value: "autopack", label: "Pack Automação (sem programar)", guide: ["<strong>bardeen.ai</strong> · scrape + planilha + CRM", "<strong>automa.site</strong> · clique/grave fluxos", "<strong>tally.so</strong> · formulários que disparam webhook", "<strong>typefully.com</strong> · agendar threads Twitter/X"], prompt: "Montar 3 automações com Bardeen + Tally + webhook n8n. Passo a passo visual para iniciante." },
+          { value: "iapack", label: "Pack IA Produtividade", guide: ["<strong>Merlin</strong> · GPT sidebar em qualquer site", "<strong>tactiq.io</strong> · transcrição Google Meet", "<strong>fireflies.ai</strong> · bot entra na call e resume", "<strong>perplexity.ai</strong> · pesquisa com fontes"], prompt: "Rotina diária com Merlin + Tactiq + Perplexity: reuniões, pesquisa e redação. Setup em 15 minutos." }
         ]
       },
       {
         id: "objetivo",
-        title: "Etapa 4 — Seu Objetivo",
+        title: "Etapa 4 · Seu Objetivo",
         question: "O que você quer resolver com essas ferramentas?",
         type: "text",
         field: "objetivo",
@@ -335,7 +335,7 @@ Seja prático, gere código completo e comentado para ${hosp === "firebase" ? "F
       },
       {
         id: "criar_tool",
-        title: "Etapa 5 — Além de Usar Apps",
+        title: "Etapa 5 · Além de Usar Apps",
         question: "Quer também criar sua própria extensão ou bot?",
         tip: "Depois de dominar apps prontos, você pode vender extensões .exe ou Chrome customizadas.",
         type: "choice",
@@ -362,7 +362,7 @@ Apps secretos recomendados:
 ${appList}
 
 Me entregue:
-1) Plano de instalação em ordem (Dia 1 a Dia 3) — onde clicar em cada app
+1) Plano de instalação em ordem (Dia 1 a Dia 3) · onde clicar em cada app
 2) Atalhos e hacks de produtividade com cada ferramenta
 3) Stack completa integrada para meu objetivo
 4) ${answers.criar_tool === 'extensao' ? 'Roteiro para criar minha extensão Chrome' : answers.criar_tool === 'bot' ? 'Roteiro para criar bot/.exe' : 'Próximos apps secretos para explorar depois'}
@@ -375,23 +375,23 @@ Me entregue:
 
   3: {
     title: "Tráfego Orgânico",
-    intro: "Cresça sem gastar em ads. Guias de CapCut, Canva, ManyChat e ChatGPT — onde clicar em cada app.",
+    intro: "Cresça sem gastar em ads. Guias de CapCut, Canva, ManyChat e ChatGPT · onde clicar em cada app.",
     steps: [
       {
         id: "ia_conteudo",
-        title: "Etapa 1 — IA para Conteúdo",
+        title: "Etapa 1 · IA para Conteúdo",
         question: "Qual ferramenta de IA você usa para criar conteúdo?",
         type: "choice",
         field: "ia_conteudo",
         options: [
           { value: "chatgpt", label: "ChatGPT (chat.openai.com)", guide: ["Acesse <strong>chat.openai.com</strong> → Login", "Clique <strong>New chat</strong>", "Cole prompt → Enter → copie resultado", "Para imagens: use <strong>DALL-E</strong> ou Canva"], prompt: "5 prompts reutilizáveis ChatGPT: post Instagram, roteiro Reels 45s, copy LinkedIn, cold email, legenda TikTok. Formato copiar e colar." },
           { value: "claude", label: "Claude (claude.ai)", guide: ["Acesse <strong>claude.ai</strong> → Sign Up", "New Chat → cole prompt longo (Claude aceita textos grandes)", "Use para roteiros e carrosséis completos"], prompt: "Prompts Claude para conteúdo orgânico B2B: 3 posts LinkedIn, 1 roteiro Reels, 1 sequência WhatsApp outreach." },
-          { value: "nao", label: "Não uso IA ainda — quero começar", guide: ["Crie conta grátis em <strong>chat.openai.com</strong>", "Ou <strong>claude.ai</strong> (melhor para textos longos)", "Canva grátis: <strong>canva.com</strong> para artes", "CapCut grátis: app ou <strong>capcut.com</strong> para editar vídeos"], prompt: "Nunca usei IA para conteúdo. Tutorial do zero: criar conta ChatGPT, primeiro prompt, gerar 3 posts Instagram sobre automação com IA, e onde colar no Instagram." }
+          { value: "nao", label: "Não uso IA ainda · quero começar", guide: ["Crie conta grátis em <strong>chat.openai.com</strong>", "Ou <strong>claude.ai</strong> (melhor para textos longos)", "Canva grátis: <strong>canva.com</strong> para artes", "CapCut grátis: app ou <strong>capcut.com</strong> para editar vídeos"], prompt: "Nunca usei IA para conteúdo. Tutorial do zero: criar conta ChatGPT, primeiro prompt, gerar 3 posts Instagram sobre automação com IA, e onde colar no Instagram." }
         ]
       },
       {
         id: "nicho",
-        title: "Etapa 2 — Seu Nicho",
+        title: "Etapa 2 · Seu Nicho",
         question: "Qual é o nicho do seu produto ou serviço?",
         type: "text",
         field: "nicho",
@@ -399,7 +399,7 @@ Me entregue:
       },
       {
         id: "redes",
-        title: "Etapa 3 — Redes Sociais",
+        title: "Etapa 3 · Redes Sociais",
         question: "Qual rede social você vai focar primeiro?",
         type: "choice",
         field: "redes",
@@ -412,19 +412,19 @@ Me entregue:
       },
       {
         id: "apps_edicao",
-        title: "Etapa 4 — Apps de Edição",
+        title: "Etapa 4 · Apps de Edição",
         question: "Quais apps de edição você vai usar?",
         type: "choice",
         field: "apps_edicao",
         options: [
-          { value: "capcut", label: "CapCut (vídeos — grátis)", guide: ["Baixe CapCut (celular) ou capcut.com (PC)", "New Project → importe vídeo ou grave", "Texto → Auto Captions (legendas automáticas)", "Efeitos → Transitions → Export 1080p", "Salve e poste no Instagram Reels"], prompt: "Roteiro Reels 45s + instruções CapCut: onde clicar para legenda automática, zoom, transições e exportar." },
-          { value: "canva", label: "Canva (carrosséis — grátis)", guide: ["canva.com → Login → <strong>Criar design</strong>", "Busque 'Instagram Carrossel'", "Edite 7 slides → Exportar PNG/PDF", "Poste no Instagram como carrossel"], prompt: "Copy de carrossel 7 slides + layout Canva slide a slide (título, cor, fonte)." },
-          { value: "manychat", label: "ManyChat (automação Direct — grátis)", guide: ["manychat.com → Sign Up → conecte Instagram", "Automation → <strong>New Flow</strong>", "Trigger: comentário contém 'QUERO'", "Ação: enviar DM com link/PDF", "Publicar automação → teste comentando no post"], prompt: "Fluxo ManyChat completo: trigger comentário 'QUERO' → DM com PDF → pergunta dificuldade → link checkout. Copy das mensagens." }
+          { value: "capcut", label: "CapCut (vídeos · grátis)", guide: ["Baixe CapCut (celular) ou capcut.com (PC)", "New Project → importe vídeo ou grave", "Texto → Auto Captions (legendas automáticas)", "Efeitos → Transitions → Export 1080p", "Salve e poste no Instagram Reels"], prompt: "Roteiro Reels 45s + instruções CapCut: onde clicar para legenda automática, zoom, transições e exportar." },
+          { value: "canva", label: "Canva (carrosséis · grátis)", guide: ["canva.com → Login → <strong>Criar design</strong>", "Busque 'Instagram Carrossel'", "Edite 7 slides → Exportar PNG/PDF", "Poste no Instagram como carrossel"], prompt: "Copy de carrossel 7 slides + layout Canva slide a slide (título, cor, fonte)." },
+          { value: "manychat", label: "ManyChat (automação Direct · grátis)", guide: ["manychat.com → Sign Up → conecte Instagram", "Automation → <strong>New Flow</strong>", "Trigger: comentário contém 'QUERO'", "Ação: enviar DM com link/PDF", "Publicar automação → teste comentando no post"], prompt: "Fluxo ManyChat completo: trigger comentário 'QUERO' → DM com PDF → pergunta dificuldade → link checkout. Copy das mensagens." }
         ]
       },
       {
         id: "formato",
-        title: "Etapa 5 — Formato Principal",
+        title: "Etapa 5 · Formato Principal",
         question: "Qual formato de conteúdo criar primeiro esta semana?",
         type: "choice",
         field: "formato",
@@ -444,7 +444,7 @@ Apps: ${answers.apps_edicao || "CapCut + Canva"}
 Formato: ${answers.formato || "vídeos"}
 
 Plano 30 dias com:
-1. Calendário semanal (4 semanas) — o que postar cada dia
+1. Calendário semanal (4 semanas) · o que postar cada dia
 2. 12 posts prontos (copy + app para criar: CapCut/Canva)
 3. Hashtags por post
 4. Fluxo ManyChat (comentário → DM → lead)
@@ -456,24 +456,24 @@ Inclua tutoriais visuais 'clique aqui' para iniciantes.`;
 
   4: {
     title: "Funil de Vendas & E-mail Marketing",
-    intro: "Monte landing page, e-mails e automações. Guias de Resend, n8n, Make e Mailchimp — clique a clique.",
+    intro: "Monte landing page, e-mails e automações. Guias de Resend, n8n, Make e Mailchimp · clique a clique.",
     steps: [
       {
         id: "ferramentas",
-        title: "Etapa 1 — Ferramentas de Automação",
+        title: "Etapa 1 · Ferramentas de Automação",
         question: "Qual ferramenta você vai usar para o funil?",
         type: "choice",
         field: "ferramentas",
         options: [
-          { value: "n8n", label: "n8n (automação — grátis self-hosted ou cloud)", guide: ["Acesse <strong>n8n.io</strong> → cloud grátis ou instale local", "Clique <strong>New Workflow</strong>", "Adicione nó <strong>Webhook</strong> → copie URL", "Adicione nó <strong>Send Email</strong> ou HTTP Request", "Conecte nós → <strong>Execute workflow</strong> → ative"], prompt: "Workflow n8n: webhook recebe lead → salva Google Sheets → envia email Resend → notifica WhatsApp. JSON exportável." },
-          { value: "make", label: "Make / Integromat (visual — tier grátis)", guide: ["Acesse <strong>make.com</strong> → Sign Up", "<strong>Create new scenario</strong>", "Módulo 1: Webhooks → Custom webhook", "Módulo 2: Resend ou Gmail → Send email", "Clique <strong>Run once</strong> → teste → ative scenario"], prompt: "Cenário Make: formulário site → email boas-vindas → adicionar linha Google Sheets. Passo a passo visual Make." },
-          { value: "resend", label: "Resend (e-mail transacional — grátis 3k/mês)", guide: ["Acesse <strong>resend.com</strong> → Sign Up", "Menu <strong>API Keys</strong> → Create API Key → copie", "Menu <strong>Domains</strong> → Add Domain → configure DNS", "Docs: copie exemplo Node.js", "Teste: envie email de teste no dashboard"], prompt: "Integrar Resend no Express.js: capturar lead POST /api/lead, enviar email HTML boas-vindas. Código completo + .env." },
-          { value: "nao", label: "Não tenho nada — montar do zero", guide: ["Comece com <strong>resend.com</strong> (email grátis)", "Landing no seu site ou <strong>carrd.co</strong> (grátis)", "n8n.io cloud grátis para conectar formulário → email", "Depois evolua para Make ou n8n self-hosted"], prompt: "Funil do zero: Resend + landing page HTML + webhook n8n. Onde criar conta, onde clicar, código Node.js completo." }
+          { value: "n8n", label: "n8n (automação · grátis self-hosted ou cloud)", guide: ["Acesse <strong>n8n.io</strong> → cloud grátis ou instale local", "Clique <strong>New Workflow</strong>", "Adicione nó <strong>Webhook</strong> → copie URL", "Adicione nó <strong>Send Email</strong> ou HTTP Request", "Conecte nós → <strong>Execute workflow</strong> → ative"], prompt: "Workflow n8n: webhook recebe lead → salva Google Sheets → envia email Resend → notifica WhatsApp. JSON exportável." },
+          { value: "make", label: "Make / Integromat (visual · tier grátis)", guide: ["Acesse <strong>make.com</strong> → Sign Up", "<strong>Create new scenario</strong>", "Módulo 1: Webhooks → Custom webhook", "Módulo 2: Resend ou Gmail → Send email", "Clique <strong>Run once</strong> → teste → ative scenario"], prompt: "Cenário Make: formulário site → email boas-vindas → adicionar linha Google Sheets. Passo a passo visual Make." },
+          { value: "resend", label: "Resend (e-mail transacional · grátis 3k/mês)", guide: ["Acesse <strong>resend.com</strong> → Sign Up", "Menu <strong>API Keys</strong> → Create API Key → copie", "Menu <strong>Domains</strong> → Add Domain → configure DNS", "Docs: copie exemplo Node.js", "Teste: envie email de teste no dashboard"], prompt: "Integrar Resend no Express.js: capturar lead POST /api/lead, enviar email HTML boas-vindas. Código completo + .env." },
+          { value: "nao", label: "Não tenho nada · montar do zero", guide: ["Comece com <strong>resend.com</strong> (email grátis)", "Landing no seu site ou <strong>carrd.co</strong> (grátis)", "n8n.io cloud grátis para conectar formulário → email", "Depois evolua para Make ou n8n self-hosted"], prompt: "Funil do zero: Resend + landing page HTML + webhook n8n. Onde criar conta, onde clicar, código Node.js completo." }
         ]
       },
       {
         id: "produto",
-        title: "Etapa 2 — Produto/Oferta",
+        title: "Etapa 2 · Produto/Oferta",
         question: "O que você está vendendo no funil?",
         type: "text",
         field: "produto",
@@ -481,7 +481,7 @@ Inclua tutoriais visuais 'clique aqui' para iniciantes.`;
       },
       {
         id: "landing",
-        title: "Etapa 3 — Página de Captura",
+        title: "Etapa 3 · Página de Captura",
         question: "Onde vai hospedar sua landing page de captura?",
         type: "choice",
         field: "landing",
@@ -493,19 +493,19 @@ Inclua tutoriais visuais 'clique aqui' para iniciantes.`;
       },
       {
         id: "sequencia",
-        title: "Etapa 4 — Sequência de E-mails",
+        title: "Etapa 4 · Sequência de E-mails",
         question: "Quantos e-mails na sequência de nutrição?",
         type: "choice",
         field: "emails",
         options: [
-          { value: "3", label: "3 e-mails (rápido)", guide: ["Resend → Templates ou código HTML", "Email 1: imediato após cadastro", "Email 2: dia 2 — case de sucesso", "Email 3: dia 5 — oferta com urgência", "Configure delay no n8n/Make entre envios"], prompt: "Sequência 3 emails: assunto + corpo HTML. Email 1 boas-vindas, 2 prova social, 3 oferta." },
+          { value: "3", label: "3 e-mails (rápido)", guide: ["Resend → Templates ou código HTML", "Email 1: imediato após cadastro", "Email 2: dia 2 · case de sucesso", "Email 3: dia 5 · oferta com urgência", "Configure delay no n8n/Make entre envios"], prompt: "Sequência 3 emails: assunto + corpo HTML. Email 1 boas-vindas, 2 prova social, 3 oferta." },
           { value: "5", label: "5 e-mails (completo)", prompt: "Sequência 5 emails nutrição: assunto + HTML cada. Jornada do lead frio ao comprador." },
           { value: "7", label: "7 e-mails (funil longo)", prompt: "Sequência 7 emails: assunto + corpo. Inclua storytelling, objeções, bônus, escassez." }
         ]
       },
       {
         id: "hospedagem",
-        title: "Etapa 5 — Hospedagem do Funil",
+        title: "Etapa 5 · Hospedagem do Funil",
         question: "Onde rodar backend do funil (webhooks, emails)?",
         type: "choice",
         field: "hospedagem",
@@ -537,19 +537,19 @@ Entregue:
     steps: [
       {
         id: "controle",
-        title: "Etapa 1 — Ferramenta de Controle",
+        title: "Etapa 1 · Ferramenta de Controle",
         question: "Onde vai acompanhar os números do negócio?",
         type: "choice",
         field: "controle",
         options: [
-          { value: "sheets", label: "Google Sheets (grátis — recomendado)", guide: ["Acesse <strong>sheets.google.com</strong> → Blank spreadsheet", "Crie abas: Receitas, Despesas, MRR, Clientes", "Coluna A: mês | Coluna B: valor | use fórmulas =SUM()", "Compartilhe com sócio se necessário", "Atualize todo dia 1 do mês"], prompt: "Planilha Google Sheets SaaS: abas MRR, Churn, CAC, LTV com fórmulas automáticas. Estrutura coluna a coluna." },
+          { value: "sheets", label: "Google Sheets (grátis · recomendado)", guide: ["Acesse <strong>sheets.google.com</strong> → Blank spreadsheet", "Crie abas: Receitas, Despesas, MRR, Clientes", "Coluna A: mês | Coluna B: valor | use fórmulas =SUM()", "Compartilhe com sócio se necessário", "Atualize todo dia 1 do mês"], prompt: "Planilha Google Sheets SaaS: abas MRR, Churn, CAC, LTV com fórmulas automáticas. Estrutura coluna a coluna." },
           { value: "stripe", label: "Stripe/Mercado Pago Dashboard", guide: ["Stripe: dashboard.stripe.com → <strong>Reports</strong>", "Mercado Pago: mercadopago.com.br → <strong>Suas vendas</strong>", "Exporte CSV mensal → importe no Sheets", "Acompanhe MRR em Billing → Subscriptions"], prompt: "Como extrair MRR e churn do Stripe Dashboard e Mercado Pago. Onde clicar para exportar relatórios." },
           { value: "nao", label: "Não controlo nada ainda", guide: ["Comece com Google Sheets hoje", "Anote: preço, clientes ativos, gastos ads", "Peça à IA fórmulas de MRR e LTV", "Atualize semanalmente"], prompt: "Planilha controle financeiro SaaS do zero: template Google Sheets com fórmulas MRR, CAC, LTV, Churn. Instruções de preenchimento." }
         ]
       },
       {
         id: "modelo",
-        title: "Etapa 2 — Modelo de Receita",
+        title: "Etapa 2 · Modelo de Receita",
         question: "Como você cobra dos clientes?",
         type: "choice",
         field: "modelo",
@@ -562,7 +562,7 @@ Entregue:
       },
       {
         id: "numeros",
-        title: "Etapa 3 — Seus Números Atuais",
+        title: "Etapa 3 · Seus Números Atuais",
         question: "Informe: preço mensal, clientes ativos, gasto marketing/mês",
         type: "text",
         field: "numeros",
@@ -570,7 +570,7 @@ Entregue:
       },
       {
         id: "dashboard",
-        title: "Etapa 4 — Dashboard Visual",
+        title: "Etapa 4 · Dashboard Visual",
         question: "Quer gráficos visuais ou só planilha?",
         type: "choice",
         field: "dashboard",
@@ -603,19 +603,19 @@ Calcule e explique:
     steps: [
       {
         id: "conta_ads",
-        title: "Etapa 1 — Plataforma de Anúncios",
+        title: "Etapa 1 · Plataforma de Anúncios",
         question: "Onde vai anunciar?",
         type: "choice",
         field: "conta_ads",
         options: [
           { value: "meta", label: "Meta Ads (Instagram/Facebook)", guide: ["Acesse <strong>business.facebook.com</strong>", "Create Account → nome da empresa", "Menu <strong>Configurações do negócio</strong> → Contas de anúncios → Adicionar", "Instale <strong>Pixel</strong>: Eventos de dados → Conectar dados → Web", "Copie código Pixel → cole antes &lt;/head&gt; do site"], prompt: "Configurar Meta Pixel no site: código base + evento Purchase. Onde colar no HTML e testar no Events Manager." },
           { value: "google", label: "Google Ads", guide: ["ads.google.com → Start now", "Crie campanha → Objetivo: Vendas/Leads", "Tipo: Performance Max ou Search", "Instale <strong>Google Tag</strong> no site", "Conecte conversões em Ferramentas → Conversões"], prompt: "Campanha Google Ads Search para SaaS B2B: estrutura, palavras-chave, copy anúncio, landing page." },
-          { value: "nao", label: "Não tenho conta — criar agora", guide: ["Recomendado: Meta Business (business.facebook.com)", "Crie conta pessoal Facebook se não tiver", "Business Settings → Add Ad Account", "Adicione forma de pagamento (cartão)", "Instale Pixel antes de rodar ads"], prompt: "Tutorial visual Meta Business Manager do zero: criar conta, ad account, pixel, primeira campanha conversão. Onde clicar em cada tela." }
+          { value: "nao", label: "Não tenho conta · criar agora", guide: ["Recomendado: Meta Business (business.facebook.com)", "Crie conta pessoal Facebook se não tiver", "Business Settings → Add Ad Account", "Adicione forma de pagamento (cartão)", "Instale Pixel antes de rodar ads"], prompt: "Tutorial visual Meta Business Manager do zero: criar conta, ad account, pixel, primeira campanha conversão. Onde clicar em cada tela." }
         ]
       },
       {
         id: "produto_ads",
-        title: "Etapa 2 — Produto Anunciado",
+        title: "Etapa 2 · Produto Anunciado",
         question: "O que você vai anunciar?",
         type: "text",
         field: "produto",
@@ -623,19 +623,19 @@ Calcule e explique:
       },
       {
         id: "criativo_app",
-        title: "Etapa 3 — App para Criar Criativos",
+        title: "Etapa 3 · App para Criar Criativos",
         question: "Como vai produzir os criativos (imagens/vídeos)?",
         type: "choice",
         field: "criativo_app",
         options: [
-          { value: "capcut", label: "CapCut (vídeo ads — grátis)", guide: ["CapCut → New Project → 9:16 vertical", "Importe gravação ou use template", "Texto grande nos primeiros 3 segundos (gancho)", "Auto Caption → Export", "Upload direto no Ads Manager"], prompt: "Roteiro vídeo ad 30s Hook-Pain-Solution + instruções CapCut para Meta Ads." },
-          { value: "canva", label: "Canva (imagem/carrossel — grátis)", guide: ["canva.com → Instagram Post ou Ad", "Templates 'Facebook Ad'", "Customize headline + CTA", "Download PNG → Ads Manager → Create Ad → Upload"], prompt: "5 variações criativo estático Canva: headline, texto, CTA para Meta Ads." },
-          { value: "ia", label: "Só copy — IA escreve, eu gravo depois", guide: ["ChatGPT: peça roteiro + indicaciones visuais", "Grave com celular (selfie ou tela)", "CapCut: edite e legenda", "Teste 3 variações de gancho"], prompt: "5 copies Meta Ads completas: headline 40 chars, texto principal, descrição, CTA. Teste A/B ganchos." }
+          { value: "capcut", label: "CapCut (vídeo ads · grátis)", guide: ["CapCut → New Project → 9:16 vertical", "Importe gravação ou use template", "Texto grande nos primeiros 3 segundos (gancho)", "Auto Caption → Export", "Upload direto no Ads Manager"], prompt: "Roteiro vídeo ad 30s Hook-Pain-Solution + instruções CapCut para Meta Ads." },
+          { value: "canva", label: "Canva (imagem/carrossel · grátis)", guide: ["canva.com → Instagram Post ou Ad", "Templates 'Facebook Ad'", "Customize headline + CTA", "Download PNG → Ads Manager → Create Ad → Upload"], prompt: "5 variações criativo estático Canva: headline, texto, CTA para Meta Ads." },
+          { value: "ia", label: "Só copy · IA escreve, eu gravo depois", guide: ["ChatGPT: peça roteiro + indicaciones visuais", "Grave com celular (selfie ou tela)", "CapCut: edite e legenda", "Teste 3 variações de gancho"], prompt: "5 copies Meta Ads completas: headline 40 chars, texto principal, descrição, CTA. Teste A/B ganchos." }
         ]
       },
       {
         id: "orcamento",
-        title: "Etapa 4 — Orçamento e Campanha",
+        title: "Etapa 4 · Orçamento e Campanha",
         question: "Qual orçamento e como estruturar campanha?",
         type: "choice",
         field: "orcamento",
@@ -665,31 +665,31 @@ Entregue:
 
   7: {
     title: "Gestão de Cobrança",
-    intro: "Configure checkout e receba pagamentos. Hotmart, Kiwify, Mercado Pago, Stripe e mais — com guia de onde clicar em cada plataforma.",
+    intro: "Configure checkout e receba pagamentos. Hotmart, Kiwify, Mercado Pago, Stripe e mais · com guia de onde clicar em cada plataforma.",
     steps: [
       {
         id: "tipo_checkout",
-        title: "Etapa 1 — Tipo de Checkout",
+        title: "Etapa 1 · Tipo de Checkout",
         question: "Como você quer vender e cobrar?",
         tip: "Plataformas prontas (Hotmart/Kiwify) não exigem programar checkout. Mercado Pago/Stripe exigem integração no seu site.",
         type: "choice",
         field: "tipo_checkout",
         options: [
-          { value: "plataforma", label: "Plataforma pronta (Hotmart, Kiwify, Eduzz) — recomendado para começar", guide: ["Ideal para cursos, comunidades e infoprodutos", "Checkout, Pix, boleto e cartão já inclusos", "Você só configura produto + preço + link", "Webhook libera acesso automaticamente no seu site"], prompt: "Comparativo Hotmart vs Kiwify vs Eduzz para comunidade/SaaS: taxas, recorrência, afiliados, qual escolher para R$47/mês." },
+          { value: "plataforma", label: "Plataforma pronta (Hotmart, Kiwify, Eduzz) · recomendado para começar", guide: ["Ideal para cursos, comunidades e infoprodutos", "Checkout, Pix, boleto e cartão já inclusos", "Você só configura produto + preço + link", "Webhook libera acesso automaticamente no seu site"], prompt: "Comparativo Hotmart vs Kiwify vs Eduzz para comunidade/SaaS: taxas, recorrência, afiliados, qual escolher para R$47/mês." },
           { value: "proprio", label: "Checkout no meu site (Mercado Pago, Stripe)", guide: ["Ideal para SaaS com login próprio", "Cliente paga dentro do seu site/app", "Precisa de backend para webhooks", "Mais controle, mais técnico"], prompt: "Quando usar checkout próprio vs Hotmart/Kiwify? Prós e contras para MicroSaaS brasileiro." },
-          { value: "hibrido", label: "Os dois — plataforma + área de membros própria", guide: ["Venda na Kiwify/Hotmart (checkout fácil)", "Webhook libera login no seu dashboard", "Melhor dos dois mundos para comunidade conectWM"], prompt: "Arquitetura híbrida: vender na Kiwify + liberar acesso automático no dashboard Firebase. Fluxo completo." }
+          { value: "hibrido", label: "Os dois · plataforma + área de membros própria", guide: ["Venda na Kiwify/Hotmart (checkout fácil)", "Webhook libera login no seu dashboard", "Melhor dos dois mundos para comunidade conectWM"], prompt: "Arquitetura híbrida: vender na Kiwify + liberar acesso automático no dashboard Firebase. Fluxo completo." }
         ]
       },
       {
         id: "gateway",
-        title: "Etapa 2 — Plataforma de Checkout",
+        title: "Etapa 2 · Plataforma de Checkout",
         question: "Qual plataforma de pagamento/checkout você vai usar?",
         type: "choice",
         field: "gateway",
         options: [
           {
             value: "kiwify",
-            label: "Kiwify (checkout moderno — Brasil)",
+            label: "Kiwify (checkout moderno · Brasil)",
             guide: [
               "Acesse <strong>kiwify.com.br</strong> → <strong>Criar conta grátis</strong>",
               "Menu <strong>Produtos</strong> → <strong>+ Novo produto</strong>",
@@ -704,7 +704,7 @@ Entregue:
           },
           {
             value: "hotmart",
-            label: "Hotmart (líder BR — cursos e assinaturas)",
+            label: "Hotmart (líder BR · cursos e assinaturas)",
             guide: [
               "Acesse <strong>hotmart.com</strong> → Login → <strong>Sou Produtor</strong>",
               "Menu <strong>Produtos</strong> → <strong>Criar produto</strong>",
@@ -734,7 +734,7 @@ Entregue:
           },
           {
             value: "mercadopago",
-            label: "Mercado Pago (checkout no seu site — Pix/Cartão)",
+            label: "Mercado Pago (checkout no seu site · Pix/Cartão)",
             guide: [
               "Acesse <strong>mercadopago.com.br/developers</strong>",
               "<strong>Suas integrações</strong> → Criar aplicação",
@@ -748,7 +748,7 @@ Entregue:
           },
           {
             value: "stripe",
-            label: "Stripe (internacional — cartão recorrente)",
+            label: "Stripe (internacional · cartão recorrente)",
             guide: [
               "<strong>dashboard.stripe.com</strong> → Create account",
               "Products → <strong>+ Add product</strong> → preço recorrente",
@@ -761,7 +761,7 @@ Entregue:
           },
           {
             value: "gumroad",
-            label: "Gumroad (internacional — simples)",
+            label: "Gumroad (internacional · simples)",
             guide: [
               "gumroad.com → Sign Up → Create Product",
               "Pricing: subscription ou one-time",
@@ -773,7 +773,7 @@ Entregue:
           },
           {
             value: "nao_sei",
-            label: "Não sei qual escolher — me ajude",
+            label: "Não sei qual escolher · me ajude",
             guide: [
               "Comunidade/curso BR → <strong>Kiwify</strong> ou Hotmart",
               "SaaS com login próprio → Mercado Pago ou Stripe",
@@ -787,7 +787,7 @@ Entregue:
       },
       {
         id: "cobranca",
-        title: "Etapa 3 — Tipo de Cobrança e Preço",
+        title: "Etapa 3 · Tipo de Cobrança e Preço",
         question: "Como vai cobrar e qual o preço?",
         tip: "Exemplo: R$47/mês recorrente ou R$497 pagamento único anual.",
         type: "choice",
@@ -795,13 +795,13 @@ Entregue:
         options: [
           { value: "mensal", label: "Assinatura mensal (ex: R$47/mês)", guide: ["Na Kiwify/Hotmart: escolha tipo <strong>Assinatura/Recorrência</strong>", "Defina valor mensal + trial opcional (7 dias grátis)", "Configure cancelamento automático se inadimplente"], prompt: "Configurar assinatura mensal R$47 na [PLATAFORMA]: onde clicar, campos obrigatórios, trial 7 dias." },
           { value: "anual", label: "Plano anual com desconto (ex: R$497/ano)", guide: ["Crie 2 planos: mensal R$47 e anual R$497", "Destaque economia de 2 meses no checkout", "Hotmart/Kiwify: adicione order bump anual"], prompt: "Dois planos mensal+anual na [PLATAFORMA]: copy checkout, order bump, comparativo preços." },
-          { value: "unico", label: "Pagamento único (acesso vitalício)", guide: ["Tipo produto: pagamento único", "Sem recorrência — acesso permanente", "Ideal para curso fechado ou licença"], prompt: null },
+          { value: "unico", label: "Pagamento único (acesso vitalício)", guide: ["Tipo produto: pagamento único", "Sem recorrência · acesso permanente", "Ideal para curso fechado ou licença"], prompt: null },
           { value: "ambos", label: "Mensal + Anual (2 opções no checkout)", guide: ["Crie 2 produtos ou 2 planos na mesma oferta", "Checkout mostra toggle mensal/anual", "Kiwify: use múltiplos planos no mesmo produto"], prompt: "Checkout com toggle mensal R$47 / anual R$497 na [PLATAFORMA]. Passo a passo visual." }
         ]
       },
       {
         id: "preco",
-        title: "Etapa 4 — Valor do Plano",
+        title: "Etapa 4 · Valor do Plano",
         question: "Qual o preço exato do seu plano?",
         type: "text",
         field: "preco",
@@ -809,7 +809,7 @@ Entregue:
       },
       {
         id: "automacao",
-        title: "Etapa 5 — Liberar Acesso Automático",
+        title: "Etapa 5 · Liberar Acesso Automático",
         question: "Como vai liberar acesso no dashboard após pagamento?",
         tip: "Webhook da plataforma → seu servidor → libera login do aluno automaticamente.",
         type: "choice",
@@ -817,7 +817,7 @@ Entregue:
         options: [
           {
             value: "n8n",
-            label: "n8n (automação visual — grátis)",
+            label: "n8n (automação visual · grátis)",
             guide: [
               "n8n.io → cloud grátis ou instale local",
               "Workflow: <strong>Webhook</strong> recebe Kiwify/Hotmart",
@@ -868,7 +868,7 @@ Entregue:
       },
       {
         id: "hospedagem",
-        title: "Etapa 6 — Hospedagem do Webhook",
+        title: "Etapa 6 · Hospedagem do Webhook",
         question: "Onde hospedar o endpoint que recebe o webhook?",
         type: "choice",
         field: "hospedagem",
@@ -925,13 +925,13 @@ Hospedagem webhook: ${getHostingLabel(hosp)}
 
 Entregue GUIA COMPLETO DE CONFIGURAÇÃO:
 
-1. CHECKOUT ${gw} — passo a passo onde clicar no painel:
+1. CHECKOUT ${gw} · passo a passo onde clicar no painel:
    - Criar produto/plano ${answers.preco || "R$47/mês"}
    - Configurar ${answers.cobranca || "recorrência"}
    - Copiar link checkout para landing page
    - Página de obrigado / redirect pós-pagamento
 
-2. WEBHOOK ${gw} — configuração exata:
+2. WEBHOOK ${gw} · configuração exata:
    - Onde cadastrar URL no painel ${gw}
    - Quais eventos marcar (pagamento aprovado, cancelamento)
    - Como copiar token secreto (Hottok/secret key)
@@ -963,12 +963,12 @@ Seja extremamente visual: "clique aqui", "menu X", "aba Y". Código completo com
     steps: [
       {
         id: "perfis",
-        title: "Etapa 1 — Otimizar Perfis",
+        title: "Etapa 1 · Otimizar Perfis",
         question: "Qual rede você vai otimizar primeiro?",
         type: "choice",
         field: "perfis",
         options: [
-          { value: "linkedin", label: "LinkedIn (B2B — autoridade)", guide: ["linkedin.com → seu perfil → ícone <strong>lápis</strong>", "Foto profissional + banner (Canva 1584×396)", "Headline: resultado + nicho (120 chars)", "Sobre: problema → solução → CTA link", "Destaques: adicione links serviços/comunidade"], prompt: "Otimize LinkedIn B2B automação IA: 3 headlines, texto Sobre conversão, 5 tópicos destaque." },
+          { value: "linkedin", label: "LinkedIn (B2B · autoridade)", guide: ["linkedin.com → seu perfil → ícone <strong>lápis</strong>", "Foto profissional + banner (Canva 1584×396)", "Headline: resultado + nicho (120 chars)", "Sobre: problema → solução → CTA link", "Destaques: adicione links serviços/comunidade"], prompt: "Otimize LinkedIn B2B automação IA: 3 headlines, texto Sobre conversão, 5 tópicos destaque." },
           { value: "instagram", label: "Instagram (visual + Reels)", guide: ["Instagram → Editar perfil", "Bio: 1 linha valor + link (Linktree/beacons.ai)", "Foto logo/marca", "Destaques: Comunidade, Depoimentos, FAQ", "Mude para conta Profissional/Creator"], prompt: "Bio Instagram + 5 ideias destaques + primeiro carrossel autoridade." },
           { value: "ambos", label: "LinkedIn + Instagram juntos", guide: ["Canva: crie kit visual (cores, fonte)", "Mesma bio adaptada para cada rede", "Repurpose: post LinkedIn → carrossel Instagram", "ManyChat conecta Instagram para leads"], prompt: "Kit presença LinkedIn + Instagram: bios, 3 posts cada, calendário 2 semanas." },
           { value: "nao", label: "Criar perfis do zero", guide: ["Crie LinkedIn e Instagram hoje", "Canva: foto perfil + banner", "ChatGPT: escreva bio", "Primeiro post: apresentação + dor do nicho"], prompt: "Roteiro 7 dias: criar LinkedIn + Instagram do zero, bio, 3 posts, conectar 30 leads." }
@@ -976,7 +976,7 @@ Seja extremamente visual: "clique aqui", "menu X", "aba Y". Código completo com
       },
       {
         id: "marca",
-        title: "Etapa 2 — Posicionamento",
+        title: "Etapa 2 · Posicionamento",
         question: "Como você se posiciona? (1 frase)",
         type: "text",
         field: "marca",
@@ -984,30 +984,30 @@ Seja extremamente visual: "clique aqui", "menu X", "aba Y". Código completo com
       },
       {
         id: "apps_post",
-        title: "Etapa 3 — Apps para Criar Posts",
+        title: "Etapa 3 · Apps para Criar Posts",
         question: "Quais apps usa para criar conteúdo?",
         type: "choice",
         field: "apps_post",
         options: [
           { value: "canva", label: "Canva (posts e carrosséis)", guide: ["canva.com → Create design → LinkedIn Post ou Instagram", "Brand Kit: salve cores e logo", "Templates → customize → Download", "Agende com Meta Business Suite se quiser"], prompt: "Template Canva carrossel 5 slides autoridade técnica. Texto de cada slide." },
           { value: "capcut", label: "CapCut (Reels e vídeos)", guide: ["CapCut → 9:16 → grave ou importe", "Templates virais → adapte texto", "Auto legendas → export", "Poste Reels + compartilhe no Stories"], prompt: "Roteiro Reels 30s autoridade + passos CapCut." },
-          { value: "chatgpt", label: "ChatGPT (só texto — copiar manual)", guide: ["ChatGPT → peça post pronto", "Copie → cole no LinkedIn/Instagram", "Use Canva só para imagem de capa"], prompt: "10 posts LinkedIn prontos B2B automação: gancho, corpo, CTA cada." }
+          { value: "chatgpt", label: "ChatGPT (só texto · copiar manual)", guide: ["ChatGPT → peça post pronto", "Copie → cole no LinkedIn/Instagram", "Use Canva só para imagem de capa"], prompt: "10 posts LinkedIn prontos B2B automação: gancho, corpo, CTA cada." }
         ]
       },
       {
         id: "automacao",
-        title: "Etapa 4 — ManyChat (Automação Direct)",
+        title: "Etapa 4 · ManyChat (Automação Direct)",
         question: "Vai configurar resposta automática no Instagram?",
         type: "choice",
         field: "automacao",
         options: [
-          { value: "sim", label: "Sim — ManyChat (grátis até 1k contatos)", guide: ["manychat.com → Get Started Free", "Connect Instagram → autorize", "Automation → New Flow", "Trigger: <strong>User comments on post</strong> → keyword QUERO", "Send Message: PDF + pergunta + link", "Live → teste comentando QUERO"], prompt: "Fluxo ManyChat: comentário QUERO → DM PDF → qualificação → link. Copy 3 mensagens." },
-          { value: "nao", label: "Não agora — só conteúdo manual", guide: ["Responda DMs manualmente 1x/dia", "Use CTA 'Comente QUERO' nos posts", "Quando tiver volume → configure ManyChat"], prompt: null }
+          { value: "sim", label: "Sim · ManyChat (grátis até 1k contatos)", guide: ["manychat.com → Get Started Free", "Connect Instagram → autorize", "Automation → New Flow", "Trigger: <strong>User comments on post</strong> → keyword QUERO", "Send Message: PDF + pergunta + link", "Live → teste comentando QUERO"], prompt: "Fluxo ManyChat: comentário QUERO → DM PDF → qualificação → link. Copy 3 mensagens." },
+          { value: "nao", label: "Não agora · só conteúdo manual", guide: ["Responda DMs manualmente 1x/dia", "Use CTA 'Comente QUERO' nos posts", "Quando tiver volume → configure ManyChat"], prompt: null }
         ]
       },
       {
         id: "frequencia",
-        title: "Etapa 5 — Frequência",
+        title: "Etapa 5 · Frequência",
         question: "Quantos posts por semana?",
         type: "choice",
         field: "frequencia",
@@ -1042,7 +1042,7 @@ Entregue:
     steps: [
       {
         id: "ia_pronta",
-        title: "Etapa 1 — Status do Produto",
+        title: "Etapa 1 · Status do Produto",
         question: "Em que fase está seu produto?",
         type: "choice",
         field: "fase",
@@ -1054,7 +1054,7 @@ Entregue:
       },
       {
         id: "lancamento",
-        title: "Etapa 2 — Canal de Lançamento",
+        title: "Etapa 2 · Canal de Lançamento",
         question: "Onde quer lançar primeiro?",
         type: "choice",
         field: "canal",
@@ -1066,7 +1066,7 @@ Entregue:
       },
       {
         id: "meta",
-        title: "Etapa 3 — Meta de Lançamento",
+        title: "Etapa 3 · Meta de Lançamento",
         question: "Qual sua meta para os primeiros 30 dias?",
         type: "text",
         field: "meta",
@@ -1074,7 +1074,7 @@ Entregue:
       },
       {
         id: "hospedagem",
-        title: "Etapa 4 — Hospedagem para Lançamento",
+        title: "Etapa 4 · Hospedagem para Lançamento",
         question: "Onde seu SaaS vai ficar no ar? 100% gratuito ou pode investir?",
         tip: "Firebase Hosting é grátis e ideal para lançar o MVP. Supabase ou VPS quando precisar escalar.",
         type: "choice",
@@ -1086,7 +1086,7 @@ Entregue:
             "<code>firebase login</code> → autorize no navegador",
             "<code>firebase init hosting</code> → selecione projeto",
             "<code>firebase deploy</code> → site no ar em minutos",
-            "URL: seu-projeto.web.app — compartilhe no lançamento"
+            "URL: seu-projeto.web.app · compartilhe no lançamento"
           ] : o.value === "supabase" ? [
             "Frontend: deploy Vercel (vercel.com) grátis",
             "Conecte GitHub → Import repo → Deploy",
@@ -1102,12 +1102,12 @@ Entregue:
       },
       {
         id: "equipe",
-        title: "Etapa 5 — Equipe",
+        title: "Etapa 5 · Equipe",
         question: "Vai contratar ajuda ou fazer solo?",
         type: "choice",
         field: "equipe",
         options: [
-          { value: "solo", label: "Solo — faço tudo com IA", prompt: null },
+          { value: "solo", label: "Solo · faço tudo com IA", prompt: null },
           { value: "freelancer", label: "Freelancer pontual (design, dev)", prompt: "Preciso contratar freelancer júnior para ajudar no SaaS. Crie: descrição da vaga, teste prático de 2h (integrar API de IA), critérios de avaliação, e faixa salarial justa." },
           { value: "socio", label: "Busco sócio/co-founder", prompt: "Busco co-founder técnico ou comercial para meu SaaS. Escreva post para LinkedIn + mensagem para enviar em comunidades de startups. Inclua: o que ofereço, o que busco, equity sugerida." }
         ]
@@ -1127,12 +1127,253 @@ ${getHostingInstructions(hosp, "lançamento")}
 
 Plano completo de lançamento:
 1. Checklist pré-lançamento (7 dias antes)
-2. Deploy em produção (${hosp === "firebase" ? "firebase deploy — gratuito" : hosp === "supabase" ? "Vercel + Supabase" : "VPS + PM2 + domínio"})
+2. Deploy em produção (${hosp === "firebase" ? "firebase deploy · gratuito" : hosp === "supabase" ? "Vercel + Supabase" : "VPS + PM2 + domínio"})
 3. Roteiro do dia D (hora a hora)
 4. ${answers.canal === "producthunt" ? "Post Product Hunt pronto" : answers.canal === "outreach" ? "Sequência de 5 cold emails" : "Calendário orgânico 7 dias"}
 5. Oferta especial early adopter (desconto + bônus)
 6. Métricas diárias para acompanhar
 7. Quando migrar de ${hosp === "firebase" ? "Firebase free → Supabase ou VPS" : hosp === "supabase" ? "Supabase free → plano Pro ou VPS" : "VPS atual → escalar recursos"}`;
+    }
+  },
+
+  10: {
+    title: "WhatsApp + IA · Funcionário Virtual 24h",
+    intro: "Monte um robô de atendimento no WhatsApp que qualifica leads, responde dúvidas e agenda horários com IA. Escolha suas ferramentas e copie os prompts prontos.",
+    steps: [
+      {
+        id: "nicho",
+        title: "Etapa 1 · Seu Negócio",
+        question: "Para qual nicho você quer criar o funcionário virtual?",
+        tip: "Quanto mais específico o nicho, melhor a IA responde. Ex: clínica odontológica, imobiliária, barbearia, academia.",
+        type: "choice",
+        field: "nicho",
+        options: [
+          { value: "clinica", label: "Clínica / consultório (agendamento + dúvidas)", prompt: null },
+          { value: "imobiliaria", label: "Imobiliária (qualificar compradores/locatários)", prompt: null },
+          { value: "barbearia", label: "Barbearia / salão (horários + serviços)", prompt: null },
+          { value: "infoproduto", label: "Infoproduto / Academy (vendas + suporte)", prompt: null },
+          { value: "b2b", label: "B2B / automação para empresas", prompt: null },
+          { value: "outro", label: "Outro nicho", prompt: null }
+        ]
+      },
+      {
+        id: "plataforma",
+        title: "Etapa 2 · Conectar o WhatsApp",
+        question: "Como você quer conectar o WhatsApp?",
+        tip: "Evolution API é open-source e roda na sua VPS. Z-API e similar são mais simples (SaaS brasileiro). Typebot é visual, bom para começar sem código.",
+        type: "choice",
+        field: "plataforma",
+        options: [
+          {
+            value: "evolution",
+            label: "Evolution API (open-source · VPS/Docker)",
+            guide: [
+              "Acesse <strong>github.com/EvolutionAPI/evolution-api</strong>",
+              "Instale via Docker: <code>docker compose up -d</code>",
+              "Painel: crie instância → escaneie QR Code no celular",
+              "Configure <strong>Webhook URL</strong> apontando para seu servidor",
+              "Teste envio: POST /message/sendText na documentação"
+            ],
+            prompt: "Tutorial Evolution API do zero: Docker no VPS, criar instância, QR Code, webhook Node.js Express recebendo mensagens, responder automaticamente. Código completo comentado."
+          },
+          {
+            value: "zapi",
+            label: "Z-API ou API WhatsApp SaaS (mais fácil)",
+            guide: [
+              "Crie conta em provedor (ex: Z-API, UltraMsg, W-API)",
+              "Conecte número WhatsApp via QR Code no painel",
+              "Copie <strong>Token</strong> e <strong>Instance ID</strong>",
+              "Configure webhook de mensagens recebidas",
+              "Teste curl de envio de texto no painel do provedor"
+            ],
+            prompt: "Integração Z-API (ou similar) com Node.js: webhook recebe mensagem, processa, envia resposta. Rotas Express, .env, tratamento de mídia e erro."
+          },
+          {
+            value: "typebot",
+            label: "Typebot + WhatsApp (visual, low-code)",
+            guide: [
+              "Acesse <strong>typebot.io</strong> → Sign Up",
+              "Create typebot → monte fluxo visual de perguntas",
+              "Integrações → conecte WhatsApp via Evolution ou Z-API",
+              "Publique bot → teste mandando mensagem",
+              "Evolua para IA depois com webhook n8n"
+            ],
+            prompt: "Montar atendimento WhatsApp no Typebot: fluxo qualificação 5 perguntas, integração WhatsApp, handoff para humano, export JSON do typebot."
+          },
+          {
+            value: "n8n_only",
+            label: "n8n + WhatsApp (sem programar)",
+            guide: [
+              "<strong>n8n.io</strong> → cloud grátis ou self-hosted",
+              "New Workflow → trigger <strong>Webhook</strong>",
+              "Nó HTTP Request → API WhatsApp (Evolution/Z-API)",
+              "Nó OpenAI → gera resposta",
+              "Ative workflow → cole URL webhook na API WhatsApp"
+            ],
+            prompt: "Workflow n8n completo WhatsApp: webhook mensagem → OpenAI Chat → resposta WhatsApp → salvar lead Google Sheets. JSON exportável passo a passo."
+          }
+        ]
+      },
+      {
+        id: "ia",
+        title: "Etapa 3 · Inteligência Artificial",
+        question: "Qual IA vai ser o cérebro do funcionário virtual?",
+        type: "choice",
+        field: "ia",
+        options: [
+          {
+            value: "openai",
+            label: "OpenAI (GPT-4o-mini · recomendado)",
+            guide: [
+              "platform.openai.com → API Keys → Create",
+              "Copie chave → .env <code>OPENAI_API_KEY=</code>",
+              "Use modelo <code>gpt-4o-mini</code> (barato e rápido)",
+              "Defina system prompt com regras do negócio",
+              "Limite tokens e custo por conversa"
+            ],
+            prompt: "Código Node.js: receber texto WhatsApp → OpenAI chat completions com system prompt de atendente [NICHO] → enviar resposta WhatsApp. Inclua histórico das últimas 10 mensagens."
+          },
+          {
+            value: "gemini",
+            label: "Google Gemini (tier free generoso)",
+            guide: [
+              "aistudio.google.com → Get API Key",
+              "npm install @google/generative-ai",
+              "Configure system instruction no modelo",
+              "Teste no playground antes de integrar"
+            ],
+            prompt: "Integração Gemini API com webhook WhatsApp: mesmo fluxo OpenAI, código Node.js completo, system prompt funcionário virtual."
+          },
+          {
+            value: "hibrido",
+            label: "Híbrido · IA + respostas fixas",
+            guide: [
+              "Palavras-chave (preço, horário, endereço) → resposta fixa instantânea",
+              "Resto → OpenAI/Gemini",
+              "Reduz custo e acelera FAQ",
+              "Use switch/case ou n8n IF node"
+            ],
+            prompt: "Arquitetura híbrida WhatsApp: FAQ fixo (preço, horário, local) + fallback IA OpenAI. Código Node.js com router de intenções simples."
+          }
+        ]
+      },
+      {
+        id: "funcoes",
+        title: "Etapa 4 · Funções do Funcionário Virtual",
+        question: "O que o robô deve fazer automaticamente?",
+        type: "choice",
+        field: "funcoes",
+        options: [
+          { value: "atendimento", label: "Atendimento 24h + FAQ", prompt: "System prompt WhatsApp: atendente [NICHO] 24h, tom profissional e humano, FAQ completo, nunca inventar preços." },
+          { value: "qualificacao", label: "Qualificar leads (perguntas + score)", prompt: "Fluxo WhatsApp qualificação: 5 perguntas, score lead quente/morno/frio, salvar CRM, alertar vendedor se quente." },
+          { value: "agendamento", label: "Agendar horários (Calendly/Google Calendar)", prompt: "Bot WhatsApp agendamento: oferece slots, confirma data/hora, envia lembrete 24h antes, integra Google Calendar API." },
+          { value: "completo", label: "Completo · FAQ + qualificar + agendar + CRM", prompt: "Funcionário virtual completo: saudação, FAQ, qualificação, agendamento, handoff humano, log no Firestore/Sheets. Arquitetura + prompts + código." }
+        ]
+      },
+      {
+        id: "integracao",
+        title: "Etapa 5 · CRM e Automações",
+        question: "Onde salvar leads e conectar automações?",
+        type: "choice",
+        field: "integracao",
+        options: [
+          { value: "sheets", label: "Google Sheets (simples · grátis)", guide: ["Google Sheets → nova planilha Leads", "n8n ou código → Google Sheets API", "Colunas: nome, WhatsApp, interesse, score, data"], prompt: "Salvar lead WhatsApp no Google Sheets via Node.js ou n8n. Credenciais, código e formato da planilha." },
+          { value: "firebase", label: "Firebase Firestore (escala com SaaS)", guide: ["Firestore → coleção leads", "Webhook grava documento por telefone", "Dashboard admin lê leads em tempo real"], prompt: "Webhook WhatsApp → Firestore: schema leads, código Node.js firebase-admin, regras de segurança." },
+          { value: "n8n", label: "n8n (WhatsApp → email → Slack → CRM)", guide: ["Lead qualificado → email Resend", "Notificação Slack/Discord", "Tag no HubSpot/Pipedrive se tiver"], prompt: "Automações pós-lead WhatsApp no n8n: 3 workflows (notificar dono, email boas-vindas, follow-up 24h)." },
+          { value: "notion", label: "Notion como CRM leve", guide: ["Crie database Leads no Notion", "n8n HTTP → Notion API", "Status: novo, contato, fechado"], prompt: "Integrar WhatsApp leads com Notion database via n8n ou Node.js." }
+        ]
+      },
+      {
+        id: "deploy",
+        title: "Etapa 6 · Colocar no Ar",
+        question: "Onde hospedar o funcionário virtual?",
+        type: "choice",
+        field: "deploy",
+        options: [
+          { value: "vps", label: "VPS (Hetzner, DigitalOcean · controle total)", guide: ["Ubuntu + Docker Evolution + Node", "PM2 para API Node", "Nginx + SSL Certbot", "Domínio webhook: api.seudominio.com/webhook/whatsapp"], prompt: "Deploy completo VPS: Evolution API + Express bot + PM2 + Nginx + SSL. Comandos Linux passo a passo." },
+          { value: "railway", label: "Railway / Render (deploy rápido)", guide: ["GitHub repo → conecte Railway", "Env vars OPENAI + WHATSAPP_TOKEN", "Deploy automático", "URL pública vira webhook"], prompt: "Deploy bot WhatsApp Node.js no Railway: Dockerfile, variáveis, webhook URL, logs e restart." },
+          { value: "n8n_cloud", label: "Só n8n Cloud (sem servidor próprio)", guide: ["n8n.io cloud → workflow ativo 24h", "Webhook público incluso", "Limite free: suficiente para testar"], prompt: "Checklist produção n8n cloud WhatsApp: limites, backup workflow, monitoramento, quando migrar VPS." }
+        ]
+      }
+    ],
+    buildFinalPrompt(answers) {
+      const nichoLabels = {
+        clinica: "clínica/consultório",
+        imobiliaria: "imobiliária",
+        barbearia: "barbearia/salão",
+        infoproduto: "infoproduto/Academy",
+        b2b: "automação B2B",
+        outro: answers.nicho_custom || "negócio local"
+      };
+      const nicho = nichoLabels[answers.nicho] || answers.nicho || "negócio local";
+      const plataforma = answers.plataforma || "evolution";
+      const ia = answers.ia || "openai";
+      const funcoes = answers.funcoes || "completo";
+      const integracao = answers.integracao || "sheets";
+      const deploy = answers.deploy || "vps";
+
+      return `Aja como engenheiro sênior especialista em automação WhatsApp + IA.
+
+PROJETO: Funcionário virtual 24h no WhatsApp para ${nicho}.
+
+STACK ESCOLHIDA:
+- WhatsApp: ${plataforma} (${plataforma === "evolution" ? "Evolution API Docker" : plataforma === "zapi" ? "Z-API/SaaS" : plataforma === "typebot" ? "Typebot visual" : "n8n workflow"})
+- IA: ${ia}
+- Funções: ${funcoes}
+- CRM/integração: ${integracao}
+- Deploy: ${deploy}
+
+ENTREGUE UM PLANO COMPLETO EXECUTÁVEL:
+
+1. ARQUITETURA (diagrama em texto): celular → API WhatsApp → webhook → IA → CRM → resposta
+
+2. PASSO A PASSO ONDE CLICAR (Dia 1 a Dia 5):
+   - Dia 1: conectar WhatsApp (QR Code, webhook teste)
+   - Dia 2: system prompt + primeira resposta IA
+   - Dia 3: fluxo qualificação + FAQ híbrido
+   - Dia 4: integrar CRM (${integracao})
+   - Dia 5: deploy produção (${deploy})
+
+3. SYSTEM PROMPT COMPLETO do funcionário virtual (tom humano, regras, limites, quando passar para humano)
+
+4. CÓDIGO NODE.JS COMPLETO:
+   - POST /webhook/whatsapp (recebe mensagem)
+   - Integração OpenAI/Gemini com histórico
+   - Envio resposta via API WhatsApp
+   - Salvar lead no ${integracao}
+   - Tratamento erro + rate limit
+
+5. FLUXO n8n (se aplicável): JSON ou passos visuais
+
+6. 10 MENSAGENS MODELO: saudação, FAQ preço, FAQ horário, qualificação, agendamento, objeção, handoff humano, follow-up 24h, reengajamento, encerramento
+
+7. CHECKLIST GO-LIVE: testes, monitoramento, backup, custo estimado OpenAI/mês
+
+8. COMO VENDER esse serviço para outros negócios (precificação R$297-997 setup + mensalidade)
+
+Seja extremamente prático: onde clicar, o que colar, código comentado em português.`;
+    },
+    buildFinalExtraHtml(answers) {
+      const tools = [
+        { name: "Evolution API", url: "https://github.com/EvolutionAPI/evolution-api", desc: "API WhatsApp open-source · Docker" },
+        { name: "Typebot", url: "https://typebot.io/", desc: "Fluxos visuais + WhatsApp" },
+        { name: "n8n", url: "https://n8n.io/", desc: "Automação webhook → IA → CRM" },
+        { name: "OpenAI API", url: "https://platform.openai.com/", desc: "Cérebro do atendimento" },
+        { name: "Chatwoot", url: "https://www.chatwoot.com/", desc: "Inbox multi-canal + handoff humano" }
+      ];
+      return `
+        <div class="glass-card rounded-xl p-5 border border-green-500/20 space-y-3 mt-4">
+          <h4 class="text-sm font-bold text-green-400 uppercase tracking-wider">Ferramentas do Módulo WhatsApp</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            ${tools.map(t => `
+              <a href="${t.url}" target="_blank" rel="noopener noreferrer" class="block p-3 rounded-lg bg-slate-950 border border-gray-800 hover:border-green-500/30 transition-colors">
+                <span class="text-sm font-bold text-white">${t.name}</span>
+                <p class="text-[11px] text-gray-500 mt-1">${t.desc}</p>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
   }
 };
@@ -1264,7 +1505,7 @@ function updateWizardProgressBar() {
   const bar = document.getElementById('wizard-progress-bar');
   const label = document.getElementById('wizard-progress-label');
   if (bar) bar.style.width = `${pct}%`;
-  if (label) label.textContent = `Etapa ${Math.min(current, total)} de ${total} — ${pct}% concluído`;
+  if (label) label.textContent = `Etapa ${Math.min(current, total)} de ${total} · ${pct}% concluído`;
 }
 
 function renderWizardStep() {
@@ -1274,7 +1515,7 @@ function renderWizardStep() {
   const container = document.getElementById('wizard-step-container');
   if (!container) return;
 
-  // Etapa final — prompt personalizado
+  // Etapa final · prompt personalizado
   if (wizardState.currentStep >= wizard.steps.length) {
     const finalPrompt = wizard.buildFinalPrompt(wizardState.answers);
     container.innerHTML = `
@@ -1302,7 +1543,7 @@ function renderWizardStep() {
 
         <div class="glass-card rounded-2xl p-5 border border-purple-500/20 space-y-3">
           <div class="flex justify-between items-center">
-            <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Prompt Mestre — Copie e Use Agora</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-300">Prompt Mestre · Copie e Use Agora</span>
             <button id="copy-final-prompt-btn" class="bg-purple-500 hover:bg-purple-400 text-white text-xs font-bold font-outfit px-4 py-2 rounded-lg transition-colors">Copiar Prompt</button>
           </div>
           <textarea id="wizard-final-prompt" readonly class="w-full h-48 bg-slate-950 border border-gray-900 rounded-xl p-4 text-xs text-purple-200 font-mono focus:outline-none resize-none leading-relaxed">${escapeHtml(finalPrompt)}</textarea>
@@ -1327,10 +1568,13 @@ function renderWizardStep() {
       renderWizardStep();
       updateWizardProgressBar();
     });
-    document.getElementById('wizard-mark-done-btn')?.addEventListener('click', () => {
+    document.getElementById('wizard-mark-done-btn')?.addEventListener('click', async () => {
       localStorage.setItem(`conectwm_module_done_${wizardState.moduleId}`, 'true');
       const btn = document.getElementById('wizard-mark-done-btn');
       if (btn) { btn.textContent = 'Módulo Concluído! ✓'; btn.classList.add('opacity-70'); }
+      if (window.Certificates?.markModuleComplete) {
+        await Certificates.markModuleComplete(wizardState.moduleId);
+      }
     });
     return;
   }
@@ -1360,7 +1604,7 @@ function renderWizardStep() {
 
   const stepPrompt = getStepPrompt(step, savedAnswer);
   const optionGuide = getOptionGuide(step, savedAnswer);
-  const guideHtml = renderGuideBox(optionGuide || step.guide, optionGuide ? 'Guia do App Escolhido' : 'Passo a Passo — Onde Clicar');
+  const guideHtml = renderGuideBox(optionGuide || step.guide, optionGuide ? 'Guia do App Escolhido' : 'Passo a Passo · Onde Clicar');
 
   container.innerHTML = `
     <div class="wizard-step fade-in space-y-4">
@@ -1462,7 +1706,7 @@ function showStepGuide(container, guide) {
       inputArea?.insertAdjacentElement('afterend', box);
     }
   }
-  box.innerHTML = renderGuideBox(guide, 'Guia do App Escolhido — Siga Agora');
+  box.innerHTML = renderGuideBox(guide, 'Guia do App Escolhido · Siga Agora');
 }
 
 function showStepPrompt(container, prompt) {
@@ -1530,7 +1774,7 @@ function renderGuideBox(guide, title) {
     <div class="wizard-guide-box rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-2 mt-3">
       <div class="flex items-center gap-2">
         <span class="text-amber-400 text-sm">📋</span>
-        <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">${title || 'Passo a Passo — Onde Clicar'}</span>
+        <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">${title || 'Passo a Passo · Onde Clicar'}</span>
       </div>
       <ol class="space-y-2 list-none pl-0">
         ${items.map((item, i) => `

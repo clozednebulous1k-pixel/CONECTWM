@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validar Certificado | conectWM Academy</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/custom.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-[#0b0f17] text-white font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6 relative">
+  <div class="grid-bg-overlay !fixed"></div>
+
+  <div class="glass-card rounded-3xl p-8 md:p-10 max-w-lg w-full border border-sky-500/20 relative z-10 space-y-6">
+    <div class="text-center space-y-2">
+      <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 mx-auto">
+        <i data-lucide="badge-check" class="h-7 w-7"></i>
+      </div>
+      <h1 class="text-2xl font-bold font-outfit">Validar Certificado</h1>
+      <p class="text-sm text-gray-400">Digite o código impresso no certificado conectWM Academy.</p>
+    </div>
+
+    <form id="verify-form" class="space-y-4">
+      <input type="text" id="verify-code" placeholder="Ex: CWMA-A1B2-C3D4" required
+        class="w-full bg-slate-950 border border-gray-800 rounded-xl px-4 py-3 text-sm text-white uppercase tracking-widest font-mono focus:border-sky-400 focus:outline-none">
+      <button type="submit" class="w-full py-3 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 font-bold text-sm transition-all">Verificar autenticidade</button>
+    </form>
+
+    <div id="verify-result" class="hidden rounded-xl border p-4 text-sm space-y-2"></div>
+
+    <a href="/login.html" class="block text-center text-xs text-gray-500 hover:text-sky-400 transition-colors">Área de membros conectWM</a>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    const params = new URLSearchParams(window.location.search);
+    const prefill = params.get('codigo') || params.get('code');
+    if (prefill) document.getElementById('verify-code').value = prefill;
+
+    function showResult(ok, cert, message) {
+      const box = document.getElementById('verify-result');
+      box.classList.remove('hidden');
+      if (!ok) {
+        box.className = 'rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300';
+        box.innerHTML = `<strong>Certificado não encontrado.</strong><br>${message || 'Verifique o código e tente novamente.'}`;
+        return;
+      }
+      const date = cert.issuedAt ? new Date(cert.issuedAt).toLocaleDateString('pt-BR') : '';
+      box.className = 'rounded-xl border border-green-500/30 bg-green-500/10 p-4 text-sm space-y-2 text-gray-200';
+      box.innerHTML = `
+        <p class="font-bold text-green-400 flex items-center gap-2"><i data-lucide="check-circle" class="h-4 w-4"></i> Certificado autêntico</p>
+        <p><strong class="text-white">Aluno:</strong> ${cert.holderName}</p>
+        <p><strong class="text-white">Formação:</strong> ${cert.subtitle || cert.title}</p>
+        <p><strong class="text-white">Carga horária:</strong> ${cert.workload || '10h'}</p>
+        <p><strong class="text-white">Emitido em:</strong> ${date}</p>
+        <p class="text-xs font-mono text-gray-500">Código ${cert.code}</p>
+      `;
+      lucide.createIcons();
+    }
+
+    async function verify(code) {
+      const res = await fetch(`/api/certificates/verify/${encodeURIComponent(code.trim())}`);
+      const data = await res.json();
+      if (data.success && data.valid) {
+        showResult(true, data.certificate);
+      } else {
+        showResult(false, null, data.message);
+      }
+    }
+
+    document.getElementById('verify-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      verify(document.getElementById('verify-code').value);
+    });
+
+    if (prefill) verify(prefill);
+  </script>
+</body>
+</html>

@@ -37,20 +37,20 @@ const modulesData = [
     title: "Aplicativos Secretos",
     subtitle: "Ferramentas Avançadas",
     image: "images/module_secret.jpg",
-    description: "Apps e extensões secretas do mundo tech que poucos conhecem — Vimium, Workona, Bardeen, Merlin, Raycast e mais. Produtividade extrema + opcional criar extensão própria.",
+    description: "Apps e extensões secretas do mundo tech que poucos conhecem · Vimium, Workona, Bardeen, Merlin, Raycast e mais. Produtividade extrema + opcional criar extensão própria.",
     lessons: [
       {
         id: "2_1",
         title: "Pack Extensões Chrome Secretas",
         duration: "18 min",
-        desc: "Instale Vimium, Workona, GoFullPage, WhatRuns, Text Blaze e Automa — ferramentas que a maioria dos devs brasileiros ainda não usa no dia a dia.",
+        desc: "Instale Vimium, Workona, GoFullPage, WhatRuns, Text Blaze e Automa · ferramentas que a maioria dos devs brasileiros ainda não usa no dia a dia.",
         prompt: "Guia completo: instalar e configurar Vimium, Workona, GoFullPage, WhatRuns, Text Blaze e Automa no Chrome. Onde clicar, atalhos e 1 caso de uso por extensão."
       },
       {
         id: "2_2",
         title: "Apps de IA e Automação Escondidos",
         duration: "20 min",
-        desc: "Merlin, Tactiq, Fireflies, Bardeen e Perplexity — IA e automação integradas na rotina sem trocar de aba o tempo todo.",
+        desc: "Merlin, Tactiq, Fireflies, Bardeen e Perplexity · IA e automação integradas na rotina sem trocar de aba o tempo todo.",
         prompt: "Setup de rotina com Merlin (sidebar GPT), Tactiq (transcrição Meet), Bardeen (automação Chrome) e Perplexity (pesquisa). Passo a passo instalação e fluxo diário."
       },
       {
@@ -271,10 +271,47 @@ const modulesData = [
         prompt: "Desenhe um plano de teste prático de 2 horas para contratação de um desenvolvedor NodeJS júnior, definindo a tarefa de integração de API de IA a ser desenvolvida, critérios de avaliação de segurança de código e qualidade de arquitetura." 
       }
     ]
+  },
+  {
+    id: 10,
+    title: "WhatsApp + IA",
+    subtitle: "Funcionário Virtual 24h",
+    image: "images/module_funnel.jpg",
+    description: "Monte um funcionário de IA no WhatsApp: conecte a API, crie fluxos de atendimento, qualifique leads, agende horários e integre com n8n, CRM e OpenAI. Passo a passo do zero ao robô respondendo sozinho.",
+    lessons: [
+      {
+        id: "10_1",
+        title: "Conectar WhatsApp (Evolution API / Z-API)",
+        duration: "28 min",
+        desc: "Como criar instância WhatsApp Business, escanear QR Code, receber webhooks de mensagens e testar envio/recebimento com Node.js ou n8n.",
+        prompt: "Me guie passo a passo para conectar WhatsApp com Evolution API (Docker) ou Z-API: criar conta, instância, QR Code, webhook POST para meu servidor Node.js, e rota que responde 'Recebi sua mensagem'. Inclua código Express completo e .env."
+      },
+      {
+        id: "10_2",
+        title: "Cérebro de IA · Atendimento Inteligente",
+        duration: "25 min",
+        desc: "Configure OpenAI (ou Gemini) com system prompt de funcionário virtual: tom de voz, regras, base de conhecimento da empresa e limites do que a IA pode prometer.",
+        prompt: "Crie um system prompt completo para funcionário virtual de WhatsApp de [NICHO]. Inclua: saudação, perguntas de qualificação, tratamento de objeções, quando escalar para humano, e código Node.js que envia mensagem do cliente para OpenAI e devolve resposta formatada para WhatsApp API."
+      },
+      {
+        id: "10_3",
+        title: "Fluxos: Qualificação, Agendamento e CRM",
+        duration: "30 min",
+        desc: "Automatize funil no WhatsApp: captura nome, interesse e horário; salva lead no Google Sheets ou Firestore; dispara lembrete e notifica você quando o lead está quente.",
+        prompt: "Workflow completo WhatsApp + n8n + OpenAI: mensagem entrante → IA responde → se lead qualificado salva Google Sheets → envia link Calendly → notifica dono no WhatsApp. JSON n8n exportável + prompts de cada etapa."
+      },
+      {
+        id: "10_4",
+        title: "Robô Pronto · Deploy e Monitoramento",
+        duration: "22 min",
+        desc: "Coloque o funcionário virtual no ar (VPS, Railway ou Render), configure fila de mensagens, rate limit, logs e fallback quando a IA falhar.",
+        prompt: "Deploy produção do bot WhatsApp: Express + Evolution API + OpenAI em VPS com PM2, variáveis .env, Nginx reverse proxy, SSL, rate limiting, fila Bull/Redis para não perder mensagens, e checklist de monitoramento diário."
+      }
+    ]
   }
 ];
 
-// 2. AUTENTICAÇÃO DO DASHBOARD — exige login válido
+// 2. AUTENTICAÇÃO DO DASHBOARD · exige login válido
 async function checkAuth() {
   const userEmailEl = document.getElementById('user-email');
   const userAvatarEl = document.getElementById('user-avatar');
@@ -380,6 +417,9 @@ function initNavigation() {
       if (targetSectionId === 'sec-modulos') {
         showModulesList();
       }
+      if (targetSectionId === 'sec-certificados' && window.Certificates?.load) {
+        Certificates.load().then(() => Certificates.renderSection());
+      }
     });
   });
 }
@@ -391,6 +431,9 @@ function renderModulesList() {
 
   container.innerHTML = '';
   modulesData.forEach(mod => {
+    const isDone = localStorage.getItem(`conectwm_module_done_${mod.id}`) === 'true'
+      || window.Certificates?.getState?.().progress?.completedModules?.includes(mod.id);
+
     const card = document.createElement('div');
     card.className = "glass-card rounded-2xl overflow-hidden border border-gray-800 hover:border-sky-500/30 transition-all cursor-pointer group flex flex-col justify-between";
     card.style.height = "380px";
@@ -405,6 +448,7 @@ function renderModulesList() {
         <span class="absolute bottom-4 left-4 rounded-full bg-sky-500/25 border border-sky-400/30 text-sky-300 text-xs px-3 py-1 font-bold uppercase tracking-wider">
           Módulo ${mod.id}
         </span>
+        ${isDone ? '<span class="absolute top-4 right-4 rounded-full bg-green-500/20 border border-green-500/40 text-green-400 text-[10px] px-2 py-1 font-bold uppercase">Concluído</span>' : ''}
       </div>
       <div class="p-5 flex-1 flex flex-col justify-between">
         <div>
@@ -430,7 +474,7 @@ function renderModulesList() {
   lucide.createIcons();
 }
 
-// 6. ABRIR MÓDULO — Wizard Interativo Passo a Passo
+// 6. ABRIR MÓDULO · Wizard Interativo Passo a Passo
 function openModule(moduleId) {
   const mod = modulesData.find(m => m.id === moduleId);
   if (!mod) return;
@@ -455,7 +499,7 @@ function openModule(moduleId) {
     introEl.innerHTML = `
       <div class="fade-in space-y-4 text-center py-8">
         <div class="inline-flex items-center gap-2 rounded-full bg-sky-500/10 border border-sky-500/30 px-4 py-1.5 text-xs font-bold text-sky-400 uppercase tracking-wider">
-          Módulo ${mod.id} — Passo a Passo
+          Módulo ${mod.id} · Passo a Passo
         </div>
         ${isDone ? '<span class="inline-block text-xs font-bold text-green-400 bg-green-500/10 border border-green-500/30 px-3 py-1 rounded-full">✓ Módulo Concluído</span>' : ''}
         <h3 class="text-2xl font-bold font-outfit text-white">${wizard.title}</h3>
@@ -653,6 +697,7 @@ function initLessonProgress() {
         if (lessonId) {
           const progressKey = `conectwm_completed_${lessonId}`;
           localStorage.setItem(progressKey, progressCheck.checked);
+          if (window.Certificates?.syncProgress) Certificates.syncProgress();
         }
       }
     });
@@ -1013,13 +1058,13 @@ const securityTipsData = [
   }
 ];
 
-// 11. FORMULÁRIO DE STACK — SEGURANÇA
+// 11. FORMULÁRIO DE STACK · SEGURANÇA
 const SECURITY_WIZARD_KEY = 'conectwm_security_stack';
 
 const securityWizardSteps = [
   {
     id: 'linguagem',
-    title: 'Etapa 1 — Linguagem de Programação',
+    title: 'Etapa 1 · Linguagem de Programação',
     question: 'Qual linguagem seu sistema usa no backend?',
     tip: 'Isso personaliza os prompts de auditoria para a sintaxe e frameworks corretos.',
     field: 'linguagem',
@@ -1034,7 +1079,7 @@ const securityWizardSteps = [
   },
   {
     id: 'banco',
-    title: 'Etapa 2 — Banco de Dados',
+    title: 'Etapa 2 · Banco de Dados',
     question: 'Qual banco de dados seu projeto utiliza?',
     tip: 'Cada banco tem riscos específicos: SQL Injection, regras Firestore, RLS no Supabase, etc.',
     field: 'banco',
@@ -1050,7 +1095,7 @@ const securityWizardSteps = [
   },
   {
     id: 'sistema',
-    title: 'Etapa 3 — Sistema / Framework',
+    title: 'Etapa 3 · Sistema / Framework',
     question: 'Qual é o tipo do seu sistema ou framework principal?',
     field: 'sistema',
     options: [
@@ -1067,7 +1112,7 @@ const securityWizardSteps = [
   },
   {
     id: 'hospedagem_sec',
-    title: 'Etapa 4 — Onde está hospedado?',
+    title: 'Etapa 4 · Onde está hospedado?',
     question: 'Onde seu sistema roda em produção (ou vai rodar)?',
     field: 'hospedagem',
     options: [
@@ -1234,10 +1279,10 @@ function showSecurityContent(answers) {
   if (summary) {
     summary.innerHTML = `
       <div class="flex flex-wrap gap-2 text-xs">
-        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Linguagem:</strong> ${securityLabels.linguagem[answers.linguagem] || '—'}</span>
-        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Banco:</strong> ${securityLabels.banco[answers.banco] || '—'}</span>
-        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Sistema:</strong> ${securityLabels.sistema[answers.sistema] || '—'}</span>
-        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Hospedagem:</strong> ${securityLabels.hospedagem[answers.hospedagem] || '—'}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Linguagem:</strong> ${securityLabels.linguagem[answers.linguagem] || ''}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Banco:</strong> ${securityLabels.banco[answers.banco] || ''}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Sistema:</strong> ${securityLabels.sistema[answers.sistema] || ''}</span>
+        <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-gray-800 text-gray-300"><strong class="text-sky-400">Hospedagem:</strong> ${securityLabels.hospedagem[answers.hospedagem] || ''}</span>
       </div>
       <button id="sec-wiz-reconfig" class="text-xs font-bold text-sky-400 hover:text-sky-300 px-3 py-1.5 rounded-lg bg-sky-500/10 border border-sky-500/20">Reconfigurar Stack</button>
     `;
@@ -1372,4 +1417,5 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof initDevResources === 'function') initDevResources();
   if (typeof initAfiliados === 'function') initAfiliados();
   initSecurityWizard();
+  if (window.Certificates?.init) await Certificates.init();
 });

@@ -66,7 +66,7 @@ function getAppUrl() {
 
 function buildWelcomeEmail({ email, planLabel, expiresAt }) {
   const loginUrl = `${getAppUrl()}/login.html?email=${encodeURIComponent(email)}&welcome=1`;
-  const expires = expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : '—';
+  const expires = expiresAt ? new Date(expiresAt).toLocaleDateString('pt-BR') : '';
 
   return {
     to: email,
@@ -156,7 +156,7 @@ async function provisionUserAccess({ email, orderId, planLabel, expiresAt, chann
       welcomeEmail: {
         to: normalizedEmail,
         subject: mustSetPassword
-          ? 'Seu acesso conectWM Academy — crie sua senha'
+          ? 'Seu acesso conectWM Academy · crie sua senha'
           : 'Seu acesso conectWM Academy continua ativo',
         body: mustSetPassword
           ? `Olá!

@@ -1,4 +1,4 @@
-// conectWM Academy — Programa de Afiliados
+// conectWM Academy · Programa de Afiliados
 
 const AFILIADO_WIZARD_KEY = 'conectwm_afiliado';
 const WHATSAPP_AFILIADO = '5511952025568';
@@ -11,7 +11,7 @@ const afiliadoWizardSteps = [
     field: 'tipo',
     title: 'Tipo de Indicação',
     question: 'O que você quer indicar?',
-    tip: 'Academy = assinatura R$39,99/mês. Empresa = projetos sob medida (automação, SaaS, IA) — comissão maior.',
+    tip: 'Academy = assinatura R$39,99/mês. Empresa = projetos sob medida (automação, SaaS, IA) · comissão maior.',
     options: [
       { value: 'academy', label: 'Indicar a conectWM Academy (assinatura do curso)' },
       { value: 'empresa', label: 'Indicar empresa para a conectWM desenvolver projeto' },
@@ -23,11 +23,11 @@ const afiliadoWizardSteps = [
     title: 'Canal de Divulgação',
     question: 'Por onde você vai divulgar?',
     options: [
-      { value: 'whatsapp', label: 'WhatsApp — grupos, contatos, status' },
-      { value: 'instagram', label: 'Instagram — Reels, stories, DM' },
-      { value: 'linkedin', label: 'LinkedIn — posts B2B e conexões' },
-      { value: 'tiktok', label: 'TikTok / YouTube — vídeos curtos' },
-      { value: 'multi', label: 'Multicanal — todos os acima' }
+      { value: 'whatsapp', label: 'WhatsApp · grupos, contatos, status' },
+      { value: 'instagram', label: 'Instagram · Reels, stories, DM' },
+      { value: 'linkedin', label: 'LinkedIn · posts B2B e conexões' },
+      { value: 'tiktok', label: 'TikTok / YouTube · vídeos curtos' },
+      { value: 'multi', label: 'Multicanal · todos os acima' }
     ]
   },
   {
@@ -35,9 +35,9 @@ const afiliadoWizardSteps = [
     title: 'Seu Perfil',
     question: 'Como você se define como afiliado?',
     options: [
-      { value: 'aluno', label: 'Aluno da Academy — indico o que uso' },
-      { value: 'dev', label: 'Desenvolvedor / freelancer — indico para clientes' },
-      { value: 'agencia', label: 'Agência ou consultor — indico empresas B2B' },
+      { value: 'aluno', label: 'Aluno da Academy · indico o que uso' },
+      { value: 'dev', label: 'Desenvolvedor / freelancer · indico para clientes' },
+      { value: 'agencia', label: 'Agência ou consultor · indico empresas B2B' },
       { value: 'influencer', label: 'Criador de conteúdo tech' }
     ]
   },
@@ -46,9 +46,9 @@ const afiliadoWizardSteps = [
     title: 'Meta Mensal',
     question: 'Quantas indicações você quer fazer por mês?',
     options: [
-      { value: '5', label: '5 indicações — renda extra' },
-      { value: '15', label: '15 indicações — foco secundário' },
-      { value: '30', label: '30+ indicações — afiliado profissional' }
+      { value: '5', label: '5 indicações · renda extra' },
+      { value: '15', label: '15 indicações · foco secundário' },
+      { value: '30', label: '30+ indicações · afiliado profissional' }
     ]
   }
 ];
@@ -83,18 +83,18 @@ function buildReferralLink(type) {
 
 function getWhatsAppIndicacaoAcademy() {
   return encodeURIComponent(
-    `Olá! Indico a *conectWM Academy* — plataforma completa para criar SaaS, automações e monetizar com IA.\n\n` +
+    `Olá! Indico a *conectWM Academy* · plataforma completa para criar SaaS, automações e monetizar com IA.\n\n` +
     `✅ Módulos passo a passo com prompts prontos\n` +
     `✅ Dashboard com ferramentas secretas de produtividade\n` +
     `✅ TikTok Shop, Frontend, Backend e mais\n\n` +
-    `Assinatura por R$ 39,99/mês (preço de lançamento — vagas limitadas):\n${buildReferralLink('academy')}\n\n` +
+    `Assinatura por R$ 39,99/mês (preço de lançamento · vagas limitadas):\n${buildReferralLink('academy')}\n\n` +
     `_(Indicação de afiliado conectWM)_`
   );
 }
 
 function getWhatsAppIndicacaoEmpresa() {
   return encodeURIComponent(
-    `Olá! Conheço a *conectWM* — estúdio especializado em automação, SaaS e integração com IA para empresas.\n\n` +
+    `Olá! Conheço a *conectWM* · estúdio especializado em automação, SaaS e integração com IA para empresas.\n\n` +
     `Eles desenvolvem:\n` +
     `• MicroSaaS e sistemas web sob medida\n` +
     `• Automação WhatsApp + n8n + CRM\n` +
@@ -126,8 +126,8 @@ Perfil do afiliado:
 - Meta: ${afiliadoLabels.meta[answers.meta]} indicações/mês
 
 Produtos para indicar:
-1) Academy R$39,99/mês — curso SaaS + automação + IA
-2) Serviços B2B conectWM — desenvolvimento sob medida para empresas
+1) Academy R$39,99/mês · curso SaaS + automação + IA
+2) Serviços B2B conectWM · desenvolvimento sob medida para empresas
 
 Me entregue:
 1) Plano 30 dias de divulgação no canal escolhido

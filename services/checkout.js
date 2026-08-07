@@ -1,9 +1,9 @@
 const { getDb, isFirebaseEnabled, serverTimestamp } = require('./firebase');
 
 const PLANS = {
-  comunidade_mensal: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
-  comunidade: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM — Mensal' },
-  comunidade_anual: { amount: 497, billing: 'annual', days: 365, label: 'Comunidade conectWM — Anual' },
+  comunidade_mensal: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM ·  Mensal' },
+  comunidade: { amount: 39.99, billing: 'monthly', days: 30, label: 'Comunidade conectWM ·  Mensal' },
+  comunidade_anual: { amount: 497, billing: 'annual', days: 365, label: 'Comunidade conectWM ·  Anual' },
 };
 
 const memoryOrders = new Map();
@@ -220,7 +220,7 @@ async function activateFromHotmartPayment({
   currency = 'BRL',
   paymentMethod = 'hotmart',
   billingDays = 30,
-  planLabel = 'Comunidade conectWM — Hotmart',
+  planLabel = 'Comunidade conectWM ·  Hotmart',
   affiliateRef = null,
 }) {
   const normalizedEmail = normalizeEmail(email);

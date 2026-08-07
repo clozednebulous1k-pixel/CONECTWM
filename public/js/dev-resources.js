@@ -1,4 +1,4 @@
-// conectWM Academy — Recursos Frontend & Backend
+// conectWM Academy · Recursos Frontend & Backend
 
 const frontendResources = [
   {
@@ -6,21 +6,21 @@ const frontendResources = [
     url: 'https://21st.dev/',
     icon: 'sparkles',
     category: 'design',
-    desc: 'Milhares de componentes React + Tailwind prontos. Copie prompt para Cursor/v0 e instale com shadcn CLI — ideal para elevar o visual do SaaS.'
+    desc: 'Milhares de componentes React + Tailwind prontos. Copie prompt para Cursor/v0 e instale com shadcn CLI · ideal para elevar o visual do SaaS.'
   },
   {
     name: 'shadcn/ui',
     url: 'https://ui.shadcn.com/',
     icon: 'blocks',
     category: 'design',
-    desc: 'Biblioteca de componentes acessíveis e customizáveis. Base usada por 21st.dev — copia o código para o seu projeto, não é dependência bloqueada.'
+    desc: 'Biblioteca de componentes acessíveis e customizáveis. Base usada por 21st.dev · copia o código para o seu projeto, não é dependência bloqueada.'
   },
   {
-    name: 'Labcodes — Confetti DS',
+    name: 'Labcodes · Confetti DS',
     url: 'https://confetti.labcodes.com.br/',
     icon: 'palette',
     category: 'design',
-    desc: 'Design system open-source brasileiro (Labcodes). Componentes Figma + React no Storybook — referência de UI profissional e consistente.'
+    desc: 'Design system open-source brasileiro (Labcodes). Componentes Figma + React no Storybook · referência de UI profissional e consistente.'
   },
   {
     name: 'Labcodes Studio',
@@ -41,7 +41,7 @@ const frontendResources = [
     url: 'https://magicui.design/',
     icon: 'stars',
     category: 'design',
-    desc: 'Biblioteca de componentes animados para React/Next.js. Marquee, bento grid, shimmer buttons — visual de startup 2025.'
+    desc: 'Biblioteca de componentes animados para React/Next.js. Marquee, bento grid, shimmer buttons · visual de startup 2025.'
   },
   {
     name: 'v0 by Vercel',
@@ -128,7 +128,7 @@ const backendResources = [
     url: 'https://nodejs.org/docs/',
     icon: 'server',
     category: 'logic',
-    desc: 'Documentação oficial do runtime usado no conectWM. Event loop, streams, fs, crypto — base sólida do backend.'
+    desc: 'Documentação oficial do runtime usado no conectWM. Event loop, streams, fs, crypto · base sólida do backend.'
   },
   {
     name: 'Express.js',
@@ -142,7 +142,7 @@ const backendResources = [
     url: 'https://supabase.com/',
     icon: 'database',
     category: 'logic',
-    desc: 'PostgreSQL + Auth + Storage + Realtime na nuvem. Tier free generoso — substitui backend custom em MVPs.'
+    desc: 'PostgreSQL + Auth + Storage + Realtime na nuvem. Tier free generoso · substitui backend custom em MVPs.'
   },
   {
     name: 'Firebase',
@@ -236,7 +236,7 @@ const backendResources = [
     desc: 'Pagamentos, assinaturas e webhooks. Referência para integrar checkout recorrente no SaaS com segurança PCI.'
   },
   {
-    name: 'Roadmap.sh — Backend',
+    name: 'Roadmap.sh · Backend',
     url: 'https://roadmap.sh/backend',
     icon: 'map',
     category: 'logic',

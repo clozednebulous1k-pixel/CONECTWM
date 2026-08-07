@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initModulesCarousel();
   initWhatsAppContactForm();
   initScrollNavbar();
+  initScrollProgress();
   initMobilePathLock();
 });
 
@@ -192,6 +193,7 @@ function initDiagnosticForm() {
 function initScarcityCounters() {
   if (typeof getSpotsRemaining !== 'function') return;
   const spots = getSpotsRemaining();
+
   ['spots-remaining', 'spots-remaining-card', 'spots-remaining-modal'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.textContent = String(spots);
@@ -292,7 +294,26 @@ function initWhatsAppContactForm() {
 }
 
 // ----------------------------------------------------
-// 9. NAVBAR SCROLL EFFECT
+// 9. BARRA DE PROGRESSO DO SCROLL (landing)
+// ----------------------------------------------------
+function initScrollProgress() {
+  const fill = document.getElementById('scroll-progress-fill');
+  if (!fill) return;
+
+  const update = () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const pct = maxScroll > 0 ? Math.min(100, (scrollTop / maxScroll) * 100) : 0;
+    fill.style.width = `${pct}%`;
+  };
+
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+}
+
+// ----------------------------------------------------
+// 10. NAVBAR SCROLL EFFECT
 // ----------------------------------------------------
 function initScrollNavbar() {
   const header = document.querySelector('header');
@@ -310,7 +331,7 @@ function initScrollNavbar() {
 }
 
 // ----------------------------------------------------
-// 10. MOBILE PATH LOCK SYSTEM
+// 11. MOBILE PATH LOCK SYSTEM
 // ----------------------------------------------------
 function initMobilePathLock() {
   const isMobile = window.innerWidth < 768;

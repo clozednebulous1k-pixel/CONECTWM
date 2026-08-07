@@ -81,6 +81,10 @@
           <i data-lucide="book-open" class="h-4.5 w-4.5"></i>
           <span>Módulos & Aulas</span>
         </a>
+        <a href="#" data-target="sec-certificados" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
+          <i data-lucide="award" class="h-4.5 w-4.5"></i>
+          <span>Certificados</span>
+        </a>
         <a href="#" data-target="sec-tiktok-shop" class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-all text-gray-400 hover:text-white border-b-2 border-transparent">
           <i data-lucide="shopping-bag" class="h-4.5 w-4.5"></i>
           <span>TikTok Shop</span>
@@ -137,7 +141,7 @@
           <p class="text-gray-400 text-sm mt-1">Selecione um módulo para iniciar o passo a passo interativo com prompts prontos para IA.</p>
         </div>
         
-        <!-- Grid de Cards de Módulos (9 Módulos) -->
+        <!-- Grid de Cards de Módulos (10 Módulos) -->
         <div id="modules-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-4">
           <!-- Renderizado Dinamicamente via dashboard.js -->
         </div>
@@ -161,7 +165,7 @@
         <!-- Barra de Progresso do Wizard -->
         <div class="glass-card rounded-xl p-4 border border-gray-800 space-y-2">
           <div class="flex justify-between items-center">
-            <span id="wizard-progress-label" class="text-xs font-bold text-gray-400">Etapa 1 de 6 — 0% concluído</span>
+            <span id="wizard-progress-label" class="text-xs font-bold text-gray-400">Etapa 1 de 6 · 0% concluído</span>
             <span class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">Formulário Guiado</span>
           </div>
           <div class="w-full h-2 rounded-full bg-gray-800 overflow-hidden">
@@ -194,10 +198,20 @@
 
     </section>
 
+    <!-- SEÇÃO: CERTIFICADOS -->
+    <section id="sec-certificados" class="dashboard-section space-y-6 hidden">
+      <div class="border-b border-gray-900 pb-4">
+        <h2 class="text-3xl font-bold font-outfit text-white">Meus Certificados</h2>
+        <p class="text-gray-400 text-sm mt-1">Conclua os módulos no passo a passo e emita certificados oficiais da conectWM Academy.</p>
+        <p id="certificates-summary" class="text-xs mt-3 flex flex-wrap gap-2 items-center"></p>
+      </div>
+      <div id="certificates-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
     <!-- SEÇÃO: TIKTOK SHOP -->
     <section id="sec-tiktok-shop" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
-        <h2 class="text-3xl font-bold font-outfit text-white">TikTok Shop — Passo a Passo Completo</h2>
+        <h2 class="text-3xl font-bold font-outfit text-white">TikTok Shop · Passo a Passo Completo</h2>
         <p class="text-gray-400 text-sm mt-1">Seja afiliado com conta real, divulgue produtos (mín. 2.000 seguidores) e use WinxSMM se faltar seguidor.</p>
       </div>
 
@@ -231,7 +245,8 @@
         <div id="tiktok-afiliado-block" class="hidden glass-card rounded-2xl p-6 md:p-8 border border-sky-500/25 space-y-4">
           <h3 class="text-xl font-bold font-outfit text-white flex items-center gap-2">
             <i data-lucide="link" class="h-5 w-5 text-sky-400"></i>
-            Afiliado TikTok Shop — conta real + divulgar produtos
+            Afiliado TikTok Shop 
+ · conta real + divulgar produtos
           </h3>
           <p class="text-gray-400 text-sm">Você não abre loja própria: entra no <strong class="text-white">programa de afiliados</strong>, escolhe produtos de outras lojas e ganha comissão por venda. Requisito: <strong class="text-pink-400">2.000 seguidores</strong> no perfil.</p>
           <div id="tiktok-afiliado-steps"></div>
@@ -262,7 +277,8 @@
             <div class="rounded-xl bg-slate-950 border border-gray-900 p-4 space-y-2">
               <strong class="text-white block">Links oficiais</strong>
               <ul class="list-disc list-inside space-y-1">
-                <li><a href="https://seller-br.tiktok.com/" target="_blank" rel="noopener noreferrer" class="text-pink-400 underline">seller-br.tiktok.com</a> — Seller Center BR</li>
+                <li><a href="https://seller-br.tiktok.com/" target="_blank" rel="noopener noreferrer" class="text-pink-400 underline">seller-br.tiktok.com</a> 
+ · Seller Center BR</li>
                 <li><a href="https://www.tiktok.com/business/" target="_blank" rel="noopener noreferrer" class="text-pink-400 underline">TikTok for Business</a></li>
                 <li>App TikTok → Perfil → TikTok Shop (após aprovação)</li>
               </ul>
@@ -276,7 +292,8 @@
             <div>
               <h3 class="text-xl font-bold font-outfit text-white flex items-center gap-2">
                 <i data-lucide="users" class="h-5 w-5 text-pink-400"></i>
-                WinxSMM — comprar seguidores até 2.000
+                WinxSMM 
+ · comprar seguidores até 2.000
               </h3>
               <p class="text-gray-400 text-sm mt-1">Se você não tem 2k seguidores, use esta plataforma para completar e liberar a divulgação de produtos afiliados.</p>
             </div>
@@ -301,7 +318,8 @@
     <section id="sec-afiliados" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
         <h2 class="text-3xl font-bold font-outfit text-white">Programa de Afiliados conectWM</h2>
-        <p class="text-gray-400 text-sm mt-1">Indique a Academy (assinatura) ou empresas para nos contratarem — ganhe comissão por cada conversão.</p>
+        <p class="text-gray-400 text-sm mt-1">Indique a Academy (assinatura) ou empresas para nos contratarem 
+ · ganhe comissão por cada conversão.</p>
       </div>
 
       <div id="afiliado-wizard-wrapper" class="glass-card rounded-2xl p-6 md:p-8 border border-green-500/15 max-w-3xl mx-auto"></div>
@@ -341,7 +359,8 @@
           <p class="text-gray-400 text-sm">Envie para amigos, seguidores ou clientes que querem aprender SaaS, automação e IA.</p>
           <ol class="list-decimal list-inside text-xs text-gray-300 space-y-2 leading-relaxed">
             <li>Copie o link de indicação ou mensagem pronta do WhatsApp</li>
-            <li>Envie para a pessoa — ela assina pelo link</li>
+            <li>Envie para a pessoa 
+ · ela assina pelo link</li>
             <li>Avise a conectWM no WhatsApp abaixo para registrar sua indicação</li>
             <li>Receba 30% enquanto a assinatura estiver ativa</li>
           </ol>
@@ -391,7 +410,8 @@
     <!-- SEÇÃO: FRONTEND -->
     <section id="sec-frontend" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
-        <h2 class="text-3xl font-bold font-outfit text-white">Frontend — Design & UI</h2>
+        <h2 class="text-3xl font-bold font-outfit text-white">Frontend 
+ · Design & UI</h2>
         <p class="text-gray-400 text-sm mt-1">Sites e ferramentas para melhorar visual, componentes, tipografia e experiência do seu SaaS.</p>
       </div>
 
@@ -407,7 +427,8 @@
     <!-- SEÇÃO: BACKEND -->
     <section id="sec-backend" class="dashboard-section space-y-6 hidden">
       <div class="border-b border-gray-900 pb-4">
-        <h2 class="text-3xl font-bold font-outfit text-white">Backend — Lógica & Infra</h2>
+        <h2 class="text-3xl font-bold font-outfit text-white">Backend 
+ · Lógica & Infra</h2>
         <p class="text-gray-400 text-sm mt-1">APIs, banco de dados, deploy, automação e ferramentas para fortalecer a lógica do servidor.</p>
       </div>
 
@@ -554,8 +575,8 @@
   </main>
 
   <!-- Scripts -->
-  <script src="js/chatbot.js"></script>
   <script src="js/auth-client.js"></script>
+  <script src="js/certificates.js"></script>
   <script src="js/module-wizards.js"></script>
   <script src="js/tiktok-shop.js"></script>
   <script src="js/dev-resources.js"></script>
