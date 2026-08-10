@@ -1,26 +1,21 @@
-// conectWM Academy - Chatbot Widget Script
-// Responsável por injetar e controlar o assistente virtual em todas as páginas
+// conectWM Academy - Assistente (painel de dicas)
+// Injeta o botão flutuante e mostra atalhos/dicas da landing e do sistema
 
 document.addEventListener('DOMContentLoaded', () => {
-  injectChatbotMarkup();
-  initChatbot();
+  injectAssistantMarkup();
+  initAssistant();
 });
 
-// 1. INJEÇÃO DO HTML DO CHATBOT COM O LOGO OFICIAL
-function injectChatbotMarkup() {
+function injectAssistantMarkup() {
   if (document.getElementById('chatbot-toggle')) return;
 
-  const chatMarkup = `
-    <!-- Botão Flutuante -->
-    <button id="chatbot-toggle" class="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center shadow-lg transition-all hover:scale-110 btn-glow-tech" aria-label="Abrir Assistente de IA">
+  const markup = `
+    <button id="chatbot-toggle" class="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center shadow-lg transition-all hover:scale-110 btn-glow-tech" aria-label="Abrir Assistente conectWM">
       <img src="images/logo.png" alt="conectWM Logo" class="h-8 w-auto object-contain">
     </button>
 
-    <!-- Janela de Chat -->
-    <div id="chatbot-window" class="hidden fixed bottom-24 right-6 z-50 w-[90%] sm:w-[380px] h-[500px] glass-card rounded-[2rem] flex flex-col overflow-hidden chat-window-glow border border-sky-500/20">
-      
-      <!-- Chat Header -->
-      <div class="bg-slate-950 p-4 border-b border-gray-800 flex justify-between items-center">
+    <div id="chatbot-window" class="hidden fixed bottom-24 right-6 z-50 w-[90%] sm:w-[380px] max-h-[min(560px,75vh)] glass-card rounded-[2rem] flex flex-col overflow-hidden chat-window-glow border border-sky-500/20">
+      <div class="bg-slate-950 p-4 border-b border-gray-800 flex justify-between items-center shrink-0">
         <div class="flex items-center gap-3">
           <div class="relative">
             <div class="h-10 w-10 rounded-xl bg-sky-500/10 flex items-center justify-center border border-sky-500/20 p-1.5 overflow-hidden">
@@ -30,301 +25,177 @@ function injectChatbotMarkup() {
           </div>
           <div>
             <h4 class="font-bold text-sm text-white font-outfit leading-none">conectWM Assistente</h4>
-            <span class="text-xs text-gray-500 font-medium">Agente inteligente online</span>
+            <span class="text-xs text-gray-500 font-medium">Dicas rápidas da plataforma</span>
           </div>
         </div>
-        <button id="chatbot-close" class="text-gray-400 hover:text-white p-1">
+        <button id="chatbot-close" class="text-gray-400 hover:text-white p-1" aria-label="Fechar assistente">
           <i data-lucide="x" class="h-5 w-5"></i>
         </button>
       </div>
 
-      <!-- Chat Messages -->
-      <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0a0d14]">
-        <!-- Mensagens inseridas via JS -->
-      </div>
+      <div id="assistant-tips" class="flex-1 p-4 overflow-y-auto space-y-3 bg-[#0a0d14]">
+        <div class="flex items-start gap-2.5 fade-in">
+          <img src="images/logo.png" alt="" class="h-7 w-7 rounded-lg bg-sky-500/10 border border-sky-500/20 p-1 flex-shrink-0 object-contain">
+          <div class="chat-bubble-bot max-w-[90%] px-4 py-3 rounded-2xl text-sm leading-relaxed">
+            Olá! Sou o assistente da <strong>conectWM</strong>. Sem chat por aqui — use as dicas abaixo para navegar na página e no sistema.
+          </div>
+        </div>
 
-      <!-- Indicador de Digitou/Pensando -->
-      <div id="chat-typing" class="hidden px-4 py-2 text-xs text-gray-500 flex items-center gap-2 bg-[#0a0d14]">
-        <div class="loader-spinner !w-3.5 !h-3.5 !border-[2px]"></div>
-        <span>Assistente está pensando...</span>
-      </div>
+        <div class="space-y-2 pt-1">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-sky-400/80 px-1">Na landing page</p>
 
-      <!-- Chat Input Form -->
-      <div class="p-3 bg-slate-950 border-t border-gray-800 flex gap-2">
-        <input type="text" id="chat-input" maxlength="800" class="flex-1 bg-slate-900 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 input-focus-glow transition-all" placeholder="Escreva sua dúvida... (máx. 800 caracteres)">
-        <button id="chat-send-btn" class="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-300 text-slate-950 flex items-center justify-center transition-all">
-          <i data-lucide="send-horizontal" class="h-4.5 w-4.5"></i>
-        </button>
+          <a href="https://chat.whatsapp.com/DDMrExZm8PnFRF2pOViB8E" target="_blank" rel="noopener noreferrer" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-green-500/15 text-green-400 border-green-400/25">
+              <i data-lucide="messages-square" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-green-300 transition-colors">Grupo gratuito no WhatsApp</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Entre no CONECT FREE · dicas e networking sem custo.</span>
+            </span>
+            <i data-lucide="external-link" class="h-3.5 w-3.5 text-gray-600 group-hover:text-green-400 shrink-0"></i>
+          </a>
+
+          <a href="#caminhos" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="route" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">Escolha seu caminho</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Criadores (Academy) ou Empresas (automação + diagnóstico).</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-sky-400 shrink-0"></i>
+          </a>
+
+          <a href="#modulos" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="layers" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">Módulos da Academy</span>
+              <span class="block text-xs text-gray-400 mt-0.5">SaaS, tráfego, funil, WhatsApp + IA e mais.</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-sky-400 shrink-0"></i>
+          </a>
+
+          <a href="#precos" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-amber-500/15 text-amber-400 border-amber-400/25">
+              <i data-lucide="tag" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-amber-300 transition-colors">Preço de lançamento</span>
+              <span class="block text-xs text-gray-400 mt-0.5">R$ 39,99/mês · vagas limitadas neste lote.</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-amber-400 shrink-0"></i>
+          </a>
+
+          <a href="#diagnostico" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-purple-500/15 text-purple-400 border-purple-400/25">
+              <i data-lucide="building-2" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-purple-300 transition-colors">Diagnóstico para empresas</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Análise gratuita de gargalos e automações com IA.</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-purple-400 shrink-0"></i>
+          </a>
+
+          <a href="#faq" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="circle-help" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">FAQ</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Precisa saber programar? Como funciona o acesso? Veja aqui.</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-sky-400 shrink-0"></i>
+          </a>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <p class="text-[10px] font-bold uppercase tracking-widest text-sky-400/80 px-1">No sistema (área de membros)</p>
+
+          <a href="/login.html" class="assistant-tip-card group">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">Dashboard e aulas</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Entre na comunidade para ver módulos e progresso.</span>
+            </span>
+            <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-sky-400 shrink-0"></i>
+          </a>
+
+          <div class="assistant-tip-card pointer-events-none opacity-95">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="sparkles" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white">Wizards e prompts prontos</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Dentro de cada módulo: guias passo a passo + prompts para IA.</span>
+            </span>
+          </div>
+
+          <div class="assistant-tip-card pointer-events-none opacity-95">
+            <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
+              <i data-lucide="book-open" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white">APRENDER+ e recursos</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Fundamentos de programação e links de ferramentas curados.</span>
+            </span>
+          </div>
+
+          <div class="assistant-tip-card pointer-events-none opacity-95">
+            <span class="assistant-tip-icon bg-amber-500/15 text-amber-400 border-amber-400/25">
+              <i data-lucide="award" class="h-4 w-4"></i>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm font-semibold text-white">Certificado e prêmio</span>
+              <span class="block text-xs text-gray-400 mt-0.5">Complete os módulos e desbloqueie certificado + benefícios.</span>
+            </span>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-gray-500 text-center pt-2 pb-1 leading-relaxed">
+          Dúvida pontual? Use o <a href="#faq" class="text-sky-400 hover:underline">FAQ</a> ou o WhatsApp de suporte na área de membros.
+        </p>
       </div>
     </div>
   `;
 
   const container = document.createElement('div');
   container.id = 'chat-widget-container';
-  container.innerHTML = chatMarkup;
+  container.innerHTML = markup;
   document.body.appendChild(container);
 
-  // Recriar ícones do Lucide para o botão de fechar e enviar
   if (window.lucide && typeof window.lucide.createIcons === 'function') {
     window.lucide.createIcons();
   }
 }
 
-// 2. INICIALIZAÇÃO E LÓGICA DO CHATBOT
-function initChatbot() {
-  const chatbotToggle = document.getElementById('chatbot-toggle');
-  const chatbotWindow = document.getElementById('chatbot-window');
-  const chatbotClose = document.getElementById('chatbot-close');
-  const chatMessages = document.getElementById('chat-messages');
-  const chatInput = document.getElementById('chat-input');
-  const chatSendBtn = document.getElementById('chat-send-btn');
-  const chatTypingIndicator = document.getElementById('chat-typing');
+function initAssistant() {
+  const toggle = document.getElementById('chatbot-toggle');
+  const win = document.getElementById('chatbot-window');
+  const closeBtn = document.getElementById('chatbot-close');
 
-  let chatHistory = [];
-  let isChatbotOpened = false;
-  let lastSendAt = 0;
-  const CHAT_MIN_INTERVAL_MS = 2500;
-  const CHAT_MAX_HISTORY = 10;
-
-  function trimChatHistory() {
-    if (chatHistory.length > CHAT_MAX_HISTORY) {
-      chatHistory = chatHistory.slice(-CHAT_MAX_HISTORY);
-    }
-  }
-
-  if (chatbotToggle && chatbotWindow) {
-    chatbotToggle.addEventListener('click', () => {
-      chatbotWindow.classList.toggle('hidden');
-      isChatbotOpened = !chatbotWindow.classList.contains('hidden');
-      
-      if (isChatbotOpened && chatMessages.children.length === 0) {
-        sendWelcomeMessage();
-      }
-      
-      scrollToBottom();
-      chatInput.focus();
+  if (toggle && win) {
+    toggle.addEventListener('click', () => {
+      win.classList.toggle('hidden');
     });
   }
 
-  if (chatbotClose && chatbotWindow) {
-    chatbotClose.addEventListener('click', () => {
-      chatbotWindow.classList.add('hidden');
+  if (closeBtn && win) {
+    closeBtn.addEventListener('click', () => {
+      win.classList.add('hidden');
     });
   }
 
-  if (chatSendBtn && chatInput) {
-    chatSendBtn.addEventListener('click', handleSendMessage);
-    chatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        handleSendMessage();
-      }
-    });
-  }
-
-  async function handleSendMessage() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-
-    if (text.length > 800) {
-      addMessageBubble('Mensagem muito longa. Use no máximo 800 caracteres.', 'bot');
-      return;
-    }
-
-    const now = Date.now();
-    if (now - lastSendAt < CHAT_MIN_INTERVAL_MS) {
-      addMessageBubble('Aguarde alguns segundos antes de enviar outra mensagem.', 'bot');
-      return;
-    }
-    lastSendAt = now;
-
-    chatInput.value = '';
-    addMessageBubble(text, 'user');
-    scrollToBottom();
-
-    chatHistory.push({ role: 'user', content: text });
-    trimChatHistory();
-
-    if (chatTypingIndicator) {
-      chatTypingIndicator.classList.remove('hidden');
-      scrollToBottom();
-    }
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatHistory })
+  // Fecha o painel ao clicar em âncoras internas da página
+  if (win) {
+    win.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', () => {
+        win.classList.add('hidden');
       });
-
-      const result = await response.json();
-
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-
-      if (response.status === 429) {
-        const wait = result.retryAfter ? ` Aguarde ~${result.retryAfter}s.` : '';
-        addMessageBubble(`⏳ ${result.message || 'Limite de mensagens atingido.'}${wait}`, 'bot');
-        chatHistory.pop();
-        return;
-      }
-
-      if (response.ok && result.success) {
-        const botReply = result.reply;
-        addMessageBubble(botReply, 'bot');
-        chatHistory.push({ role: 'assistant', content: botReply });
-        trimChatHistory();
-      } else if (response.status === 400) {
-        addMessageBubble(result.message || 'Mensagem inválida. Tente encurtar o texto.', 'bot');
-        chatHistory.pop();
-      } else {
-        const botReply = getFrontendFallbackResponse(text);
-        addMessageBubble(botReply, 'bot');
-        chatHistory.push({ role: 'assistant', content: botReply });
-        trimChatHistory();
-      }
-    } catch (error) {
-      console.warn('Erro de rede ao conectar à API do chat, usando fallback local...', error);
-      
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-
-      // Fallback local se o servidor estiver offline (ex: abertura por arquivo file://)
-      setTimeout(() => {
-        const botReply = getFrontendFallbackResponse(text);
-        addMessageBubble(botReply, 'bot');
-        chatHistory.push({ role: 'assistant', content: botReply });
-        scrollToBottom();
-      }, 600);
-    }
-
-    scrollToBottom();
+    });
   }
-
-  function sendWelcomeMessage() {
-    if (chatTypingIndicator) {
-      chatTypingIndicator.classList.remove('hidden');
-    }
-    
-    setTimeout(() => {
-      if (chatTypingIndicator) {
-        chatTypingIndicator.classList.add('hidden');
-      }
-      const welcomeText = `Olá! Sou o assistente de IA da **conectWM** 🤖✨.
-
-Como posso te ajudar hoje? 
-- Se quiser saber mais sobre a **Comunidade conectWM** (ensino full-stack com IA para criar seus apps), digite "Comunidade".
-- Se quiser entender como ajudamos sua **Empresa** com automação inteligente e agentes de IA, digite "Automação".`;
-      addMessageBubble(welcomeText, 'bot');
-      chatHistory.push({ role: 'assistant', content: welcomeText });
-      scrollToBottom();
-    }, 800);
-  }
-
-  function addMessageBubble(text, sender) {
-    const bubbleWrapper = document.createElement('div');
-    bubbleWrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'} mb-3 fade-in items-start gap-2.5`;
-
-    // Adiciona o logotipo como avatar para as mensagens do bot
-    if (sender === 'bot') {
-      const avatar = document.createElement('img');
-      avatar.src = 'images/logo.png';
-      avatar.alt = 'conectWM Logo';
-      avatar.className = 'h-7 w-7 rounded-lg bg-sky-500/10 border border-sky-500/20 p-1 flex-shrink-0 object-contain';
-      bubbleWrapper.appendChild(avatar);
-    }
-
-    const bubble = document.createElement('div');
-    bubble.className = `max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-      sender === 'user' 
-        ? 'chat-bubble-user font-medium' 
-        : 'chat-bubble-bot'
-    }`;
-
-    // Formatação simples do Markdown
-    let formattedText = text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/•\s(.*?)\n/g, '<li class="ml-4 list-disc">$1</li>')
-      .replace(/\n/g, '<br>');
-
-    bubble.innerHTML = formattedText;
-    bubbleWrapper.appendChild(bubble);
-    chatMessages.appendChild(bubbleWrapper);
-  }
-
-  function scrollToBottom() {
-    if (chatMessages) {
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-  }
-}
-
-// 3. MOTOR DE RESPOSTA LOCAL PARA FALLBACK OFFLINE/LOCAL FILE
-function getFrontendFallbackResponse(message) {
-  const text = message.toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-
-  if (text.includes('comunidade') || text.includes('aluno') || text.includes('aprender') || text.includes('curso') || text.includes('escola') || text.includes('ensina') || text.includes('conteudo')) {
-    return `Na **Comunidade conectWM**, você aprende a criar sites, aplicativos e SaaS (softwares como serviço) usando Inteligência Artificial como sua copiloto. 
-
-O conteúdo inclui:
-• Desenvolvimento Full-Stack auxiliado por IA (Copilot, Cursor, prompts).
-• Criação de sites, Web Apps e Microsaas de alta qualidade.
-• Monetização, marketing digital, tráfego pago e validação de ideias.
-• Kits e templates prontos para você acelerar seus projetos.
-• Grupo exclusivo de WhatsApp para suporte e networking.
-
-Deseja começar a criar seus próprios projetos? Clique no botão **"Quero Entrar na Comunidade"** na barra de navegação para iniciar!`;
-  }
-
-  if (text.includes('empresa') || text.includes('negocio') || text.includes('automacao') || text.includes('diagnostico') || text.includes('processo') || text.includes('atendimento') || text.includes('crm')) {
-    return `Para empresas, a **conectWM** desenvolve projetos de automação de processos inteligentes e agentes de IA personalizados. 
-
-Nós ajudamos a estruturar:
-• Agentes inteligentes de atendimento 24 horas via WhatsApp e web.
-• Integrações complexas entre CRMs (Pipedrive, Hubspot), planilhas, ERPs e e-mails.
-• Automação de qualificação de leads e tarefas administrativas.
-
-Para descobrirmos os maiores gargalos do seu negócio, recomendo preencher o formulário na seção **"Diagnóstico para Empresas"** aqui mesmo na página. O diagnóstico inicial é **100% gratuito**!`;
-  }
-
-  if (text.includes('programar') || text.includes('codigo') || text.includes('programacao') || text.includes('dificil') || text.includes('saber programar') || text.includes('iniciante') || text.includes('zero')) {
-    return `Absolutamente **não precisa saber programar** para começar! 
-
-Hoje em dia, com o auxílio de Inteligências Artificiais modernas (como ChatGPT, Claude, Cursor e Copilot) e ferramentas Low-Code/No-Code, qualquer pessoa consegue traduzir suas ideias em código funcional. 
-
-Na comunidade, nós ensinamos o passo a passo de como "conversar" com a IA (Engenharia de Prompt) para que ela escreva a lógica do código, crie o banco de dados e resolva bugs para você. Você atua como o arquiteto/diretor do projeto!`;
-  }
-
-  if (text.includes('preco') || text.includes('valor') || text.includes('custo') || text.includes('pagamento') || text.includes('gratuito') || text.includes('gratis')) {
-    return `Temos dois caminhos principais na conectWM:
-1. **Comunidade conectWM:** É uma assinatura de apenas R$ 47 por mês no plano mensal (ou R$ 497 anual). Oferece acesso completo a todos os módulos, kits de ferramentas, comunidade de WhatsApp e suporte técnico.
-2. **Diagnóstico para Empresas:** Este serviço inicial de análise de gargalos e desenho de solução de automação é **100% gratuito**. 
-
-Para se inscrever na comunidade ou solicitar o diagnóstico empresarial, utilize os botões e formulários disponíveis no corpo da nossa landing page!`;
-  }
-
-  if (text.includes('suporte') || text.includes('duvida') || text.includes('ajuda') || text.includes('whatsapp') || text.includes('grupo')) {
-    return `O suporte na **conectWM** é diferenciado! Nós oferecemos:
-• Canal de suporte direto para dúvidas técnicas sobre seus códigos e integrações na plataforma.
-• Grupo exclusivo de networking no **WhatsApp**, onde você pode interagir com outros desenvolvedores, empresários e especialistas da conectWM.
-• Respostas rápidas e acompanhamento personalizado para que você nunca fique travado no seu projeto.`;
-  }
-
-  if (text.includes('ola') || text.includes('oi') || text.includes('bom dia') || text.includes('boa tarde') || text.includes('boa noite')) {
-    return `Olá! Seja muito bem-vindo à **conectWM**. 🤖✨
-
-Sou o assistente inteligente da plataforma. Como posso te ajudar hoje?
-• Se você quer aprender a criar apps e SaaS com IA, me pergunte sobre a **Comunidade**.
-• Se você tem uma empresa e quer automatizar tarefas repetitivas, pergunte sobre as nossas **Automações e Diagnóstico**.`;
-  }
-
-  return `Fico feliz em te ajudar! Como assistente da **conectWM**, estou pronto para te dar detalhes sobre duas frentes:
-1. **Comunidade conectWM:** Como pessoas comuns criam sites, apps e SaaS usando Inteligência Artificial do absoluto zero.
-2. **Automações de Processos:** Como empresas economizam tempo e dinheiro automatizando tarefas manuais e integrando sistemas.
-
-Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perguntar o que quiser, ou use os formulários e botões na página para interagir direto!`;
 }
