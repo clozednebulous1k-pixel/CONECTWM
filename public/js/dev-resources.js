@@ -51,6 +51,13 @@ const frontendResources = [
     desc: 'Gere interfaces completas com IA a partir de texto. Exporte código React + Tailwind e cole no Cursor para refinar.'
   },
   {
+    name: 'CodePen',
+    url: 'https://codepen.io/',
+    icon: 'code-2',
+    category: 'logic',
+    desc: 'Playground online para testar HTML, CSS e JavaScript ao vivo. Prototipe componentes, animações e efeitos de UI antes de levar ao seu SaaS · fork e adapte pens da comunidade.'
+  },
+  {
     name: 'Dribbble',
     url: 'https://dribbble.com/',
     icon: 'image',
