@@ -114,13 +114,13 @@ function injectAssistantMarkup() {
         <div class="space-y-2 pt-2">
           <p class="text-[10px] font-bold uppercase tracking-widest text-sky-400/80 px-1">No sistema (área de membros)</p>
 
-          <a href="/login.html" class="assistant-tip-card group">
+          <a href="/login.html" id="assistant-dashboard-link" class="assistant-tip-card group">
             <span class="assistant-tip-icon bg-sky-500/15 text-sky-400 border-sky-400/25">
               <i data-lucide="layout-dashboard" class="h-4 w-4"></i>
             </span>
             <span class="min-w-0 flex-1">
-              <span class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">Dashboard e aulas</span>
-              <span class="block text-xs text-gray-400 mt-0.5">Entre na comunidade para ver módulos e progresso.</span>
+              <span id="assistant-dashboard-title" class="block text-sm font-semibold text-white group-hover:text-sky-300 transition-colors">Dashboard e aulas</span>
+              <span id="assistant-dashboard-desc" class="block text-xs text-gray-400 mt-0.5">Entre na comunidade para ver módulos e progresso.</span>
             </span>
             <i data-lucide="chevron-right" class="h-3.5 w-3.5 text-gray-600 group-hover:text-sky-400 shrink-0"></i>
           </a>
@@ -173,10 +173,54 @@ function injectAssistantMarkup() {
   }
 }
 
+async function configureAssistantDashboardLink() {
+  const link = document.getElementById('assistant-dashboard-link');
+  const title = document.getElementById('assistant-dashboard-title');
+  const desc = document.getElementById('assistant-dashboard-desc');
+  if (!link) return;
+
+  const token = typeof getAuthToken === 'function'
+    ? getAuthToken()
+    : localStorage.getItem('conectwm_auth_token');
+
+  if (!token) return;
+
+  let isAdmin = localStorage.getItem('conectwm_user_role') === 'admin';
+  if (typeof fetchAuthMe === 'function') {
+    try {
+      const me = await fetchAuthMe();
+      if (me?.role) {
+        localStorage.setItem('conectwm_user_role', me.role);
+        isAdmin = me.role === 'admin';
+      } else if (me?.email) {
+        link.href = '/dashboard.html';
+        if (title) title.textContent = 'Abrir meu dashboard';
+        if (desc) desc.textContent = 'Continue de onde parou nos módulos e certificados.';
+        return;
+      }
+    } catch {
+      /* mantém fallback local */
+    }
+  }
+
+  if (isAdmin) {
+    link.href = '/dashboard.html?section=relatorios';
+    if (title) title.textContent = 'Painel admin · Relatórios';
+    if (desc) desc.textContent = 'Veja leads do diagnóstico enviados pela landing.';
+    return;
+  }
+
+  link.href = '/dashboard.html';
+  if (title) title.textContent = 'Abrir meu dashboard';
+  if (desc) desc.textContent = 'Continue de onde parou nos módulos e certificados.';
+}
+
 function initAssistant() {
   const toggle = document.getElementById('chatbot-toggle');
   const win = document.getElementById('chatbot-window');
   const closeBtn = document.getElementById('chatbot-close');
+
+  configureAssistantDashboardLink();
 
   if (toggle && win) {
     toggle.addEventListener('click', () => {

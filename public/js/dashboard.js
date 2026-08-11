@@ -389,42 +389,72 @@ function initProfileMenu() {
 }
 
 // 4. CONTROLE DE NAVEGAÇÃO ENTRE ABAS
-function initNavigation() {
+const DASHBOARD_SECTION_ALIASES = {
+  relatorios: 'sec-relatorios',
+  admin: 'sec-relatorios',
+  modulos: 'sec-modulos',
+  aprender: 'sec-aprender',
+  certificados: 'sec-certificados',
+  tiktok: 'sec-tiktok-shop',
+  frontend: 'sec-frontend',
+  backend: 'sec-backend',
+  afiliados: 'sec-afiliados',
+  seguranca: 'sec-seguranca',
+  recursos: 'sec-recursos',
+  suporte: 'sec-suporte',
+};
+
+function resolveDashboardSectionFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = (params.get('section') || window.location.hash.replace(/^#/, '')).trim().toLowerCase();
+  if (!raw) return null;
+  if (DASHBOARD_SECTION_ALIASES[raw]) return DASHBOARD_SECTION_ALIASES[raw];
+  if (raw.startsWith('sec-')) return raw;
+  return null;
+}
+
+function openDashboardSection(targetSectionId) {
   const navItems = document.querySelectorAll('.nav-link');
   const sections = document.querySelectorAll('.dashboard-section');
+  const item = document.querySelector(`.nav-link[data-target="${targetSectionId}"]`);
+  if (!item) return false;
 
-  navItems.forEach(item => {
+  navItems.forEach((nav) => {
+    nav.classList.remove('text-sky-400', 'border-sky-400', 'text-amber-400', 'border-amber-400');
+    nav.classList.add('text-gray-400', 'border-transparent');
+  });
+
+  const isAdminSection = targetSectionId === 'sec-relatorios';
+  if (isAdminSection) {
+    item.classList.add('text-amber-400', 'border-amber-400');
+  } else {
+    item.classList.add('text-sky-400', 'border-sky-400');
+  }
+  item.classList.remove('text-gray-400', 'border-transparent');
+
+  sections.forEach((sec) => sec.classList.add('hidden'));
+  const targetSec = document.getElementById(targetSectionId);
+  if (targetSec) targetSec.classList.remove('hidden');
+
+  const mainPanel = document.querySelector('.dashboard-main');
+  if (mainPanel) mainPanel.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (targetSectionId === 'sec-modulos') showModulesList();
+  if (targetSectionId === 'sec-certificados' && window.Certificates?.load) {
+    Certificates.load().then(() => Certificates.renderSection());
+  }
+  if (targetSectionId === 'sec-relatorios' && window.AdminLeads?.loadAdminLeads) {
+    window.AdminLeads.loadAdminLeads();
+  }
+
+  return true;
+}
+
+function initNavigation() {
+  document.querySelectorAll('.nav-link').forEach((item) => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
-      const targetSectionId = item.getAttribute('data-target');
-
-      // Atualizar classes ativas no menu lateral
-      navItems.forEach(nav => {
-        nav.classList.remove('text-sky-400', 'border-sky-400');
-        nav.classList.add('text-gray-400', 'border-transparent');
-      });
-      item.classList.add('text-sky-400', 'border-sky-400');
-      item.classList.remove('text-gray-400', 'border-transparent');
-
-      // Mostrar apenas a seção alvo
-      sections.forEach(sec => {
-        sec.classList.add('hidden');
-      });
-      const targetSec = document.getElementById(targetSectionId);
-      if (targetSec) {
-        targetSec.classList.remove('hidden');
-      }
-
-      const mainPanel = document.querySelector('.dashboard-main');
-      if (mainPanel) mainPanel.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Se voltarmos para módulos, limpar a tela de exibição de aula e resetar para lista de módulos
-      if (targetSectionId === 'sec-modulos') {
-        showModulesList();
-      }
-      if (targetSectionId === 'sec-certificados' && window.Certificates?.load) {
-        Certificates.load().then(() => Certificates.renderSection());
-      }
+      openDashboardSection(item.getAttribute('data-target'));
     });
   });
 }
@@ -1490,4 +1520,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.AdminLeads?.initAdminLeads) {
     window.AdminLeads.initAdminLeads(window.__conectwmMe || null);
   }
+
+  const deepSection = resolveDashboardSectionFromUrl();
+  if (deepSection) openDashboardSection(deepSection);
 });
+
+window.openDashboardSection = openDashboardSection;

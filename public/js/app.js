@@ -119,12 +119,47 @@ function openWhatsAppUrl(url) {
   link.remove();
 }
 
+async function isLoggedInAdmin() {
+  const token = typeof getAuthToken === 'function'
+    ? getAuthToken()
+    : localStorage.getItem('conectwm_auth_token');
+  if (!token) return false;
+
+  if (typeof fetchAuthMe === 'function') {
+    try {
+      const me = await fetchAuthMe();
+      if (me?.role === 'admin') {
+        localStorage.setItem('conectwm_user_role', 'admin');
+        return true;
+      }
+    } catch {
+      /* fallback abaixo */
+    }
+  }
+
+  return localStorage.getItem('conectwm_user_role') === 'admin';
+}
+
+async function redirectAdminToReportsPanel() {
+  if (!(await isLoggedInAdmin())) return false;
+  window.location.href = '/dashboard.html?section=relatorios';
+  return true;
+}
+
 function initDiagnosticForm() {
   const form = document.getElementById('diagnostico-form');
   const submitBtn = document.getElementById('diagnostico-submit-btn');
   const successModal = document.getElementById('success-modal');
   const closeModalBtn = document.getElementById('close-success-modal');
   const successWhatsAppBtn = document.getElementById('success-whatsapp-btn');
+  const successAdminPanelBtn = document.getElementById('success-admin-panel-btn');
+
+  isLoggedInAdmin().then((isAdmin) => {
+    if (successAdminPanelBtn) {
+      successAdminPanelBtn.classList.toggle('hidden', !isAdmin);
+      successAdminPanelBtn.classList.toggle('flex', isAdmin);
+    }
+  });
 
   if (form && submitBtn) {
     form.addEventListener('submit', async (e) => {
@@ -167,6 +202,8 @@ function initDiagnosticForm() {
         const result = await response.json();
 
         if (response.ok && result.success) {
+          if (await redirectAdminToReportsPanel()) return;
+
           if (successWhatsAppBtn) successWhatsAppBtn.href = whatsappUrl;
 
           if (successModal) {

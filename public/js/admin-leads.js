@@ -180,13 +180,6 @@ function initAdminLeads(me) {
     refreshBtn.addEventListener('click', () => loadAdminLeads());
   }
 
-  // Carrega ao abrir a seção
-  document.querySelectorAll('.nav-link[data-target="sec-relatorios"]').forEach((link) => {
-    link.addEventListener('click', () => {
-      loadAdminLeads();
-    });
-  });
-
   // Pré-carrega em background
   loadAdminLeads();
 }
