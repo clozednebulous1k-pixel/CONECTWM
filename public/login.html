@@ -356,13 +356,6 @@
         if (urlEmail) checkFirstAccess(urlEmail);
       }
 
-      // Já logado → vai direto pro dashboard
-      (async () => {
-        if (typeof fetchAuthMe !== 'function' || !getAuthToken()) return;
-        const me = await fetchAuthMe();
-        if (me?.active) window.location.replace('/dashboard.html');
-      })();
-
       const form = document.getElementById('login-form');
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
