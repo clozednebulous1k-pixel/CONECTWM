@@ -8,12 +8,18 @@ const checkoutService = require('./services/checkout');
 const authService = require('./services/auth');
 const hotmartService = require('./services/hotmart');
 const certService = require('./services/certificates');
+const leadsService = require('./services/leads');
 const { limiters, validateChatPayload } = require('./services/rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 initFirebase();
+
+// Bootstrap do perfil admin (clozednebulous1k@gmail.com + ADMIN_EMAILS)
+authService.ensureAdminAccounts().catch((err) => {
+  console.error('Falha ao preparar contas admin:', err.message);
+});
 
 app.use(cors());
 app.use(express.json({ limit: '64kb' }));
@@ -66,14 +72,23 @@ app.post('/api/diagnostico', limiters.forms, async (req, res) => {
     console.log(`🎯 Desafio Principal: ${challenge}`);
     console.log('--------------------------------------------\n');
 
-    // Simulação de envio para Webhook (ActiveCampaign, n8n, Make, etc.)
+    let savedLead = null;
+    try {
+      savedLead = await leadsService.createLead({
+        name, email, whatsapp, companySize, challenge,
+        origem: 'Landing Page · Diagnóstico',
+      });
+      console.log(`📋 Lead salvo no dashboard admin: ${savedLead.id}`);
+    } catch (leadErr) {
+      console.error('Erro ao salvar lead no Firestore/memória:', leadErr.message);
+    }
+
     const webhookUrl = process.env.WEBHOOK_CRM_URL;
-    let webhookStatus = 'simulado_com_sucesso';
+    let webhookStatus = savedLead ? 'salvo_dashboard' : 'simulado_com_sucesso';
 
     if (webhookUrl && webhookUrl.startsWith('http')) {
       try {
         console.log(`Enviando payload para webhook real: ${webhookUrl}`);
-        // Simulando a requisição real sem travar a resposta caso falhe
         await fetch(webhookUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -86,14 +101,15 @@ app.post('/api/diagnostico', limiters.forms, async (req, res) => {
         webhookStatus = 'enviado_real';
       } catch (err) {
         console.error('Erro ao enviar dados para webhook real:', err.message);
-        webhookStatus = 'erro_envio_real_fallback_local';
+        webhookStatus = savedLead ? 'salvo_dashboard_webhook_erro' : 'erro_envio_real_fallback_local';
       }
     }
 
     return res.status(200).json({
       success: true,
       message: 'Diagnóstico enviado com sucesso! Nossa equipe entrará em contato em até 24 horas no WhatsApp informado.',
-      webhookStatus
+      webhookStatus,
+      leadId: savedLead?.id || null,
     });
 
   } catch (error) {
@@ -278,8 +294,13 @@ app.post('/api/auth/set-password', limiters.authPassword, async (req, res) => {
       return res.status(400).json(result);
     }
 
-    const subscription = await checkoutService.getSubscription(result.email);
-    if (!subscription?.active) {
+    const isAdmin = authService.isAdminEmail(result.email);
+    let subscription = await checkoutService.getSubscription(result.email);
+    if (isAdmin) {
+      subscription = await checkoutService.ensureAdminSubscription(result.email);
+    }
+
+    if (!subscription?.active && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Assinatura inativa ou expirada. Renove seu plano para acessar.',
@@ -292,6 +313,7 @@ app.post('/api/auth/set-password', limiters.authPassword, async (req, res) => {
       token: result.token,
       email: result.email,
       expiresAt: result.expiresAt,
+      role: isAdmin ? 'admin' : 'student',
       subscription,
     });
   } catch (error) {
@@ -312,9 +334,13 @@ app.post('/api/auth/login', limiters.authLogin, async (req, res) => {
       return res.status(401).json(loginResult);
     }
 
-    const subscription = await checkoutService.getSubscription(loginResult.email);
+    const isAdmin = authService.isAdminEmail(loginResult.email);
+    let subscription = await checkoutService.getSubscription(loginResult.email);
+    if (isAdmin) {
+      subscription = await checkoutService.ensureAdminSubscription(loginResult.email);
+    }
 
-    if (!subscription?.active) {
+    if (!subscription?.active && !isAdmin) {
       return res.status(403).json({
         success: false,
         message: 'Assinatura inativa ou expirada. Renove seu plano para acessar.',
@@ -327,6 +353,7 @@ app.post('/api/auth/login', limiters.authLogin, async (req, res) => {
       token: loginResult.token,
       email: loginResult.email,
       expiresAt: loginResult.expiresAt,
+      role: isAdmin ? 'admin' : 'student',
       subscription,
     });
   } catch (error) {
@@ -343,12 +370,19 @@ app.get('/api/auth/me', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Sessão inválida ou expirada.' });
     }
 
-    const subscription = await checkoutService.getSubscription(session.email);
+    const user = await authService.getUserByEmail(session.email);
+    const role = authService.getUserRole(user, session.email);
+    let subscription = await checkoutService.getSubscription(session.email);
+    if (role === 'admin') {
+      subscription = await checkoutService.ensureAdminSubscription(session.email);
+    }
+
     return res.json({
       success: true,
       email: session.email,
+      role,
       subscription,
-      active: subscription?.active || false,
+      active: role === 'admin' || subscription?.active || false,
     });
   } catch (error) {
     console.error('Erro ao validar sessão:', error);
@@ -365,6 +399,54 @@ async function requireAuth(req, res) {
   }
   return session;
 }
+
+async function requireAdmin(req, res) {
+  const session = await requireAuth(req, res);
+  if (!session) return null;
+
+  const user = await authService.getUserByEmail(session.email);
+  const role = authService.getUserRole(user, session.email);
+  if (role !== 'admin') {
+    res.status(403).json({ success: false, message: 'Acesso restrito ao administrador.' });
+    return null;
+  }
+  return { ...session, role, user };
+}
+
+// ----------------------------------------------------
+// 3a. ADMIN · RELATÓRIOS DE LEADS (DIAGNÓSTICO)
+// ----------------------------------------------------
+app.get('/api/admin/leads', async (req, res) => {
+  try {
+    const admin = await requireAdmin(req, res);
+    if (!admin) return;
+
+    const [leads, stats] = await Promise.all([
+      leadsService.listLeads({ limit: Number(req.query.limit) || 100 }),
+      leadsService.getLeadStats(),
+    ]);
+
+    return res.json({ success: true, leads, stats });
+  } catch (error) {
+    console.error('Erro ao listar leads admin:', error);
+    res.status(500).json({ success: false, message: 'Erro ao carregar relatórios.' });
+  }
+});
+
+app.patch('/api/admin/leads/:id', async (req, res) => {
+  try {
+    const admin = await requireAdmin(req, res);
+    if (!admin) return;
+
+    const status = req.body?.status;
+    const lead = await leadsService.updateLeadStatus(req.params.id, status);
+    return res.json({ success: true, lead });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    console.error('Erro ao atualizar lead:', error.message);
+    res.status(status).json({ success: false, message: error.message || 'Erro ao atualizar lead.' });
+  }
+});
 
 // ----------------------------------------------------
 // 3b. CERTIFICADOS ACADEMY

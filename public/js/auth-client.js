@@ -14,6 +14,7 @@ function clearAuthSession() {
   localStorage.removeItem('conectwm_logged_in_user');
   localStorage.removeItem('conectwm_user_is_paying');
   localStorage.removeItem('conectwm_subscription_expires');
+  localStorage.removeItem('conectwm_user_role');
 }
 
 function getAuthToken() {

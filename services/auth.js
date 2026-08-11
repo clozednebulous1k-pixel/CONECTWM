@@ -4,6 +4,21 @@ const { getDb, isFirebaseEnabled, serverTimestamp } = require('./firebase');
 const memoryUsers = new Map();
 const memorySessions = new Map();
 
+/** E-mails admin (padrão + ADMIN_EMAILS no .env, separados por vírgula). */
+const DEFAULT_ADMIN_EMAILS = ['clozednebulous1k@gmail.com'];
+
+function getAdminEmails() {
+  const fromEnv = String(process.env.ADMIN_EMAILS || '')
+    .split(',')
+    .map((e) => normalizeEmail(e))
+    .filter(Boolean);
+  return [...new Set([...DEFAULT_ADMIN_EMAILS, ...fromEnv])];
+}
+
+function isAdminEmail(email) {
+  return getAdminEmails().includes(normalizeEmail(email));
+}
+
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
@@ -107,6 +122,7 @@ async function createUserAccess({ email, orderId, planLabel, expiresAt, channel 
     orderId: orderId || null,
     planLabel: planLabel || null,
     status: 'active',
+    role: isAdminEmail(normalizedEmail) ? 'admin' : 'student',
     mustSetPassword: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -398,6 +414,58 @@ async function loginUser({ email, password }) {
   };
 }
 
+async function ensureAdminAccounts() {
+  const checkoutService = require('./checkout');
+  const emails = getAdminEmails();
+  const results = [];
+
+  for (const email of emails) {
+    const docId = emailToDocId(email);
+    let user = await getUserByEmail(email);
+
+    if (!user) {
+      await createUserAccess({
+        email,
+        orderId: 'admin_bootstrap',
+        planLabel: 'Admin conectWM',
+        channel: 'admin_bootstrap',
+      });
+      user = await getUserByEmail(email);
+    }
+
+    if (isFirebaseEnabled()) {
+      const db = getDb();
+      await db.collection('users').doc(docId).set({
+        role: 'admin',
+        status: 'active',
+        planLabel: 'Admin conectWM',
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+    } else if (user) {
+      user.role = 'admin';
+      user.status = 'active';
+      user.planLabel = 'Admin conectWM';
+      memoryUsers.set(docId, user);
+    }
+
+    await checkoutService.ensureAdminSubscription(email);
+    const refreshed = await getUserByEmail(email);
+    results.push({
+      email,
+      mustSetPassword: needsPasswordSetup(refreshed),
+      role: 'admin',
+    });
+    console.log(`👑 Admin pronto: ${email}${needsPasswordSetup(refreshed) ? ' (crie a senha no login)' : ''}`);
+  }
+
+  return results;
+}
+
+function getUserRole(user, email) {
+  if (user?.role === 'admin' || isAdminEmail(email || user?.email)) return 'admin';
+  return user?.role || 'student';
+}
+
 module.exports = {
   createUserAccess,
   provisionUserAccess,
@@ -409,4 +477,8 @@ module.exports = {
   getUserByEmail,
   buildWelcomeEmail,
   normalizeEmail,
+  getAdminEmails,
+  isAdminEmail,
+  ensureAdminAccounts,
+  getUserRole,
 };

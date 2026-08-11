@@ -324,14 +324,16 @@ async function checkAuth() {
 
   if (typeof fetchAuthMe === 'function') {
     const me = await fetchAuthMe();
-    if (me?.email && me?.active) {
+    if (me?.email && (me?.active || me?.role === 'admin')) {
       if (userEmailEl) userEmailEl.innerText = me.email;
       if (userAvatarEl) userAvatarEl.innerText = me.email.charAt(0).toUpperCase();
       localStorage.setItem('conectwm_logged_in_user', me.email);
       localStorage.setItem('conectwm_user_is_paying', 'true');
+      if (me.role) localStorage.setItem('conectwm_user_role', me.role);
       if (me.subscription?.expiresAt) {
         localStorage.setItem('conectwm_subscription_expires', me.subscription.expiresAt);
       }
+      window.__conectwmMe = me;
       return true;
     }
   }
@@ -1484,4 +1486,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof initAfiliados === 'function') initAfiliados();
   initSecurityWizard();
   if (window.Certificates?.init) await Certificates.init();
+  if (window.AdminLeads?.initAdminLeads) {
+    window.AdminLeads.initAdminLeads(window.__conectwmMe || null);
+  }
 });

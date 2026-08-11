@@ -381,6 +381,46 @@ async function getSubscription(email) {
   return { ...sub, active };
 }
 
+/** Assinatura vitalícia para contas admin (acesso ao dashboard sem Hotmart). */
+async function ensureAdminSubscription(email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return null;
+
+  const existing = await getSubscription(normalizedEmail);
+  if (existing?.active && existing.source === 'admin') return existing;
+
+  const now = new Date();
+  const expiresAt = new Date('2099-12-31T23:59:59.000Z');
+  const subDocId = emailToDocId(normalizedEmail);
+  const subscriptionData = {
+    email: normalizedEmail,
+    plan: 'admin',
+    planLabel: 'Admin conectWM',
+    status: 'active',
+    amount: 0,
+    billing: 'lifetime',
+    orderId: 'admin_access',
+    source: 'admin',
+    startedAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+    updatedAt: now.toISOString(),
+  };
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('subscriptions').doc(subDocId).set({
+      ...subscriptionData,
+      startedAt: serverTimestamp(),
+      expiresAt,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } else {
+    memorySubscriptions.set(subDocId, subscriptionData);
+  }
+
+  return getSubscription(normalizedEmail);
+}
+
 module.exports = {
   PLANS,
   createOrder,
@@ -389,6 +429,7 @@ module.exports = {
   getSubscription,
   activateFromHotmartPayment,
   deactivateSubscription,
+  ensureAdminSubscription,
   isHotmartEventProcessed,
   normalizeEmail,
 };
