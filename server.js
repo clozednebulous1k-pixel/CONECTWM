@@ -322,6 +322,86 @@ app.post('/api/auth/set-password', limiters.authPassword, async (req, res) => {
   }
 });
 
+app.post('/api/auth/forgot-password', limiters.authForgotPassword, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Informe o e-mail da sua conta.' });
+    }
+
+    const result = await authService.requestPasswordReset(email);
+    return res.json(result);
+  } catch (error) {
+    console.error('Erro ao solicitar redefinição de senha:', error);
+    res.status(500).json({ success: false, message: 'Erro interno. Tente novamente em instantes.' });
+  }
+});
+
+app.get('/api/auth/reset-password/verify', async (req, res) => {
+  try {
+    const token = req.query.token;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Token ausente.' });
+    }
+
+    const record = await authService.getResetTokenRecord(token);
+    if (!record) {
+      return res.status(400).json({
+        success: false,
+        message: 'Link inválido ou expirado. Solicite uma nova redefinição de senha.',
+      });
+    }
+
+    return res.json({ success: true, email: record.email });
+  } catch (error) {
+    console.error('Erro ao verificar token de reset:', error);
+    res.status(500).json({ success: false, message: 'Erro ao validar link de redefinição.' });
+  }
+});
+
+app.post('/api/auth/reset-password', limiters.authPassword, async (req, res) => {
+  try {
+    const { token, password, passwordConfirm } = req.body;
+    if (!token || !password || !passwordConfirm) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token, senha e confirmação de senha são obrigatórios.',
+      });
+    }
+
+    const result = await authService.resetPasswordWithToken({ token, password, passwordConfirm });
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    const isAdmin = authService.isAdminEmail(result.email);
+    let subscription = await checkoutService.getSubscription(result.email);
+    if (isAdmin) {
+      subscription = await checkoutService.ensureAdminSubscription(result.email);
+    }
+
+    if (!subscription?.active && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        message: 'Assinatura inativa ou expirada. Renove seu plano para acessar.',
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: result.message,
+      token: result.token,
+      email: result.email,
+      expiresAt: result.expiresAt,
+      role: isAdmin ? 'admin' : 'student',
+      subscription,
+    });
+  } catch (error) {
+    console.error('Erro ao redefinir senha:', error);
+    res.status(500).json({ success: false, message: 'Erro interno ao redefinir senha.' });
+  }
+});
+
 app.post('/api/auth/login', limiters.authLogin, async (req, res) => {
   try {
     const { email, password } = req.body;

@@ -150,6 +150,26 @@
           <p class="text-xs text-gray-400">Esta conta ainda não tem senha. Defina uma agora para entrar na plataforma.</p>
         </div>
 
+        <div id="reset-password-banner" class="hidden rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 space-y-2">
+          <p class="text-sm font-bold text-amber-300 flex items-center gap-2">
+            <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+            Redefinir senha
+          </p>
+          <p class="text-xs text-gray-400">Escolha uma nova senha segura para sua conta.</p>
+        </div>
+
+        <div id="forgot-success-banner" class="hidden rounded-xl border border-green-500/30 bg-green-500/10 p-4 space-y-2">
+          <p class="text-sm font-bold text-green-400 flex items-center gap-2">
+            <i data-lucide="mail-check" class="h-4 w-4"></i>
+            Verifique seu e-mail
+          </p>
+          <p id="forgot-success-text" class="text-xs text-gray-400">Se o e-mail estiver cadastrado, enviamos um link para redefinir a senha (válido por 1 hora).</p>
+          <p class="text-xs text-gray-500 pt-1">
+            Não recebeu?
+            <a href="https://api.whatsapp.com/send?phone=5511952025568&text=Ol%C3%A1,%20preciso%20de%20ajuda%20para%20recuperar%20minha%20senha%20na%20conectWM" target="_blank" rel="noopener" class="text-sky-400 hover:underline">Fale com o suporte no WhatsApp</a>.
+          </p>
+        </div>
+
         <div id="login-error" class="hidden rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-300"></div>
 
         <form id="login-form" class="space-y-5">
@@ -207,13 +227,17 @@
           </div>
 
           <!-- Lembrar-me e Esqueci Senha -->
-          <div class="flex items-center justify-between text-xs pt-1">
+          <div id="login-extras-row" class="flex items-center justify-between text-xs pt-1">
             <label class="flex items-center gap-2 cursor-pointer select-none text-gray-400 hover:text-white transition-colors">
               <input type="checkbox" id="remember-me" class="rounded border-gray-800 bg-slate-950 text-sky-400 focus:ring-sky-400 focus:ring-offset-slate-950">
               <span>Lembrar-me</span>
             </label>
-            <a href="#" class="text-sky-400 hover:underline">Esqueceu sua senha?</a>
+            <button type="button" id="forgot-password-link" class="text-sky-400 hover:underline">Esqueceu sua senha?</button>
           </div>
+
+          <p id="back-to-login-wrap" class="hidden text-xs text-center pt-1">
+            <button type="button" id="back-to-login-btn" class="text-gray-400 hover:text-white transition-colors">← Voltar ao login</button>
+          </p>
 
           <!-- Botões de Ação -->
           <div class="space-y-3 pt-2">
@@ -269,10 +293,20 @@
       const loginTitle = document.getElementById('login-title');
       const loginSubtitle = document.getElementById('login-subtitle');
       const emailInput = document.getElementById('login-email');
+      const passwordGroup = document.getElementById('login-password-group');
+      const loginExtrasRow = document.getElementById('login-extras-row');
+      const backToLoginWrap = document.getElementById('back-to-login-wrap');
+      const backToLoginBtn = document.getElementById('back-to-login-btn');
+      const forgotPasswordLink = document.getElementById('forgot-password-link');
+      const resetPasswordBanner = document.getElementById('reset-password-banner');
+      const forgotSuccessBanner = document.getElementById('forgot-success-banner');
+      const forgotSuccessText = document.getElementById('forgot-success-text');
 
       let authMode = 'login';
+      let resetToken = null;
       const params = new URLSearchParams(window.location.search);
       const welcomeFromUrl = params.get('welcome') === '1';
+      const resetFromUrl = params.get('reset');
 
       function bindPasswordToggle(btn, input, iconEl) {
         if (!btn || !input || !iconEl) return;
@@ -296,30 +330,85 @@
       function setAuthMode(mode) {
         authMode = mode;
         const isFirstAccess = mode === 'first-access';
+        const isForgot = mode === 'forgot';
+        const isReset = mode === 'reset';
+        const showPassword = !isForgot;
 
-        if (confirmPasswordGroup) confirmPasswordGroup.classList.toggle('hidden', !isFirstAccess);
-        if (confirmPasswordInput) confirmPasswordInput.required = isFirstAccess;
+        if (passwordGroup) passwordGroup.classList.toggle('hidden', !showPassword);
+        if (confirmPasswordGroup) confirmPasswordGroup.classList.toggle('hidden', !(isFirstAccess || isReset));
+        if (confirmPasswordInput) confirmPasswordInput.required = isFirstAccess || isReset;
+        if (passwordInput) passwordInput.required = showPassword && !isForgot;
 
-        if (loginTitle) loginTitle.textContent = isFirstAccess ? 'Crie sua senha' : 'Acesse sua Conta';
+        if (loginTitle) {
+          loginTitle.textContent = isFirstAccess
+            ? 'Crie sua senha'
+            : isForgot
+              ? 'Recuperar senha'
+              : isReset
+                ? 'Nova senha'
+                : 'Acesse sua Conta';
+        }
         if (loginSubtitle) {
           loginSubtitle.textContent = isFirstAccess
             ? 'Defina uma senha segura para acessar a plataforma.'
-            : 'Entre para gerenciar seus projetos e acessar a comunidade.';
+            : isForgot
+              ? 'Informe o e-mail da compra. Enviaremos um link para criar uma nova senha.'
+              : isReset
+                ? 'Digite e confirme sua nova senha abaixo.'
+                : 'Entre para gerenciar seus projetos e acessar a comunidade.';
         }
         if (passwordInput) {
-          passwordInput.placeholder = isFirstAccess ? 'Crie sua senha...' : 'Digite sua senha...';
+          passwordInput.placeholder = isFirstAccess || isReset ? 'Crie sua senha...' : 'Digite sua senha...';
         }
-        if (submitLabel) submitLabel.textContent = isFirstAccess ? 'CRIAR SENHA E ENTRAR' : 'ENTRAR';
-        if (submitIcon) submitIcon.setAttribute('data-lucide', isFirstAccess ? 'key-round' : 'log-in');
+        if (submitLabel) {
+          submitLabel.textContent = isFirstAccess
+            ? 'CRIAR SENHA E ENTRAR'
+            : isForgot
+              ? 'ENVIAR LINK DE RECUPERAÇÃO'
+              : isReset
+                ? 'SALVAR NOVA SENHA'
+                : 'ENTRAR';
+        }
+        if (submitIcon) {
+          submitIcon.setAttribute(
+            'data-lucide',
+            isFirstAccess || isReset ? 'key-round' : isForgot ? 'mail' : 'log-in'
+          );
+        }
+
+        if (emailInput) emailInput.readOnly = isReset;
 
         if (welcomeBanner) {
-          welcomeBanner.classList.toggle('hidden', isFirstAccess || !welcomeFromUrl);
+          welcomeBanner.classList.toggle('hidden', isFirstAccess || isForgot || isReset || !welcomeFromUrl);
         }
         if (firstAccessBanner) {
           firstAccessBanner.classList.toggle('hidden', !isFirstAccess);
         }
+        if (resetPasswordBanner) {
+          resetPasswordBanner.classList.toggle('hidden', !isReset);
+        }
+        if (forgotSuccessBanner) {
+          forgotSuccessBanner.classList.toggle('hidden', !isForgot || !forgotSuccessBanner.dataset.visible);
+        }
+        if (loginExtrasRow) {
+          loginExtrasRow.classList.toggle('hidden', isForgot || isReset || isFirstAccess);
+        }
+        if (backToLoginWrap) {
+          backToLoginWrap.classList.toggle('hidden', !(isForgot || isReset));
+        }
+
+        if (loginError) loginError.classList.add('hidden');
 
         lucide.createIcons();
+      }
+
+      function goToLoginMode() {
+        resetToken = null;
+        if (forgotSuccessBanner) delete forgotSuccessBanner.dataset.visible;
+        if (window.location.search.includes('reset=')) {
+          window.history.replaceState({}, '', '/login.html');
+        }
+        setAuthMode('login');
       }
 
       async function checkFirstAccess(email) {
@@ -351,6 +440,39 @@
         showError('Sessão expirada ou inválida. Faça login novamente.');
       }
 
+      if (forgotPasswordLink) {
+        forgotPasswordLink.addEventListener('click', () => {
+          if (forgotSuccessBanner) delete forgotSuccessBanner.dataset.visible;
+          setAuthMode('forgot');
+        });
+      }
+
+      if (backToLoginBtn) {
+        backToLoginBtn.addEventListener('click', goToLoginMode);
+      }
+
+      async function initResetMode(token) {
+        resetToken = token;
+        try {
+          const res = await fetch(`/api/auth/reset-password/verify?token=${encodeURIComponent(token)}`);
+          const data = await res.json();
+          if (!data.success) {
+            showError(data.message || 'Link inválido ou expirado.');
+            setAuthMode('forgot');
+            return;
+          }
+          if (emailInput && data.email) emailInput.value = data.email;
+          setAuthMode('reset');
+        } catch {
+          showError('Não foi possível validar o link. Solicite uma nova redefinição.');
+          setAuthMode('forgot');
+        }
+      }
+
+      if (resetFromUrl) {
+        initResetMode(resetFromUrl);
+      }
+
       if (emailInput) {
         emailInput.addEventListener('blur', () => checkFirstAccess(emailInput.value));
         if (urlEmail) checkFirstAccess(urlEmail);
@@ -368,7 +490,55 @@
           return;
         }
 
-        if (authMode === 'first-access') {
+        if (authMode === 'forgot') {
+          if (loginError) loginError.classList.add('hidden');
+          const originalHtml = submitBtn.innerHTML;
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span>Enviando...</span>';
+
+          try {
+            const res = await fetch('/api/auth/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+            const data = await res.json();
+
+            if (data.code === 'FIRST_ACCESS') {
+              setAuthMode('first-access');
+              showError('Esta conta ainda não tem senha. Crie uma agora nos campos abaixo.');
+              return;
+            }
+
+            if (forgotSuccessText && data.message) {
+              forgotSuccessText.textContent = data.message;
+            }
+            if (forgotSuccessBanner) forgotSuccessBanner.dataset.visible = '1';
+            setAuthMode('forgot');
+          } catch {
+            showError('Erro de conexão. Tente novamente.');
+          }
+
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHtml;
+          lucide.createIcons();
+          return;
+        }
+
+        if (authMode === 'reset') {
+          if (!resetToken) {
+            showError('Link inválido. Solicite uma nova redefinição de senha.');
+            return;
+          }
+          if (!password || !passwordConfirm) {
+            showError('Informe e confirme sua nova senha.');
+            return;
+          }
+          if (password !== passwordConfirm) {
+            showError('As senhas não coincidem. Digite a mesma senha nos dois campos.');
+            return;
+          }
+        } else if (authMode === 'first-access') {
           if (!password || !passwordConfirm) {
             showError('Informe e confirme sua senha.');
             return;
@@ -385,13 +555,19 @@
         if (loginError) loginError.classList.add('hidden');
         const originalHtml = submitBtn.innerHTML;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span>${authMode === 'first-access' ? 'Criando senha...' : 'Entrando...'}</span>`;
+        submitBtn.innerHTML = `<span>${authMode === 'first-access' ? 'Criando senha...' : authMode === 'reset' ? 'Salvando...' : 'Entrando...'}</span>`;
 
         try {
-          const endpoint = authMode === 'first-access' ? '/api/auth/set-password' : '/api/auth/login';
+          const endpoint = authMode === 'first-access'
+            ? '/api/auth/set-password'
+            : authMode === 'reset'
+              ? '/api/auth/reset-password'
+              : '/api/auth/login';
           const body = authMode === 'first-access'
             ? { email, password, passwordConfirm }
-            : { email, password };
+            : authMode === 'reset'
+              ? { token: resetToken, password, passwordConfirm }
+              : { email, password };
 
           const res = await fetch(endpoint, {
             method: 'POST',

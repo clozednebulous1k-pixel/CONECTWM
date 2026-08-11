@@ -3,6 +3,9 @@ const { getDb, isFirebaseEnabled, serverTimestamp } = require('./firebase');
 
 const memoryUsers = new Map();
 const memorySessions = new Map();
+const memoryResetTokens = new Map();
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
 /** E-mails admin (padrão + ADMIN_EMAILS no .env, separados por vírgula). */
 const DEFAULT_ADMIN_EMAILS = ['clozednebulous1k@gmail.com'];
@@ -372,6 +375,204 @@ async function setInitialPassword({ email, password, passwordConfirm }) {
   };
 }
 
+function buildResetEmail({ email, resetUrl }) {
+  return {
+    to: email,
+    subject: '🔐 Redefinir senha · conectWM Academy',
+    body: `Olá!
+
+Recebemos um pedido para redefinir a senha da sua conta na conectWM Academy.
+
+📧 E-mail: ${email}
+
+👉 Criar nova senha (link válido por 1 hora):
+${resetUrl}
+
+Se você não pediu isso, ignore este e-mail. Sua senha atual continua valendo.
+
+Equipe conectWM`,
+    resetUrl,
+  };
+}
+
+async function saveResetToken(token, email) {
+  const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+  const payload = {
+    email: normalizeEmail(email),
+    expiresAt: expiresAt.toISOString(),
+    createdAt: new Date().toISOString(),
+  };
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('password_resets').doc(token).set({
+      email: payload.email,
+      expiresAt,
+      createdAt: serverTimestamp(),
+    });
+  } else {
+    memoryResetTokens.set(token, payload);
+  }
+
+  return expiresAt;
+}
+
+async function getResetTokenRecord(token) {
+  if (!token) return null;
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    const snap = await db.collection('password_resets').doc(token).get();
+    if (!snap.exists) return null;
+    const data = snap.data();
+    const expires = data.expiresAt?.toDate?.() || new Date(data.expiresAt);
+    if (expires < new Date()) return null;
+    return { email: data.email, expiresAt: expires.toISOString() };
+  }
+
+  const record = memoryResetTokens.get(token);
+  if (!record) return null;
+  if (new Date(record.expiresAt) < new Date()) {
+    memoryResetTokens.delete(token);
+    return null;
+  }
+  return record;
+}
+
+async function deleteResetToken(token) {
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('password_resets').doc(token).delete();
+  } else {
+    memoryResetTokens.delete(token);
+  }
+}
+
+async function dispatchResetEmail(resetEmail) {
+  const webhookUrl = process.env.ACCESS_EMAIL_WEBHOOK_URL;
+  const payload = {
+    to: resetEmail.to,
+    subject: resetEmail.subject,
+    body: resetEmail.body,
+    resetUrl: resetEmail.resetUrl,
+    source: 'conectwm_password_reset',
+  };
+
+  if (webhookUrl && webhookUrl.startsWith('http')) {
+    try {
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      console.log(`📧 Link de redefinição enviado para ${resetEmail.to}`);
+      return { sent: true, channel: 'webhook' };
+    } catch (err) {
+      console.error('Erro ao enviar e-mail de reset:', err.message);
+    }
+  }
+
+  console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+  console.log('🔐 REDEFINIR SENHA (simulado / log servidor)');
+  console.log(`Para: ${resetEmail.to}`);
+  console.log(`Link: ${resetEmail.resetUrl}`);
+  console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+
+  return { sent: false, channel: 'log' };
+}
+
+async function requestPasswordReset(email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail || !normalizedEmail.includes('@')) {
+    return {
+      success: true,
+      message: 'Se este e-mail estiver cadastrado, você receberá instruções para redefinir a senha.',
+    };
+  }
+
+  const user = await getUserByEmail(normalizedEmail);
+
+  if (!user || user.status !== 'active') {
+    return {
+      success: true,
+      message: 'Se este e-mail estiver cadastrado, você receberá instruções para redefinir a senha.',
+    };
+  }
+
+  if (needsPasswordSetup(user)) {
+    return {
+      success: true,
+      code: 'FIRST_ACCESS',
+      message: 'Esta conta ainda não tem senha definida. Digite seu e-mail e crie uma senha na tela de login.',
+      email: normalizedEmail,
+    };
+  }
+
+  const token = 'reset_' + crypto.randomBytes(24).toString('hex');
+  await saveResetToken(token, normalizedEmail);
+
+  const resetUrl = `${getAppUrl()}/login.html?reset=${encodeURIComponent(token)}`;
+  const resetEmail = buildResetEmail({ email: normalizedEmail, resetUrl });
+  await dispatchResetEmail(resetEmail);
+
+  return {
+    success: true,
+    message: 'Se este e-mail estiver cadastrado, você receberá instruções para redefinir a senha.',
+  };
+}
+
+async function resetPasswordWithToken({ token, password, passwordConfirm }) {
+  const record = await getResetTokenRecord(token);
+  if (!record) {
+    return { success: false, message: 'Link inválido ou expirado. Solicite uma nova redefinição de senha.' };
+  }
+
+  const pwdCheck = validateNewPassword(password, passwordConfirm);
+  if (!pwdCheck.valid) {
+    return { success: false, message: pwdCheck.message };
+  }
+
+  const normalizedEmail = record.email;
+  const user = await getUserByEmail(normalizedEmail);
+  if (!user || user.status !== 'active') {
+    return { success: false, message: 'Conta não encontrada ou inativa.' };
+  }
+
+  const docId = emailToDocId(normalizedEmail);
+  const passwordHash = hashPassword(password);
+
+  if (isFirebaseEnabled()) {
+    const db = getDb();
+    await db.collection('users').doc(docId).update({
+      passwordHash,
+      mustSetPassword: false,
+      passwordSetAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+  } else {
+    const stored = memoryUsers.get(docId);
+    if (stored) {
+      stored.passwordHash = passwordHash;
+      stored.mustSetPassword = false;
+      stored.passwordSetAt = new Date().toISOString();
+      stored.updatedAt = new Date().toISOString();
+      memoryUsers.set(docId, stored);
+    }
+  }
+
+  await deleteResetToken(token);
+
+  const session = await createSession(normalizedEmail);
+
+  return {
+    success: true,
+    message: 'Senha redefinida com sucesso!',
+    token: session.token,
+    email: normalizedEmail,
+    expiresAt: session.expiresAt,
+  };
+}
+
 async function loginUser({ email, password }) {
   const normalizedEmail = normalizeEmail(email);
   const user = await getUserByEmail(normalizedEmail);
@@ -472,6 +673,9 @@ module.exports = {
   dispatchWelcomeEmail,
   getFirstAccessStatus,
   setInitialPassword,
+  requestPasswordReset,
+  resetPasswordWithToken,
+  getResetTokenRecord,
   loginUser,
   validateSession,
   getUserByEmail,

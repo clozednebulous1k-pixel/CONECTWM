@@ -79,6 +79,11 @@ const limiters = {
     max: 8,
     message: 'Muitas tentativas de alteração de senha. Tente novamente mais tarde.',
   }),
+  authForgotPassword: createRateLimiter({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    message: 'Muitas solicitações de redefinição. Aguarde 1 hora e tente novamente.',
+  }),
   certificatesWrite: createRateLimiter({
     windowMs: 15 * 60 * 1000,
     max: 40,
