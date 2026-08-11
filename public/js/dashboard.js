@@ -1123,6 +1123,7 @@ const securityTipsData = [
     icon: "server",
     desc: "Limite em memória funciona em servidor único. Com múltiplas instâncias (Vercel, Kubernetes), use Redis compartilhado (ex.: Upstash) para contagem global por IP.",
     prompt: "Explique como migrar rate limiting de Map in-memory para Redis/Upstash em Node.js Express, mantendo janela deslizante por IP e rota."
+  }
 ];
 
 // 11. FORMULÁRIO DE STACK · SEGURANÇA
