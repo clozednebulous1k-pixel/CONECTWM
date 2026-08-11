@@ -95,30 +95,6 @@ function initSmoothScroll() {
 // ----------------------------------------------------
 // 4. FORMULÁRIO DE DIAGNÓSTICO
 // ----------------------------------------------------
-function buildDiagnosticoWhatsAppUrl({ name, email, whatsapp, companySize, challenge }) {
-  const message = `Olá conectWM! Solicitei um diagnóstico de automação pelo site.
-
-*Dados do Diagnóstico:*
-👤 *Nome:* ${name}
-📧 *E-mail:* ${email}
-📞 *WhatsApp:* ${whatsapp}
-🏢 *Tamanho da Empresa:* ${companySize}
-🎯 *Desafio Principal:* ${challenge}`;
-
-  return `https://wa.me/5511952025568?text=${encodeURIComponent(message)}`;
-}
-
-function openWhatsAppUrl(url) {
-  // Clique em <a> costuma passar pelo bloqueador de pop-up melhor que window.open pós-await
-  const link = document.createElement('a');
-  link.href = url;
-  link.target = '_blank';
-  link.rel = 'noopener noreferrer';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-}
-
 async function isLoggedInAdmin() {
   const token = typeof getAuthToken === 'function'
     ? getAuthToken()
@@ -151,7 +127,6 @@ function initDiagnosticForm() {
   const submitBtn = document.getElementById('diagnostico-submit-btn');
   const successModal = document.getElementById('success-modal');
   const closeModalBtn = document.getElementById('close-success-modal');
-  const successWhatsAppBtn = document.getElementById('success-whatsapp-btn');
   const successAdminPanelBtn = document.getElementById('success-admin-panel-btn');
 
   isLoggedInAdmin().then((isAdmin) => {
@@ -176,11 +151,6 @@ function initDiagnosticForm() {
         return;
       }
 
-      const whatsappUrl = buildDiagnosticoWhatsAppUrl({ name, email, whatsapp, companySize, challenge });
-
-      // Abre aba vazia AINDA no clique do usuário (evita bloqueio de pop-up após o fetch)
-      const waTab = window.open('about:blank', '_blank');
-
       const originalBtnText = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.innerHTML = `
@@ -204,33 +174,20 @@ function initDiagnosticForm() {
         if (response.ok && result.success) {
           if (await redirectAdminToReportsPanel()) return;
 
-          if (successWhatsAppBtn) successWhatsAppBtn.href = whatsappUrl;
-
           if (successModal) {
             successModal.classList.remove('hidden');
             successModal.classList.add('flex');
             if (window.lucide?.createIcons) window.lucide.createIcons();
           }
 
-          if (waTab && !waTab.closed) {
-            waTab.location.href = whatsappUrl;
-          } else {
-            openWhatsAppUrl(whatsappUrl);
-          }
-
           form.reset();
         } else {
-          if (waTab && !waTab.closed) waTab.close();
           alert(result.message || 'Ocorreu um erro ao enviar. Tente novamente.');
         }
 
       } catch (error) {
         console.error('Erro ao enviar formulário:', error);
-        if (waTab && !waTab.closed) waTab.close();
-        // Mesmo se a API falhar, permite falar no WhatsApp
-        if (successWhatsAppBtn) successWhatsAppBtn.href = whatsappUrl;
-        openWhatsAppUrl(whatsappUrl);
-        alert('Não foi possível salvar no servidor, mas o WhatsApp foi aberto com sua mensagem.');
+        alert('Não foi possível enviar agora. Verifique sua conexão e tente novamente.');
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnText;
