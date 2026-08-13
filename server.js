@@ -787,6 +787,15 @@ Sou o assistente inteligente da plataforma. Como posso te ajudar hoje?
 Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perguntar o que quiser, ou use os formulários e botões na página para interagir direto!`;
 }
 
+// Arquivo de verificação TikTok Developers (antes do fallback *)
+app.get(
+  '/callback/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt',
+  (req, res) => {
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
+  }
+);
+
 // Rotas limpas para servir as páginas principais
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
