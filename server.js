@@ -528,6 +528,57 @@ app.patch('/api/admin/leads/:id', async (req, res) => {
   }
 });
 
+app.post('/api/admin/reset-first-access', async (req, res) => {
+  try {
+    const email = req.body?.email;
+    const secret = req.headers['x-admin-secret'] || req.body?.secret;
+    const configuredSecret = process.env.ADMIN_RESET_SECRET;
+
+    let authorized = false;
+
+    if (configuredSecret && secret && secret === configuredSecret) {
+      authorized = true;
+    } else if (req.headers.authorization) {
+      const admin = await requireAdmin(req, res);
+      if (!admin) return;
+      authorized = true;
+    }
+
+    if (!authorized) {
+      if (!configuredSecret) {
+        return res.status(503).json({
+          success: false,
+          message: 'Configure ADMIN_RESET_SECRET na Vercel ou faça login como admin.',
+        });
+      }
+      return res.status(403).json({ success: false, message: 'Não autorizado.' });
+    }
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Informe { "email": "..." }.' });
+    }
+
+    const targetEmail = authService.normalizeEmail(email);
+    if (!authService.isAdminEmail(targetEmail)) {
+      return res.status(403).json({
+        success: false,
+        message: 'Por segurança, só contas admin podem ser resetadas por esta rota.',
+      });
+    }
+
+    const result = await authService.resetUserForFirstAccess(targetEmail);
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    console.log(`🔁 Primeiro acesso resetado: ${targetEmail}`);
+    return res.json(result);
+  } catch (error) {
+    console.error('Erro ao resetar primeiro acesso:', error);
+    res.status(500).json({ success: false, message: 'Erro ao resetar conta.' });
+  }
+});
+
 // ----------------------------------------------------
 // 3b. CERTIFICADOS ACADEMY
 // ----------------------------------------------------
@@ -788,12 +839,17 @@ Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perg
 }
 
 // Arquivo de verificação TikTok Developers (antes do fallback *)
+const tiktokVerifyHandler = (req, res) => {
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
+};
+app.get(
+  '/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt',
+  tiktokVerifyHandler
+);
 app.get(
   '/callback/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt',
-  (req, res) => {
-    res.set('Content-Type', 'text/plain; charset=utf-8');
-    res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
-  }
+  tiktokVerifyHandler
 );
 
 // Rotas limpas para servir as páginas principais
