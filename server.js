@@ -841,16 +841,25 @@ Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perg
 // Arquivo de verificação TikTok Developers (antes do fallback *)
 const tiktokVerifyHandler = (req, res) => {
   res.set('Content-Type', 'text/plain; charset=utf-8');
-  res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
+  res.status(200).send('4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3');
 };
 app.get(
-  '/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt',
+  '/tiktok4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3.txt',
   tiktokVerifyHandler
 );
 app.get(
-  '/callback/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt',
+  '/callback/tiktok4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3.txt',
   tiktokVerifyHandler
 );
+// Mantém o código antigo acessível (tentativas anteriores)
+app.get('/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
+});
+app.get('/callback/tiktokrLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS.txt', (req, res) => {
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.status(200).send('rLhvXyYbNV0gt9VDZF8WktaIf30Lr1dS');
+});
 
 // Rotas limpas para servir as páginas principais
 app.get('/dashboard', (req, res) => {
