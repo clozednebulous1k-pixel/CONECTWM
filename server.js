@@ -840,8 +840,14 @@ Qual das frentes é a ideal para você no momento? Sinta-se à vontade para perg
 
 // Arquivo de verificação TikTok Developers (antes do fallback *)
 const tiktokVerifyHandler = (req, res) => {
-  res.set('Content-Type', 'text/plain; charset=utf-8');
-  res.status(200).send('4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3');
+  const body = Buffer.from('4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3', 'ascii');
+  res.status(200);
+  res.set({
+    'Content-Type': 'text/plain',
+    'Content-Length': String(body.length),
+    'Cache-Control': 'no-store',
+  });
+  res.end(body);
 };
 app.get(
   '/tiktok4Yu0tdpubxdXoNGDvW8YOA2dUG0h18j3.txt',

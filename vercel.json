@@ -1,0 +1,13 @@
+{
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "headers": [
+    {
+      "source": "/tiktok:code.txt",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
